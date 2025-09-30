@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  .app-card {
+    @apply bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-1;
+  }
+
+  .app-card-header {
+    @apply flex items-center space-x-4 mb-4;
+  }
+
+  .app-icon {
+    @apply w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-lg;
+  }
+
+  .feature-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .demo-button {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+  }
+
+  .demo-button-primary {
+    @apply demo-button bg-blue-600 text-white hover:bg-blue-700;
+  }
+
+  .demo-button-secondary {
+    @apply demo-button bg-gray-200 text-gray-700 hover:bg-gray-300;
+  }
+}
+
+
+
