@@ -9,6 +9,10 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './test/setupTests.ts',
+    env: {
+      DATABASE_URL: process.env.DATABASE_URL || '',
+      NEON_DATABASE_URL: process.env.NEON_DATABASE_URL || '',
+    },
   },
   resolve: {
     alias: {

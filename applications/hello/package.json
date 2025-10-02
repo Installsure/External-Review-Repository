@@ -4,7 +4,13 @@
   "type": "module",
   "scripts": {
     "dev": "react-router dev",
-    "typecheck": "react-router typegen && tsc --noEmit"
+    "build": "react-router build",
+    "start": "react-router-serve ./build/server/index.js",
+    "typecheck": "react-router typegen && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:api": "vitest run --config src/app/api/vitest.config.ts",
+    "test:ui": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
     "@auth/core": "^0.37.2",
@@ -83,6 +89,7 @@
     "@typescript-eslint/parser": "^8.44.1",
     "autoprefixer": "^10.4.21",
     "babel-plugin-react-require": "^4.0.3",
+    "dotenv": "^17.2.3",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "fast-glob": "^3.3.3",
