@@ -22,6 +22,7 @@ declare class RedisManager {
     set(key: string, value: any, ttl?: number): Promise<boolean>;
     get<T = any>(key: string): Promise<T | null>;
     del(key: string): Promise<boolean>;
+    delMany(keys: string[]): Promise<boolean>;
     exists(key: string): Promise<boolean>;
     expire(key: string, ttl: number): Promise<boolean>;
     mget<T = any>(keys: string[]): Promise<(T | null)[]>;

@@ -1,5 +1,18 @@
 import multer from 'multer';
 import { Request, Response, NextFunction } from 'express';
+declare global {
+    var webSocketManager: any;
+    namespace Express {
+        interface Request {
+            chunkInfo?: {
+                chunkNumber: number;
+                totalChunks: number;
+                chunkSize: number;
+                isComplete: boolean;
+            };
+        }
+    }
+}
 export interface OptimizedUploadOptions {
     maxFileSize: number;
     allowedMimeTypes: string[];

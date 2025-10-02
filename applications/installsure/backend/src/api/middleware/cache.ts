@@ -9,6 +9,12 @@ export interface CacheOptions {
   condition?: (req: Request, res: Response) => boolean;
 }
 
+export interface ServiceCacheOptions {
+  ttl?: number;
+  prefix?: string;
+  keyGenerator?: (...args: any[]) => string;
+}
+
 // Cache middleware for GET requests
 export const cacheMiddleware = (options: CacheOptions = {}) => {
   const {
@@ -82,7 +88,7 @@ export const invalidateCache = (patterns: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const originalJson = res.json.bind(res);
 
-    res.json = async function (data: any) {
+    (res.json as any) = async function (data: any) {
       // Invalidate cache patterns after successful response
       if (res.statusCode >= 200 && res.statusCode < 300) {
         for (const pattern of patterns) {
@@ -110,7 +116,7 @@ export const invalidateCache = (patterns: string[]) => {
 };
 
 // Cache decorator for service methods
-export const cached = (options: CacheOptions = {}) => {
+export const cached = (options: ServiceCacheOptions = {}) => {
   const { ttl = 300, prefix = 'service', keyGenerator } = options;
 
   return function (target: any, propertyName: string, descriptor: PropertyDescriptor) {
@@ -118,7 +124,7 @@ export const cached = (options: CacheOptions = {}) => {
 
     descriptor.value = async function (...args: any[]) {
       const cacheKey = keyGenerator
-        ? keyGenerator(...args)
+        ? keyGenerator(...(args as []))
         : `${target.constructor.name}:${propertyName}:${JSON.stringify(args)}`;
 
       try {

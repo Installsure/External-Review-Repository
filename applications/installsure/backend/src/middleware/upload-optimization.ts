@@ -7,6 +7,20 @@ import { createReadStream, createWriteStream } from 'fs';
 import { createHash } from 'crypto';
 import path from 'path';
 
+declare global {
+  var webSocketManager: any;
+  namespace Express {
+    interface Request {
+      chunkInfo?: {
+        chunkNumber: number;
+        totalChunks: number;
+        chunkSize: number;
+        isComplete: boolean;
+      };
+    }
+  }
+}
+
 export interface OptimizedUploadOptions {
   maxFileSize: number;
   allowedMimeTypes: string[];

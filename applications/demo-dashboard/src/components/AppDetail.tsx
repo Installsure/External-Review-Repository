@@ -5,23 +5,17 @@ import {
   ExternalLink,
   Play,
   Code,
-  Database,
-  Shield,
-  Users,
-  TrendingUp,
   CheckCircle,
   Clock,
   AlertCircle,
   Monitor,
   Smartphone,
   Globe,
-  Zap,
-  Heart,
   Star,
   Download,
-  Share2,
+  Shield,
 } from 'lucide-react';
-import { getAppById, AppDemo } from '../data/apps';
+import { getAppById } from '../data/apps';
 
 const AppDetail: React.FC = () => {
   const { appId } = useParams<{ appId: string }>();
@@ -107,9 +101,9 @@ const AppDetail: React.FC = () => {
               </Link>
               <div className="flex items-center space-x-3">
                 <div
-                  className={`w-10 h-10 bg-${app.color}-500 rounded-lg flex items-center justify-center text-white font-bold text-lg`}
+                  className={`w-10 h-10 ${app.color ? `bg-${app.color}-500` : 'bg-blue-500'} rounded-lg flex items-center justify-center text-white font-bold text-lg`}
                 >
-                  {app.icon}
+                  {app.icon || app.name.charAt(0)}
                 </div>
                 <div>
                   <h1 className="text-xl font-semibold text-gray-900">{app.name}</h1>
@@ -178,7 +172,7 @@ const AppDetail: React.FC = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div>
                   <h2 className="text-3xl font-bold text-gray-900 mb-4">{app.name}</h2>
-                  <p className="text-lg text-gray-700 mb-6">{app.longDescription}</p>
+                  <p className="text-lg text-gray-700 mb-6">{app.longDescription || app.description}</p>
 
                   <div className="flex flex-wrap gap-3 mb-6">
                     {app.features.slice(0, 4).map((feature, index) => (
@@ -186,7 +180,7 @@ const AppDetail: React.FC = () => {
                         key={index}
                         className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700"
                       >
-                        {feature.icon} {feature.name}
+                        {typeof feature === 'string' ? feature : `${feature.icon || ''} ${feature.name || feature}`}
                       </span>
                     ))}
                   </div>
@@ -211,22 +205,24 @@ const AppDetail: React.FC = () => {
 
                 <div className="space-y-6">
                   {/* Key Metrics */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Key Metrics</h3>
-                    <div className="grid grid-cols-1 gap-4">
-                      {app.keyMetrics.map((metric, index) => (
-                        <div key={index} className="bg-gray-50 rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium text-gray-600">
-                              {metric.label}
-                            </span>
-                            <span className="text-2xl font-bold text-gray-900">{metric.value}</span>
+                  {app.keyMetrics && app.keyMetrics.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Key Metrics</h3>
+                      <div className="grid grid-cols-1 gap-4">
+                        {app.keyMetrics.map((metric, index) => (
+                          <div key={index} className="bg-gray-50 rounded-lg p-4">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-medium text-gray-600">
+                                {metric.label}
+                              </span>
+                              <span className="text-2xl font-bold text-gray-900">{metric.value}</span>
+                            </div>
+                            <p className="text-sm text-gray-500">{metric.description}</p>
                           </div>
-                          <p className="text-sm text-gray-500">{metric.description}</p>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Platform Support */}
                   <div>
@@ -258,30 +254,35 @@ const AppDetail: React.FC = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Features & Capabilities</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {app.features.map((feature, index) => (
-                  <div
-                    key={index}
-                    className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex items-start space-x-4">
-                      <div className="text-2xl">{feature.icon}</div>
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-lg font-semibold text-gray-900">{feature.name}</h3>
-                          <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getFeatureStatusColor(feature.status)}`}
-                          >
-                            {getFeatureStatusIcon(feature.status)}
-                            <span className="ml-1 capitalize">
-                              {feature.status.replace('-', ' ')}
+                {app.features.map((feature, index) => {
+                  const featureName: string = typeof feature === 'string' ? feature : feature.name;
+                  const featureDesc = typeof feature === 'string' ? `${feature} capability` : feature.description || '';
+                  const featureStatus = typeof feature === 'string' ? 'ready' : feature.status || 'ready';
+                  return (
+                    <div
+                      key={index}
+                      className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-start space-x-4">
+                        <div className="text-2xl">✓</div>
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <h3 className="text-lg font-semibold text-gray-900">{featureName}</h3>
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getFeatureStatusColor(featureStatus)}`}
+                            >
+                              {getFeatureStatusIcon(featureStatus)}
+                              <span className="ml-1 capitalize">
+                                {featureStatus.replace('-', ' ')}
+                              </span>
                             </span>
-                          </span>
+                          </div>
+                          <p className="text-gray-600">{featureDesc}</p>
                         </div>
-                        <p className="text-gray-600">{feature.description}</p>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -387,12 +388,12 @@ const AppDetail: React.FC = () => {
                 <h3 className="text-lg font-semibold text-green-900 mb-3">Demo Features</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {app.features
-                    .filter((f) => f.status === 'completed')
+                    .filter((f) => typeof f !== 'string' && f.status === 'completed')
                     .slice(0, 4)
                     .map((feature, index) => (
                       <div key={index} className="flex items-center space-x-2 text-green-800">
                         <CheckCircle className="w-4 h-4" />
-                        <span>{feature.name}</span>
+                        <span>{typeof feature === 'string' ? feature : feature.name}</span>
                       </div>
                     ))}
                 </div>

@@ -23,7 +23,7 @@ export interface WebSocketMessage {
     | 'ping'
     | 'pong';
   payload: any;
-  timestamp: string;
+  timestamp?: string;
   userId?: number;
   companyId?: number;
 }
@@ -45,10 +45,10 @@ export class WebSocketManager {
 
   private setupWebSocketServer(): void {
     this.wss.on('connection', (ws: AuthenticatedWebSocket, request) => {
-      logger.debug('WebSocket connection attempt', {
+      logger.debug({
         ip: request.socket.remoteAddress,
         userAgent: request.headers['user-agent'],
-      });
+      }, 'WebSocket connection attempt');
 
       // Handle authentication
       const token = this.extractTokenFromRequest(request);
@@ -69,11 +69,11 @@ export class WebSocketManager {
         // Add to connection maps
         this.addConnection(ws);
 
-        logger.info('WebSocket connection established', {
+        logger.info({
           userId: ws.userId,
           email: ws.userEmail,
           companyId: ws.companyId,
-        });
+        }, 'WebSocket connection established');
 
         // Send welcome message
         this.sendMessage(ws, {
@@ -85,10 +85,10 @@ export class WebSocketManager {
           timestamp: new Date().toISOString(),
         });
       } catch (error) {
-        logger.warn('WebSocket authentication failed', {
+        logger.warn({
           error: (error as Error).message,
           ip: request.socket.remoteAddress,
-        });
+        }, 'WebSocket authentication failed');
         ws.close(1008, 'Authentication failed');
         return;
       }
@@ -99,10 +99,10 @@ export class WebSocketManager {
           const message = JSON.parse(data.toString());
           this.handleMessage(ws, message);
         } catch (error) {
-          logger.error('Invalid WebSocket message', {
+          logger.error({
             error: (error as Error).message,
             userId: ws.userId,
-          });
+          }, 'Invalid WebSocket message');
         }
       });
 
@@ -114,18 +114,18 @@ export class WebSocketManager {
       // Handle connection close
       ws.on('close', () => {
         this.removeConnection(ws);
-        logger.info('WebSocket connection closed', {
+        logger.info({
           userId: ws.userId,
           email: ws.userEmail,
-        });
+        }, 'WebSocket connection closed');
       });
 
       // Handle errors
       ws.on('error', (error) => {
-        logger.error('WebSocket error', {
+        logger.error({
           error: error.message,
           userId: ws.userId,
-        });
+        }, 'WebSocket error');
         this.removeConnection(ws);
       });
     });
@@ -199,10 +199,10 @@ export class WebSocketManager {
         });
         break;
       default:
-        logger.debug('Unknown WebSocket message type', {
+        logger.debug({
           type: message.type,
           userId: ws.userId,
-        });
+        }, 'Unknown WebSocket message type');
     }
   }
 
@@ -319,9 +319,9 @@ export class WebSocketManager {
     const interval = setInterval(() => {
       this.wss.clients.forEach((ws: AuthenticatedWebSocket) => {
         if (!ws.isAlive) {
-          logger.debug('Terminating inactive WebSocket connection', {
+          logger.debug({
             userId: ws.userId,
-          });
+          }, 'Terminating inactive WebSocket connection');
           this.removeConnection(ws);
           ws.terminate();
           return;
@@ -347,6 +347,10 @@ export class WebSocketManager {
       userConnections: this.connections.size,
       companyConnections: this.companyConnections.size,
     };
+  }
+
+  public close(callback?: () => void): void {
+    this.wss.close(callback);
   }
 }
 

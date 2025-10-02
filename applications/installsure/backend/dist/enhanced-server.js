@@ -26,7 +26,7 @@ async function startServer() {
                 logger.info('HTTP server closed');
             });
             // Close WebSocket connections
-            wsManager.wss.close(() => {
+            wsManager.close(() => {
                 logger.info('WebSocket server closed');
             });
             // Close database connections
@@ -57,7 +57,7 @@ async function startServer() {
                 environment: config.NODE_ENV,
                 websocketEnabled: true,
                 redisEnabled: redisManager.isHealthy(),
-                connections: wsManager.getConnectionStats()
+                connections: wsManager.getConnectionStats(),
             }, 'InstallSure server started successfully');
             console.log(`🚀 InstallSure Server running on port ${config.PORT}`);
             console.log(`📊 Health check: http://localhost:${config.PORT}/api/health`);
@@ -72,8 +72,8 @@ async function startServer() {
                     enabled: true,
                     totalConnections: stats.totalConnections,
                     userConnections: stats.userConnections,
-                    companyConnections: stats.companyConnections
-                }
+                    companyConnections: stats.companyConnections,
+                },
             });
         });
     }

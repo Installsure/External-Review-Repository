@@ -32,7 +32,7 @@ export const generateToken = (payload: Omit<JWTPayload, 'iat' | 'exp'>): string 
     expiresIn: config.JWT_EXPIRES_IN || '24h',
     issuer: 'installsure',
     audience: 'installsure-users',
-  });
+  } as jwt.SignOptions);
 };
 
 export const verifyToken = (token: string): JWTPayload => {

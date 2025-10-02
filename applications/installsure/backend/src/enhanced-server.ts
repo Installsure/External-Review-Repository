@@ -34,7 +34,7 @@ async function startServer() {
       });
 
       // Close WebSocket connections
-      wsManager.wss.close(() => {
+      wsManager.close(() => {
         logger.info('WebSocket server closed');
       });
 

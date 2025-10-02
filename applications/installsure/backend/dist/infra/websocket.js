@@ -8,17 +8,17 @@ export class WebSocketManager {
     constructor(server) {
         this.wss = new WebSocketServer({
             server,
-            path: '/ws'
+            path: '/ws',
         });
         this.setupWebSocketServer();
         this.startHeartbeat();
     }
     setupWebSocketServer() {
         this.wss.on('connection', (ws, request) => {
-            logger.debug('WebSocket connection attempt', {
+            logger.debug({
                 ip: request.socket.remoteAddress,
-                userAgent: request.headers['user-agent']
-            });
+                userAgent: request.headers['user-agent'],
+            }, 'WebSocket connection attempt');
             // Handle authentication
             const token = this.extractTokenFromRequest(request);
             if (!token) {
@@ -35,26 +35,26 @@ export class WebSocketManager {
                 ws.isAlive = true;
                 // Add to connection maps
                 this.addConnection(ws);
-                logger.info('WebSocket connection established', {
+                logger.info({
                     userId: ws.userId,
                     email: ws.userEmail,
-                    companyId: ws.companyId
-                });
+                    companyId: ws.companyId,
+                }, 'WebSocket connection established');
                 // Send welcome message
                 this.sendMessage(ws, {
                     type: 'notification',
                     payload: {
                         message: 'Connected to InstallSure real-time updates',
-                        userId: ws.userId
+                        userId: ws.userId,
                     },
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
                 });
             }
             catch (error) {
-                logger.warn('WebSocket authentication failed', {
+                logger.warn({
                     error: error.message,
-                    ip: request.socket.remoteAddress
-                });
+                    ip: request.socket.remoteAddress,
+                }, 'WebSocket authentication failed');
                 ws.close(1008, 'Authentication failed');
                 return;
             }
@@ -65,10 +65,10 @@ export class WebSocketManager {
                     this.handleMessage(ws, message);
                 }
                 catch (error) {
-                    logger.error('Invalid WebSocket message', {
+                    logger.error({
                         error: error.message,
-                        userId: ws.userId
-                    });
+                        userId: ws.userId,
+                    }, 'Invalid WebSocket message');
                 }
             });
             // Handle pong responses
@@ -78,17 +78,17 @@ export class WebSocketManager {
             // Handle connection close
             ws.on('close', () => {
                 this.removeConnection(ws);
-                logger.info('WebSocket connection closed', {
+                logger.info({
                     userId: ws.userId,
-                    email: ws.userEmail
-                });
+                    email: ws.userEmail,
+                }, 'WebSocket connection closed');
             });
             // Handle errors
             ws.on('error', (error) => {
-                logger.error('WebSocket error', {
+                logger.error({
                     error: error.message,
-                    userId: ws.userId
-                });
+                    userId: ws.userId,
+                }, 'WebSocket error');
                 this.removeConnection(ws);
             });
         });
@@ -150,14 +150,14 @@ export class WebSocketManager {
                 this.sendMessage(ws, {
                     type: 'pong',
                     payload: { timestamp: new Date().toISOString() },
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
                 });
                 break;
             default:
-                logger.debug('Unknown WebSocket message type', {
+                logger.debug({
                     type: message.type,
-                    userId: ws.userId
-                });
+                    userId: ws.userId,
+                }, 'Unknown WebSocket message type');
         }
     }
     sendMessage(ws, message) {
@@ -172,9 +172,9 @@ export class WebSocketManager {
             const fullMessage = {
                 ...message,
                 userId,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
             };
-            userConnections.forEach(ws => {
+            userConnections.forEach((ws) => {
                 this.sendMessage(ws, fullMessage);
             });
         }
@@ -185,9 +185,9 @@ export class WebSocketManager {
             const fullMessage = {
                 ...message,
                 companyId,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
             };
-            companyConnections.forEach(ws => {
+            companyConnections.forEach((ws) => {
                 this.sendMessage(ws, fullMessage);
             });
         }
@@ -195,7 +195,7 @@ export class WebSocketManager {
     broadcastToAll(message) {
         const fullMessage = {
             ...message,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
         };
         this.wss.clients.forEach((ws) => {
             this.sendMessage(ws, fullMessage);
@@ -207,8 +207,8 @@ export class WebSocketManager {
             payload: {
                 projectId,
                 update,
-                message: 'Project has been updated'
-            }
+                message: 'Project has been updated',
+            },
         };
         if (companyId) {
             this.sendToCompany(companyId, message);
@@ -223,8 +223,8 @@ export class WebSocketManager {
             payload: {
                 fileId,
                 status,
-                message: `File upload ${status}`
-            }
+                message: `File upload ${status}`,
+            },
         });
     }
     sendForgeProcessingStatus(urn, status, userId) {
@@ -233,8 +233,8 @@ export class WebSocketManager {
             payload: {
                 urn,
                 status,
-                message: `Forge processing ${status}`
-            }
+                message: `Forge processing ${status}`,
+            },
         });
     }
     sendQuickBooksSyncStatus(syncId, status, companyId) {
@@ -243,23 +243,23 @@ export class WebSocketManager {
             payload: {
                 syncId,
                 status,
-                message: `QuickBooks sync ${status}`
-            }
+                message: `QuickBooks sync ${status}`,
+            },
         });
     }
     sendNotification(userId, notification) {
         this.sendToUser(userId, {
             type: 'notification',
-            payload: notification
+            payload: notification,
         });
     }
     startHeartbeat() {
         const interval = setInterval(() => {
             this.wss.clients.forEach((ws) => {
                 if (!ws.isAlive) {
-                    logger.debug('Terminating inactive WebSocket connection', {
-                        userId: ws.userId
-                    });
+                    logger.debug({
+                        userId: ws.userId,
+                    }, 'Terminating inactive WebSocket connection');
                     this.removeConnection(ws);
                     ws.terminate();
                     return;
@@ -276,8 +276,11 @@ export class WebSocketManager {
         return {
             totalConnections: this.wss.clients.size,
             userConnections: this.connections.size,
-            companyConnections: this.companyConnections.size
+            companyConnections: this.companyConnections.size,
         };
+    }
+    close(callback) {
+        this.wss.close(callback);
     }
 }
 export let webSocketManager = null;
