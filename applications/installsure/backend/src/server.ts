@@ -195,6 +195,73 @@ app.get('/api/autocad/takeoff/:urn', (req, res) => {
   res.json({ areas: [], lengths: [] });
 });
 
+// Models translation endpoint
+app.post('/api/models/translate', (req, res) => {
+  if (!config.FORGE_CLIENT_ID || !config.FORGE_CLIENT_SECRET) {
+    return res.status(400).json({
+      error: 'FORGE_CLIENT_ID/SECRET missing',
+      message: 'Configure Forge credentials to enable this feature',
+    });
+  }
+  const { blueprint, urn, sheets, meta } = req.body;
+  res.status(200).json({
+    success: true,
+    blueprint,
+    urn,
+    sheets,
+    meta,
+    translationJobId: `translation-${Date.now()}`,
+    status: 'processing',
+  });
+});
+
+// Takeoff sync endpoint
+app.post('/api/takeoff/sync', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Takeoff data synchronized',
+    syncedAt: new Date().toISOString(),
+  });
+});
+
+// Takeoff items endpoint
+app.get('/api/takeoff/items', (req, res) => {
+  res.status(200).json({
+    items: [
+      { package: 'Walls', type: 'Drywall', qty: 200, unit: 'sheets' },
+      { package: 'Framing', type: '2x4 Lumber', qty: 500, unit: 'pieces' },
+    ],
+  });
+});
+
+// Estimate lines endpoint (enriched assemblies)
+app.get('/api/estimate/lines', (req, res) => {
+  res.status(200).json({
+    lines: [
+      {
+        package: 'Walls',
+        type: 'Drywall',
+        qty: 200,
+        unit: 'sheets',
+        unitCost: 12.5,
+        totalCost: 2500,
+        laborHours: 40,
+      },
+      {
+        package: 'Framing',
+        type: '2x4 Lumber',
+        qty: 500,
+        unit: 'pieces',
+        unitCost: 3.75,
+        totalCost: 1875,
+        laborHours: 60,
+      },
+    ],
+    totalCost: 4375,
+    totalLaborHours: 100,
+  });
+});
+
 // QuickBooks endpoint
 app.get('/api/qb/health', (req, res) => {
   res.json({

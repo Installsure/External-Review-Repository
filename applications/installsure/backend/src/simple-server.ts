@@ -6,6 +6,10 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { z } from 'zod';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 // Configuration
 const config = {
@@ -369,6 +373,84 @@ app.get('/api/autocad/takeoff/:urn', (req, res) => {
       ],
       lengths: [{ name: 'Perimeter', value: 301.4, unit: 'm' }],
       volumes: [{ name: 'Total Volume', value: 125625.0, unit: 'm³' }],
+    },
+  });
+});
+
+// Models translation endpoint
+app.post('/api/models/translate', (req, res) => {
+  if (!config.FORGE_CLIENT_ID || !config.FORGE_CLIENT_SECRET) {
+    return res.status(400).json({
+      success: false,
+      error: 'FORGE_CLIENT_ID/SECRET missing',
+      message: 'Configure Forge credentials to enable this feature',
+    });
+  }
+  const { blueprint, urn, sheets, meta } = req.body;
+  res.status(200).json({
+    success: true,
+    data: {
+      blueprint,
+      urn,
+      sheets,
+      meta,
+      translationJobId: `translation-${Date.now()}`,
+      status: 'processing',
+    },
+  });
+});
+
+// Takeoff sync endpoint
+app.post('/api/takeoff/sync', (req, res) => {
+  res.status(200).json({
+    success: true,
+    data: {
+      message: 'Takeoff data synchronized',
+      syncedAt: new Date().toISOString(),
+    },
+  });
+});
+
+// Takeoff items endpoint
+app.get('/api/takeoff/items', (req, res) => {
+  res.status(200).json({
+    success: true,
+    data: {
+      items: [
+        { package: 'Walls', type: 'Drywall', qty: 200, unit: 'sheets' },
+        { package: 'Framing', type: '2x4 Lumber', qty: 500, unit: 'pieces' },
+      ],
+    },
+  });
+});
+
+// Estimate lines endpoint (enriched assemblies)
+app.get('/api/estimate/lines', (req, res) => {
+  res.status(200).json({
+    success: true,
+    data: {
+      lines: [
+        {
+          package: 'Walls',
+          type: 'Drywall',
+          qty: 200,
+          unit: 'sheets',
+          unitCost: 12.5,
+          totalCost: 2500,
+          laborHours: 40,
+        },
+        {
+          package: 'Framing',
+          type: '2x4 Lumber',
+          qty: 500,
+          unit: 'pieces',
+          unitCost: 3.75,
+          totalCost: 1875,
+          laborHours: 60,
+        },
+      ],
+      totalCost: 4375,
+      totalLaborHours: 100,
     },
   });
 });
