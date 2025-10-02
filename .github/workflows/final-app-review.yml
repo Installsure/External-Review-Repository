@@ -1,0 +1,187 @@
+---
+name: Final App Review
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            applications/installsure/backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: applications/installsure/backend
+        run: npm ci
+
+      - name: Typecheck backend
+        working-directory: applications/installsure/backend
+        run: npm run typecheck
+
+      - name: Lint backend
+        working-directory: applications/installsure/backend
+        run: npm run lint
+
+      - name: Build backend
+        working-directory: applications/installsure/backend
+        run: npm run build
+
+      - name: Run backend tests
+        working-directory: applications/installsure/backend
+        run: npm test
+
+      - name: Install frontend dependencies
+        working-directory: applications/installsure/frontend
+        run: npm ci
+
+      - name: Typecheck frontend
+        working-directory: applications/installsure/frontend
+        run: npm run typecheck
+
+      - name: Lint frontend
+        working-directory: applications/installsure/frontend
+        run: npm run lint
+
+      - name: Build frontend
+        working-directory: applications/installsure/frontend
+        run: npm run build
+
+  e2e-tests:
+    name: E2E Tests with Playwright
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install backend dependencies
+        working-directory: applications/installsure/backend
+        run: npm ci
+
+      - name: Start backend server
+        working-directory: applications/installsure/backend
+        run: |
+          npm run dev &
+          echo $! > server.pid
+        env:
+          PORT: 8000
+          NODE_ENV: test
+          CORS_ORIGINS: http://localhost:3000,http://localhost:5173
+          AUTH_SECRET: >-
+            test-secret-key-for-ci-minimum-32-chars-long
+
+      - name: Wait for backend to be ready
+        run: |
+          timeout 60 bash -c \
+            'until curl -s http://localhost:8000/api/health > /dev/null
+            do sleep 2; done'
+
+      - name: Run API smoke tests
+        run: |
+          chmod +x ./scripts/test-api.sh
+          ./scripts/test-api.sh
+
+      - name: Install Playwright
+        working-directory: applications/installsure/frontend
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Start frontend server
+        working-directory: applications/installsure/frontend
+        run: |
+          npm run dev &
+          echo $! > frontend.pid
+        env:
+          VITE_API_URL: http://localhost:8000
+
+      - name: Wait for frontend to be ready
+        run: |
+          timeout 60 bash -c \
+            'until curl -s http://localhost:3000 > /dev/null
+            do sleep 2; done'
+
+      - name: Run Playwright tests
+        working-directory: applications/installsure/frontend
+        run: |
+          if [ -f "playwright.config.ts" ]; then
+            npx playwright test
+          else
+            echo "No Playwright tests configured, skipping"
+          fi
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: applications/installsure/frontend/playwright-report/
+          retention-days: 30
+
+      - name: Cleanup
+        if: always()
+        run: |
+          if [ -f applications/installsure/backend/server.pid ]; then
+            kill $(cat applications/installsure/backend/server.pid) || true
+          fi
+          if [ -f applications/installsure/frontend/frontend.pid ]; then
+            kill $(cat applications/installsure/frontend/frontend.pid) || true
+          fi
+
+  security-scans:
+    name: Security Scans
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript, typescript
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+      - name: Setup Python (for Bandit, optional)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+        continue-on-error: true
+
+      - name: Install Bandit
+        run: |
+          pip install bandit || echo "Bandit installation skipped"
+        continue-on-error: true
+
+      - name: Run Bandit scan
+        run: |
+          if command -v bandit &> /dev/null; then
+            bandit -r applications/installsure/backend/src ||
+              echo "No Python code found, skipping Bandit"
+          else
+            echo "Bandit not available, skipping Python security scan"
+          fi
+        continue-on-error: true

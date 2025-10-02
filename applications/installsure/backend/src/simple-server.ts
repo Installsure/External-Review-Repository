@@ -13,6 +13,7 @@ const config = {
   PORT: parseInt(process.env.PORT || '8000'),
   CORS_ORIGINS: process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()) || [
     'http://localhost:3000',
+    'http://localhost:5173',
   ],
   DATABASE_URL: process.env.DATABASE_URL,
   FORGE_CLIENT_ID: process.env.FORGE_CLIENT_ID,
@@ -369,6 +370,113 @@ app.get('/api/autocad/takeoff/:urn', (req, res) => {
       ],
       lengths: [{ name: 'Perimeter', value: 301.4, unit: 'm' }],
       volumes: [{ name: 'Total Volume', value: 125625.0, unit: 'm³' }],
+    },
+  });
+});
+
+// New endpoints for demo pipeline
+app.post('/api/models/translate', (req, res) => {
+  const { urn, format } = req.body;
+  res.json({
+    success: true,
+    data: {
+      jobId: 'translate-job-' + Date.now(),
+      urn: urn || 'mock-urn',
+      format: format || 'svf2',
+      status: 'processing',
+    },
+  });
+});
+
+app.post('/api/takeoff/sync', (req, res) => {
+  const { projectId, modelUrn } = req.body;
+  res.json({
+    success: true,
+    data: {
+      syncId: 'sync-' + Date.now(),
+      projectId: projectId || 'project-1',
+      modelUrn: modelUrn || 'mock-urn',
+      status: 'synced',
+      itemsCount: 42,
+    },
+  });
+});
+
+app.get('/api/takeoff/items', (req, res) => {
+  const { projectId } = req.query;
+  res.json({
+    success: true,
+    data: {
+      projectId: projectId || 'project-1',
+      items: [
+        {
+          id: 'item-1',
+          name: 'Concrete Foundation',
+          quantity: 150,
+          unit: 'm³',
+          category: 'Foundation',
+        },
+        {
+          id: 'item-2',
+          name: 'Steel Reinforcement',
+          quantity: 2500,
+          unit: 'kg',
+          category: 'Structural',
+        },
+        {
+          id: 'item-3',
+          name: 'Wall Framing',
+          quantity: 320,
+          unit: 'm',
+          category: 'Framing',
+        },
+      ],
+      totalItems: 3,
+    },
+  });
+});
+
+app.get('/api/estimate/lines', (req, res) => {
+  const { projectId } = req.query;
+  res.json({
+    success: true,
+    data: {
+      projectId: projectId || 'project-1',
+      lines: [
+        {
+          id: 'line-1',
+          itemId: 'item-1',
+          description: 'Concrete Foundation',
+          quantity: 150,
+          unit: 'm³',
+          unitCost: 250.0,
+          totalCost: 37500.0,
+          laborHours: 300,
+        },
+        {
+          id: 'line-2',
+          itemId: 'item-2',
+          description: 'Steel Reinforcement',
+          quantity: 2500,
+          unit: 'kg',
+          unitCost: 5.0,
+          totalCost: 12500.0,
+          laborHours: 120,
+        },
+        {
+          id: 'line-3',
+          itemId: 'item-3',
+          description: 'Wall Framing',
+          quantity: 320,
+          unit: 'm',
+          unitCost: 45.0,
+          totalCost: 14400.0,
+          laborHours: 160,
+        },
+      ],
+      totalLines: 3,
+      totalCost: 64400.0,
+      totalLaborHours: 580,
     },
   });
 });
