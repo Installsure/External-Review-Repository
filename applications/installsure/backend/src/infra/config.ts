@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 const configSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  PORT: z.coerce.number().default(8000),
-  CORS_ORIGINS: z.string().default('http://localhost:3000'),
+  PORT: z.coerce.number().default(8080),
+  CORS_ORIGINS: z.string().default('http://localhost:3000,http://localhost:5173'),
   DATABASE_URL: z.string().optional(),
   FORGE_CLIENT_ID: z.string().optional(),
   FORGE_CLIENT_SECRET: z.string().optional(),
@@ -40,6 +40,7 @@ const env = process.env;
 // Parse CORS_ORIGINS as comma-separated string
 const corsOrigins = env.CORS_ORIGINS?.split(',').map((origin) => origin.trim()) || [
   'http://localhost:3000',
+  'http://localhost:5173',
 ];
 
 const config = {
