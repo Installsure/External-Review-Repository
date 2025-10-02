@@ -1,14 +1,29 @@
+export interface FeatureObject {
+  icon?: string;
+  name: string;
+  description?: string;
+  status?: 'ready' | 'completed' | 'in-progress';
+}
+
 export interface App {
   id: string;
   name: string;
   description: string;
   category: string;
   status: 'ready' | 'building' | 'error';
-  features: string[];
+  features: (string | FeatureObject)[];
   techStack: string[];
   demoUrl: string;
   githubUrl: string;
   port: number;
+  color?: string;
+  icon?: string;
+  longDescription?: string;
+  keyMetrics?: Array<{
+    label: string;
+    value: string;
+    description: string;
+  }>;
 }
 
 export const apps: App[] = [
@@ -114,16 +129,5 @@ export function getAppById(id: string): App | undefined {
   return apps.find((app) => app.id === id);
 }
 
-// Type for app demo data
-export interface AppDemo {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  status: 'ready' | 'building' | 'error';
-  features: string[];
-  techStack: string[];
-  demoUrl: string;
-  githubUrl: string;
-  port: number;
-}
+// Type for app demo data (same as App)
+export type AppDemo = App;

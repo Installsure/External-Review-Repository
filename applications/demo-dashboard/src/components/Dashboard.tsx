@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Search,
-  Filter,
   Grid,
   List,
   ExternalLink,
@@ -66,7 +65,9 @@ const Dashboard: React.FC = () => {
   const AppCard: React.FC<{ app: AppDemo }> = ({ app }) => (
     <div className="app-card group">
       <div className="app-card-header">
-        <div className={`app-icon bg-${app.color}-500`}>{app.icon}</div>
+        <div className={`app-icon ${app.color ? `bg-${app.color}-500` : 'bg-blue-500'}`}>
+          {app.icon || app.name.charAt(0)}
+        </div>
         <div className="flex-1">
           <h3 className="text-xl font-semibold text-gray-900">{app.name}</h3>
           <p className="text-sm text-gray-600">{app.category}</p>
@@ -82,7 +83,7 @@ const Dashboard: React.FC = () => {
       <div className="flex flex-wrap gap-2 mb-4">
         {app.features.slice(0, 3).map((feature, index) => (
           <span key={index} className="feature-badge bg-gray-100 text-gray-700">
-            {feature.icon} {feature.name}
+            {typeof feature === 'string' ? feature : `${feature.icon || ''} ${feature.name || feature}`}
           </span>
         ))}
         {app.features.length > 3 && (
@@ -114,7 +115,9 @@ const Dashboard: React.FC = () => {
   const AppListItem: React.FC<{ app: AppDemo }> = ({ app }) => (
     <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-md transition-shadow">
       <div className="flex items-center space-x-6">
-        <div className={`app-icon bg-${app.color}-500 w-16 h-16 text-xl`}>{app.icon}</div>
+        <div className={`app-icon ${app.color ? `bg-${app.color}-500` : 'bg-blue-500'} w-16 h-16 text-xl`}>
+          {app.icon || app.name.charAt(0)}
+        </div>
 
         <div className="flex-1">
           <div className="flex items-center space-x-3 mb-2">
@@ -134,7 +137,7 @@ const Dashboard: React.FC = () => {
             </span>
             <span className="flex items-center space-x-1">
               <CheckCircle className="w-4 h-4" />
-              <span>{app.features.filter((f) => f.status === 'completed').length} features</span>
+              <span>{app.features.filter((f) => typeof f === 'string' || f.status === 'completed').length} features</span>
             </span>
             <span className="flex items-center space-x-1">
               <Database className="w-4 h-4" />
