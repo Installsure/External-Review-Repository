@@ -1,0 +1,5 @@
+{
+  "name": "InstallSure",
+  "version": "0.1.0",
+  "features": ["build", "test", "scan", "mcp"]
+}
