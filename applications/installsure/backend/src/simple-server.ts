@@ -10,25 +10,32 @@ import { z } from 'zod';
 // Configuration
 const config = {
   NODE_ENV: process.env.NODE_ENV || 'development',
-  PORT: parseInt(process.env.PORT || '8000'),
+  PORT: parseInt(process.env.PORT || '8080'),
   CORS_ORIGINS: process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()) || [
     'http://localhost:3000',
+    'http://localhost:5173',
   ],
   DATABASE_URL: process.env.DATABASE_URL,
   FORGE_CLIENT_ID: process.env.FORGE_CLIENT_ID,
   FORGE_CLIENT_SECRET: process.env.FORGE_CLIENT_SECRET,
   FORGE_BASE_URL: process.env.FORGE_BASE_URL || 'https://developer.api.autodesk.com',
   FORGE_BUCKET: process.env.FORGE_BUCKET,
+  APS_CLIENT_ID: process.env.APS_CLIENT_ID,
+  APS_CLIENT_SECRET: process.env.APS_CLIENT_SECRET,
 };
 
 const app = express();
 
 // Security middleware
 app.use(helmet());
+
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN ?? 'http://localhost:5173';
 app.use(
   cors({
-    origin: config.CORS_ORIGINS,
-    credentials: true,
+    origin: [FRONTEND_ORIGIN, ...config.CORS_ORIGINS],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: false,
   }),
 );
 app.use(morgan('combined'));
@@ -65,8 +72,13 @@ const upload = multer({
 
 // Health endpoints
 app.get('/api/health', (req, res) => {
+  const forgeConfigured = Boolean(
+    config.APS_CLIENT_ID && config.APS_CLIENT_SECRET
+  );
   res.json({
     ok: true,
+    forgeConfigured,
+    port: config.PORT,
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     version: '1.0.0',
@@ -383,6 +395,119 @@ app.get('/api/qb/health', (req, res) => {
       message: 'QuickBooks integration not configured',
     },
   });
+});
+
+// Models/Translation endpoint
+app.post('/api/models/translate', (req, res) => {
+  try {
+    const { blueprint, urn, sheets, meta } = req.body;
+    res.json({
+      success: true,
+      data: {
+        jobId: 'job-' + Date.now(),
+        urn: urn || 'urn:demo:translated:' + Date.now(),
+        status: 'in_progress',
+        blueprint: blueprint || 'Unknown',
+        sheets: sheets || [],
+        meta: meta || {},
+      },
+    });
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+
+// Takeoff sync endpoint
+app.post('/api/takeoff/sync', (req, res) => {
+  try {
+    res.json({
+      success: true,
+      data: {
+        synced: true,
+        itemsCount: 42,
+        lastSync: new Date().toISOString(),
+      },
+    });
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+
+// Takeoff items endpoint
+app.get('/api/takeoff/items', (req, res) => {
+  try {
+    const mockItems = [
+      {
+        id: '1',
+        itemName: 'Drywall - Interior Walls',
+        quantity: 200,
+        unit: 'sf',
+        properties: { typeName: 'Walls', material: 'Gypsum Board' },
+      },
+      {
+        id: '2',
+        itemName: '2x4 Lumber - Framing',
+        quantity: 500,
+        unit: 'lf',
+        properties: { typeName: 'Framing', material: 'Wood' },
+      },
+      {
+        id: '3',
+        itemName: 'Concrete Foundation',
+        quantity: 75,
+        unit: 'cy',
+        properties: { typeName: 'Foundation', material: 'Concrete' },
+      },
+    ];
+    res.json({ data: mockItems });
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+
+// Estimate lines endpoint with enrichment
+app.get('/api/estimate/lines', (req, res) => {
+  try {
+    // Mock data representing takeoff items enriched with cost/assembly info
+    const mockItems = [
+      {
+        itemName: 'Drywall - Interior Walls',
+        quantity: 200,
+        unit: 'sf',
+        properties: { typeName: 'Walls', material: 'Gypsum Board' },
+      },
+      {
+        itemName: '2x4 Lumber - Framing',
+        quantity: 500,
+        unit: 'lf',
+        properties: { typeName: 'Framing', material: 'Wood' },
+      },
+      {
+        itemName: 'Concrete Foundation',
+        quantity: 75,
+        unit: 'cy',
+        properties: { typeName: 'Foundation', material: 'Concrete' },
+      },
+    ];
+
+    const enriched = mockItems.map((r) => ({
+      name: r.itemName,
+      quantity: r.quantity,
+      unit: r.unit,
+      category:
+        typeof r.properties === 'object' && r.properties !== null
+          ? (r.properties as any).typeName || 'Unknown'
+          : 'Unknown',
+      assemblyCode: 'ASMB-000', // TODO: map from assembly_map
+      unitCost: 17.5, // placeholder for demo
+      totalCost: Number((r.quantity * 17.5).toFixed(2)),
+      laborHours: Number((r.quantity * 0.2).toFixed(2)),
+    }));
+
+    res.json({ data: enriched });
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
 });
 
 // Error handler

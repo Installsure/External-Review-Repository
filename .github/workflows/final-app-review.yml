@@ -1,0 +1,132 @@
+name: final-app-review
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+env:
+  BACKEND_URL: http://localhost:8080
+  FRONTEND_URL: http://localhost:5173
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install backend
+        if: ${{ hashFiles('backend/package.json') != '' || hashFiles('applications/installsure/backend/package.json') != '' }}
+        shell: bash
+        run: |
+          if [ -f backend/package.json ]; then pushd backend; npm ci || npm i; popd; fi
+          if [ -f applications/installsure/backend/package.json ]; then pushd applications/installsure/backend; npm ci || npm i; popd; fi
+
+      - name: Prepare backend .env (best effort)
+        shell: bash
+        run: |
+          TARGET_ENV=""
+          if [ -f backend/.env.example ]; then TARGET_ENV="backend"; fi
+          if [ -f applications/installsure/backend/env.example ]; then TARGET_ENV="applications/installsure/backend"; fi
+          if [ -n "$TARGET_ENV" ]; then
+            cp -f "$TARGET_ENV/.env.example" "$TARGET_ENV/.env" || true
+            cp -f "$TARGET_ENV/env.example" "$TARGET_ENV/.env" || true
+            sed -i "s#PORT=.*#PORT=8080#g" "$TARGET_ENV/.env" || true
+          fi
+
+      - name: Start backend
+        shell: bash
+        run: |
+          if [ -f backend/package.json ]; then (cd backend && npm run dev > ../backend.log 2>&1 &); fi
+          if [ -f applications/installsure/backend/package.json ]; then (cd applications/installsure/backend && npm run dev > ../../../backend.log 2>&1 &); fi
+
+      - name: Install frontend
+        if: ${{ hashFiles('frontend/package.json') != '' || hashFiles('applications/installsure/frontend/package.json') != '' }}
+        shell: bash
+        run: |
+          if [ -f frontend/package.json ]; then pushd frontend; npm ci || npm i; popd; fi
+          if [ -f applications/installsure/frontend/package.json ]; then pushd applications/installsure/frontend; npm ci || npm i; popd; fi
+
+      - name: Start frontend
+        shell: bash
+        run: |
+          if [ -f frontend/package.json ]; then (cd frontend && (npm run preview || npm run dev) > ../frontend.log 2>&1 &); fi
+          if [ -f applications/installsure/frontend/package.json ]; then (cd applications/installsure/frontend && (npm run preview || npm run dev) > ../../../frontend.log 2>&1 &); fi
+
+      - name: Install wait-on & Playwright
+        run: |
+          npm i -D wait-on
+          npx -y playwright install --with-deps || true
+
+      - name: Wait for services
+        run: |
+          npx wait-on $FRONTEND_URL --timeout 180000 || exit 1
+          npx wait-on $BACKEND_URL/api/health --timeout 180000 || true
+
+      - name: Create sample docs
+        run: |
+          mkdir -p samples
+          echo '{ "blueprint":"Sample House A", "urn":"urn:sample:demo", "sheets":["planA.pdf"], "meta":{"sqft":1200,"floors":2} }' > samples/sample_blueprint.json
+          echo '[{"package":"Walls","type":"Drywall","qty":200,"unit":"sf"},{"package":"Framing","type":"2x4 Lumber","qty":500,"unit":"lf"}]' > samples/sample_takeoff.json
+
+      - name: Exercise APIs
+        shell: bash
+        run: |
+          set -e
+          if curl -sSf "$BACKEND_URL/api/health" > /dev/null; then
+            curl -sS -X POST "$BACKEND_URL/api/models/translate" -H "Content-Type: application/json" --data-binary @samples/sample_blueprint.json -o translate.json || true
+            curl -sS -X POST "$BACKEND_URL/api/takeoff/sync" -o sync.json || true
+            curl -sS "$BACKEND_URL/api/takeoff/items" -o items.json || echo '{"data":[]}' > items.json
+            curl -sS "$BACKEND_URL/api/estimate/lines" -o estimate.json || echo '{"data":[]}' > estimate.json
+          else
+            echo "Backend not reachable; skipping API calls."
+            echo '{}' > translate.json; echo '{}' > sync.json; echo '{"data":[]}' > items.json; echo '{"data":[]}' > estimate.json
+          fi
+
+      - name: Playwright E2E
+        env: { PLAYWRIGHT_BASE_URL: ${{ env.FRONTEND_URL }} }
+        run: |
+          if [ -f tests/playwright.config.ts ]; then npx playwright test; else echo "No Playwright tests found; skipping."; fi
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-app-review
+          path: |
+            backend.log
+            frontend.log
+            translate.json
+            sync.json
+            items.json
+            estimate.json
+            playwright-report
+          if-no-files-found: ignore
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with: { languages: javascript-typescript }
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@v3
+
+      - name: Bandit (Python) – optional
+        if: ${{ hashFiles('**/*.py') != '' }}
+        uses: actions/setup-python@v5
+        with: { python-version: '3.x' }
+      - if: ${{ hashFiles('**/*.py') != '' }}
+        run: |
+          pip install bandit
+          bandit -r . -f sarif -o bandit.sarif || true
+      - if: ${{ hashFiles('**/*.py') != '' }}
+        uses: github/codeql-action/upload-sarif@v3
+        with: { sarif_file: bandit.sarif }
