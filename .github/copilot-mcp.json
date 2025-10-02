@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "cloudflare": {
+      "type": "sse",
+      "url": "https://docs.mcp.cloudflare.com/sse",
+      "tools": ["*"]
+    },
+    "github": {
+      "type": "local",
+      "command": "npx",
+      "args": ["-y","@github/mcp-server@latest"],
+      "tools": ["repo_search","repo_list_files","repo_read_file"]
+    }
+  }
+}

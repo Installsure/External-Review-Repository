@@ -1,0 +1,15 @@
+{
+  "name": "InstallSure Demo",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "postCreateCommand": "bash -lc \"npm i && npx -y playwright install --with-deps || true\"",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "github.copilot",
+        "ms-playwright.playwright",
+        "sourcegraph.cody-ai",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  }
+}
