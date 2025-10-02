@@ -19,7 +19,8 @@ out/
 .env.production.local
 
 # IDE and editor files
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo

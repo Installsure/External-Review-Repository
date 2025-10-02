@@ -1,5 +1,6 @@
 /** @type {import('@playwright/test').PlaywrightTestConfig} */
 const config = {
+  testDir: './tests/e2e',
   timeout: 30_000,
   retries: 1,
   use: {
