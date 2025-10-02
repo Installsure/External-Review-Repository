@@ -4,7 +4,7 @@ router.get('/health', (req, res) => {
     res.json({
         ok: true,
         connected: false,
-        message: 'QuickBooks integration placeholder'
+        message: 'QuickBooks integration placeholder',
     });
 });
 export default router;

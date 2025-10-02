@@ -26,7 +26,10 @@ router.post('/upload', async (req, res) => {
             return res.status(400).json({ error: 'fileBuffer and fileName are required' });
         }
         const buffer = Buffer.from(fileBuffer, 'base64');
-        const result = await forgeService.uploadFile({ fileBuffer: buffer.toString('base64'), fileName });
+        const result = await forgeService.uploadFile({
+            fileBuffer: buffer.toString('base64'),
+            fileName,
+        });
         res.json(result);
     }
     catch (error) {

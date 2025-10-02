@@ -140,6 +140,18 @@ class RedisManager {
     }
   }
 
+  public async delMany(keys: string[]): Promise<boolean> {
+    if (!this.client || keys.length === 0) return false;
+
+    try {
+      const result = await this.client.del(...keys);
+      return result > 0;
+    } catch (error) {
+      logger.error({ error: (error as Error).message, keys: keys.length }, 'Failed to delete multiple cache keys');
+      return false;
+    }
+  }
+
   public async exists(key: string): Promise<boolean> {
     if (!this.client) return false;
 
@@ -372,9 +384,7 @@ export const cache = {
     if (keys.length === 0) return true;
 
     try {
-      if (redisManager.client) {
-        await redisManager.client.del(...keys);
-      }
+      await redisManager.delMany(keys);
       return true;
     } catch (error) {
       logger.error(

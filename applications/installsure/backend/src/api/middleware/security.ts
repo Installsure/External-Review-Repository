@@ -88,7 +88,7 @@ export const securityMiddleware = (app: express.Application) => {
     },
     standardHeaders: true,
     legacyHeaders: false,
-    handler: (req, res) => {
+    handler: (req: any, res: any) => {
       logger.warn(
         {
           ip: req.ip,

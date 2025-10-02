@@ -15,7 +15,7 @@ class RedisManager {
                 db: 0,
                 retryDelayOnFailover: 100,
                 maxRetriesPerRequest: 3,
-                lazyConnect: true
+                lazyConnect: true,
             };
             // Parse Redis URL if provided
             if (config.REDIS_URL) {
@@ -115,6 +115,18 @@ class RedisManager {
             return false;
         }
     }
+    async delMany(keys) {
+        if (!this.client || keys.length === 0)
+            return false;
+        try {
+            const result = await this.client.del(...keys);
+            return result > 0;
+        }
+        catch (error) {
+            logger.error({ error: error.message, keys: keys.length }, 'Failed to delete multiple cache keys');
+            return false;
+        }
+    }
     async exists(key) {
         if (!this.client)
             return false;
@@ -145,7 +157,7 @@ class RedisManager {
             return [];
         try {
             const values = await this.client.mget(...keys);
-            return values.map(value => value ? JSON.parse(value) : null);
+            return values.map((value) => (value ? JSON.parse(value) : null));
         }
         catch (error) {
             logger.error({ error: error.message, keys }, 'Failed to get multiple cache values');
@@ -286,7 +298,7 @@ class RedisManager {
             return [];
         try {
             const values = await this.client.lrange(key, start, stop);
-            return values.map(value => JSON.parse(value));
+            return values.map((value) => JSON.parse(value));
         }
         catch (error) {
             logger.error({ error: error.message, key }, 'Failed to get list range');
@@ -303,7 +315,7 @@ class RedisManager {
             return {
                 connected: this.isConnected,
                 dbSize,
-                memoryInfo: info
+                memoryInfo: info,
             };
         }
         catch (error) {
@@ -337,16 +349,14 @@ export const cache = {
         if (keys.length === 0)
             return true;
         try {
-            if (redisManager.client) {
-                await redisManager.client.del(...keys);
-            }
+            await redisManager.delMany(keys);
             return true;
         }
         catch (error) {
             logger.error({ error: error.message, pattern }, 'Failed to invalidate cache pattern');
             return false;
         }
-    }
+    },
 };
 export default redisManager;
 //# sourceMappingURL=redis.js.map

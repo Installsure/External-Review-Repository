@@ -10,7 +10,7 @@ export interface AuthenticatedWebSocket extends WebSocket {
 export interface WebSocketMessage {
     type: 'notification' | 'project_update' | 'file_upload' | 'forge_status' | 'qb_sync' | 'ping' | 'pong';
     payload: any;
-    timestamp: string;
+    timestamp?: string;
     userId?: number;
     companyId?: number;
 }
@@ -39,6 +39,7 @@ export declare class WebSocketManager {
         userConnections: number;
         companyConnections: number;
     };
+    close(callback?: () => void): void;
 }
 export declare let webSocketManager: WebSocketManager | null;
 export declare const initializeWebSocket: (server: Server) => WebSocketManager;

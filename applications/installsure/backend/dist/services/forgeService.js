@@ -23,13 +23,13 @@ export class ForgeService {
                 client_id: config.FORGE_CLIENT_ID,
                 client_secret: config.FORGE_CLIENT_SECRET,
                 grant_type: 'client_credentials',
-                scope: 'data:read data:write data:create bucket:create bucket:read viewables:read'
+                scope: 'data:read data:write data:create bucket:create bucket:read viewables:read',
             });
             const response = await httpClient.post(`${config.FORGE_BASE_URL}/authentication/v2/token`, form, {
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             });
             this.accessToken = response.data.access_token;
-            this.tokenExpiry = Date.now() + (response.data.expires_in * 1000);
+            this.tokenExpiry = Date.now() + response.data.expires_in * 1000;
             if (!this.accessToken) {
                 throw new Error('No access token received from Forge');
             }
@@ -62,12 +62,12 @@ export class ForgeService {
             // Try to create bucket
             await httpClient.post(`${config.FORGE_BASE_URL}/oss/v2/buckets`, {
                 bucketKey: bucketKey,
-                policyKey: 'temporary'
+                policyKey: 'temporary',
             }, {
                 headers: {
-                    'Authorization': `Bearer ${this.accessToken}`,
-                    'Content-Type': 'application/json'
-                }
+                    Authorization: `Bearer ${this.accessToken}`,
+                    'Content-Type': 'application/json',
+                },
             });
             childLogger.debug('Forge bucket created');
             return bucketKey;
@@ -93,16 +93,16 @@ export class ForgeService {
             childLogger.debug({ bucketKey, objectKey }, 'Uploading file to Forge');
             const response = await httpClient.put(`${config.FORGE_BASE_URL}/oss/v2/buckets/${bucketKey}/objects/${objectKey}`, fileBuffer, {
                 headers: {
-                    'Authorization': `Bearer ${this.accessToken}`,
-                    'Content-Type': 'application/octet-stream'
-                }
+                    Authorization: `Bearer ${this.accessToken}`,
+                    'Content-Type': 'application/octet-stream',
+                },
             });
             const result = {
                 objectId: response.data.objectId,
                 bucketKey: response.data.bucketKey,
                 objectKey: response.data.objectKey,
                 size: response.data.size,
-                location: response.data.location
+                location: response.data.location,
             };
             childLogger.info({ objectId: result.objectId }, 'File uploaded to Forge successfully');
             return result;
@@ -120,30 +120,30 @@ export class ForgeService {
             childLogger.debug({ urn, objectId }, 'Starting Forge translation job');
             const response = await httpClient.post(`${config.FORGE_BASE_URL}/modelderivative/v2/designdata/job`, {
                 input: {
-                    urn: urn
+                    urn: urn,
                 },
                 output: {
                     destination: {
-                        region: 'us'
+                        region: 'us',
                     },
                     formats: [
                         {
                             type: 'svf',
-                            views: ['2d', '3d']
-                        }
-                    ]
-                }
+                            views: ['2d', '3d'],
+                        },
+                    ],
+                },
             }, {
                 headers: {
-                    'Authorization': `Bearer ${this.accessToken}`,
-                    'Content-Type': 'application/json'
-                }
+                    Authorization: `Bearer ${this.accessToken}`,
+                    'Content-Type': 'application/json',
+                },
             });
             const result = {
                 urn: urn,
                 status: response.data.status,
                 progress: response.data.progress,
-                output: response.data.output
+                output: response.data.output,
             };
             childLogger.info({ urn, status: result.status }, 'Forge translation job started');
             return result;
@@ -160,8 +160,8 @@ export class ForgeService {
             childLogger.debug({ urn }, 'Fetching Forge manifest');
             const response = await httpClient.get(`${config.FORGE_BASE_URL}/modelderivative/v2/designdata/${urn}/manifest`, {
                 headers: {
-                    'Authorization': `Bearer ${this.accessToken}`
-                }
+                    Authorization: `Bearer ${this.accessToken}`,
+                },
             });
             childLogger.debug('Forge manifest fetched successfully');
             return response.data;
@@ -178,8 +178,8 @@ export class ForgeService {
             childLogger.debug({ urn }, 'Fetching Forge properties');
             const response = await httpClient.get(`${config.FORGE_BASE_URL}/modelderivative/v2/designdata/${urn}/properties`, {
                 headers: {
-                    'Authorization': `Bearer ${this.accessToken}`
-                }
+                    Authorization: `Bearer ${this.accessToken}`,
+                },
             });
             childLogger.debug('Forge properties fetched successfully');
             return response.data;
@@ -251,7 +251,7 @@ export class ForgeService {
             areas: [],
             lengths: [],
             volumes: [],
-            counts: []
+            counts: [],
         };
     }
 }

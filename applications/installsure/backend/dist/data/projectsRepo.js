@@ -8,14 +8,14 @@ export class ProjectsRepository {
     async findAll(requestId) {
         if (isTest) {
             // Return a shallow copy sorted by created_at desc
-            return [...this.store].sort((a, b) => (new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
+            return [...this.store].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         }
         const result = await db.query('SELECT * FROM projects ORDER BY created_at DESC', [], requestId);
         return result.rows;
     }
     async findById(id, requestId) {
         if (isTest) {
-            return this.store.find(p => p.id === id) || null;
+            return this.store.find((p) => p.id === id) || null;
         }
         const result = await db.query('SELECT * FROM projects WHERE id = $1', [id], requestId);
         return result.rows[0] || null;
@@ -38,7 +38,7 @@ export class ProjectsRepository {
     }
     async update(id, data, requestId) {
         if (isTest) {
-            const idx = this.store.findIndex(p => p.id === id);
+            const idx = this.store.findIndex((p) => p.id === id);
             if (idx === -1)
                 return null;
             const existing = this.store[idx];
@@ -72,7 +72,7 @@ export class ProjectsRepository {
     }
     async delete(id, requestId) {
         if (isTest) {
-            const idx = this.store.findIndex(p => p.id === id);
+            const idx = this.store.findIndex((p) => p.id === id);
             if (idx === -1)
                 return false;
             this.store.splice(idx, 1);
@@ -83,7 +83,7 @@ export class ProjectsRepository {
     }
     async exists(id, requestId) {
         if (isTest) {
-            return this.store.some(p => p.id === id);
+            return this.store.some((p) => p.id === id);
         }
         const result = await db.query('SELECT 1 FROM projects WHERE id = $1', [id], requestId);
         return (result.rowCount ?? 0) > 0;

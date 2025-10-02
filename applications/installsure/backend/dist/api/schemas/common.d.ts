@@ -82,18 +82,18 @@ export declare const fileUploadSchema: z.ZodObject<{
     path: z.ZodString;
 }, "strip", z.ZodTypeAny, {
     path: string;
-    encoding: string;
     fieldname: string;
     originalname: string;
+    encoding: string;
     mimetype: string;
     size: number;
     destination: string;
     filename: string;
 }, {
     path: string;
-    encoding: string;
     fieldname: string;
     originalname: string;
+    encoding: string;
     mimetype: string;
     size: number;
     destination: string;
