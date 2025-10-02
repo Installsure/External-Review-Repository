@@ -1,0 +1,12 @@
+[
+  {
+    "package": "Walls",
+    "type": "Drywall",
+    "qty": 200
+  },
+  {
+    "package": "Framing",
+    "type": "2x4 Lumber",
+    "qty": 500
+  }
+]
