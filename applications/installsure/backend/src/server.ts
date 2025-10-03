@@ -8,10 +8,12 @@ import fs from 'fs';
 import { z } from 'zod';
 
 // Configuration
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
 const config = {
   NODE_ENV: process.env.NODE_ENV || 'development',
-  PORT: parseInt(process.env.PORT || '8000'),
+  PORT: parseInt(process.env.PORT || '8080'),
   CORS_ORIGINS: process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()) || [
+    FRONTEND_ORIGIN,
     'http://localhost:3000',
   ],
   DATABASE_URL: process.env.DATABASE_URL,
@@ -28,7 +30,9 @@ app.use(helmet());
 app.use(
   cors({
     origin: config.CORS_ORIGINS,
-    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: false,
   }),
 );
 app.use(morgan('combined'));
@@ -65,8 +69,11 @@ const upload = multer({
 
 // Health endpoints
 app.get('/api/health', (req, res) => {
+  const forgeConfigured = Boolean(config.FORGE_CLIENT_ID && config.FORGE_CLIENT_SECRET);
   res.json({
     ok: true,
+    forgeConfigured,
+    port: config.PORT,
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     version: '1.0.0',
@@ -202,6 +209,132 @@ app.get('/api/qb/health', (req, res) => {
     connected: false,
     message: 'QuickBooks integration not configured',
   });
+});
+
+// NEW ENDPOINTS FOR DEMO PIPELINE
+
+// /api/models/translate - Translate blueprint/model
+app.post('/api/models/translate', (req, res) => {
+  res.json({
+    urn: 'dXJuOmFkc2sud2lwcHJvZDpmcy5maWxlOnZmLk1vY2tVcm4=' + Date.now(),
+    status: 'success',
+    message: 'Model translation started',
+    blueprint: req.body.blueprint || 'Unknown',
+  });
+});
+
+// /api/takeoff/sync - Sync takeoff data
+app.post('/api/takeoff/sync', (req, res) => {
+  res.json({
+    syncId: Date.now().toString(),
+    status: 'completed',
+    itemsProcessed: 15,
+    message: 'Takeoff data synchronized successfully',
+  });
+});
+
+// /api/takeoff/items - Get takeoff items
+app.get('/api/takeoff/items', (req, res) => {
+  const items = [
+    {
+      id: 1,
+      itemName: 'Drywall 1/2"',
+      quantity: 2400,
+      unit: 'sf',
+      properties: { typeName: 'Walls', category: 'Interior Finishes' },
+    },
+    {
+      id: 2,
+      itemName: '2x4 Lumber - 8ft',
+      quantity: 320,
+      unit: 'ea',
+      properties: { typeName: 'Framing', category: 'Structural' },
+    },
+    {
+      id: 3,
+      itemName: 'Concrete - 3000 PSI',
+      quantity: 45,
+      unit: 'cy',
+      properties: { typeName: 'Foundation', category: 'Structural' },
+    },
+    {
+      id: 4,
+      itemName: 'Asphalt Shingles',
+      quantity: 1850,
+      unit: 'sf',
+      properties: { typeName: 'Roofing', category: 'Exterior' },
+    },
+    {
+      id: 5,
+      itemName: 'Paint - Interior',
+      quantity: 18,
+      unit: 'gal',
+      properties: { typeName: 'Painting', category: 'Interior Finishes' },
+    },
+  ];
+  res.json({ data: items });
+});
+
+// /api/estimate/lines - Get estimate lines with costs
+app.get('/api/estimate/lines', (req, res) => {
+  const items = [
+    {
+      id: 1,
+      name: 'Drywall 1/2"',
+      quantity: 2400,
+      unit: 'sf',
+      category: 'Interior Finishes',
+      assemblyCode: 'ASMB-001',
+      unitCost: 2.50,
+      totalCost: 6000.00,
+      laborHours: 48.00,
+    },
+    {
+      id: 2,
+      name: '2x4 Lumber - 8ft',
+      quantity: 320,
+      unit: 'ea',
+      category: 'Structural',
+      assemblyCode: 'ASMB-002',
+      unitCost: 4.75,
+      totalCost: 1520.00,
+      laborHours: 16.00,
+    },
+    {
+      id: 3,
+      name: 'Concrete - 3000 PSI',
+      quantity: 45,
+      unit: 'cy',
+      category: 'Structural',
+      assemblyCode: 'ASMB-003',
+      unitCost: 125.00,
+      totalCost: 5625.00,
+      laborHours: 22.50,
+    },
+    {
+      id: 4,
+      name: 'Asphalt Shingles',
+      quantity: 1850,
+      unit: 'sf',
+      category: 'Exterior',
+      assemblyCode: 'ASMB-004',
+      unitCost: 3.25,
+      totalCost: 6012.50,
+      laborHours: 37.00,
+    },
+    {
+      id: 5,
+      name: 'Paint - Interior',
+      quantity: 18,
+      unit: 'gal',
+      category: 'Interior Finishes',
+      assemblyCode: 'ASMB-005',
+      unitCost: 32.50,
+      totalCost: 585.00,
+      laborHours: 9.00,
+    },
+  ];
+  res.json({ data: items });
 });
 
 // Error handler
