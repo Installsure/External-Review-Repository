@@ -4,7 +4,7 @@ export const errorHandler = (err, req, res, next) => {
     const isDevelopment = process.env.NODE_ENV === 'development';
     res.status(500).json({
         error: isDevelopment ? err.message : 'Internal Server Error',
-        ...(isDevelopment && { stack: err.stack })
+        ...(isDevelopment && { stack: err.stack }),
     });
 };
 //# sourceMappingURL=errorHandler.js.map

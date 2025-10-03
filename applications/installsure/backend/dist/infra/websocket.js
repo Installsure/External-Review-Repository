@@ -8,7 +8,7 @@ export class WebSocketManager {
     constructor(server) {
         this.wss = new WebSocketServer({
             server,
-            path: '/ws'
+            path: '/ws',
         });
         this.setupWebSocketServer();
         this.startHeartbeat();
@@ -17,7 +17,7 @@ export class WebSocketManager {
         this.wss.on('connection', (ws, request) => {
             logger.debug('WebSocket connection attempt', {
                 ip: request.socket.remoteAddress,
-                userAgent: request.headers['user-agent']
+                userAgent: request.headers['user-agent'],
             });
             // Handle authentication
             const token = this.extractTokenFromRequest(request);
@@ -38,22 +38,22 @@ export class WebSocketManager {
                 logger.info('WebSocket connection established', {
                     userId: ws.userId,
                     email: ws.userEmail,
-                    companyId: ws.companyId
+                    companyId: ws.companyId,
                 });
                 // Send welcome message
                 this.sendMessage(ws, {
                     type: 'notification',
                     payload: {
                         message: 'Connected to InstallSure real-time updates',
-                        userId: ws.userId
+                        userId: ws.userId,
                     },
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
                 });
             }
             catch (error) {
                 logger.warn('WebSocket authentication failed', {
                     error: error.message,
-                    ip: request.socket.remoteAddress
+                    ip: request.socket.remoteAddress,
                 });
                 ws.close(1008, 'Authentication failed');
                 return;
@@ -67,7 +67,7 @@ export class WebSocketManager {
                 catch (error) {
                     logger.error('Invalid WebSocket message', {
                         error: error.message,
-                        userId: ws.userId
+                        userId: ws.userId,
                     });
                 }
             });
@@ -80,14 +80,14 @@ export class WebSocketManager {
                 this.removeConnection(ws);
                 logger.info('WebSocket connection closed', {
                     userId: ws.userId,
-                    email: ws.userEmail
+                    email: ws.userEmail,
                 });
             });
             // Handle errors
             ws.on('error', (error) => {
                 logger.error('WebSocket error', {
                     error: error.message,
-                    userId: ws.userId
+                    userId: ws.userId,
                 });
                 this.removeConnection(ws);
             });
@@ -150,13 +150,13 @@ export class WebSocketManager {
                 this.sendMessage(ws, {
                     type: 'pong',
                     payload: { timestamp: new Date().toISOString() },
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
                 });
                 break;
             default:
                 logger.debug('Unknown WebSocket message type', {
                     type: message.type,
-                    userId: ws.userId
+                    userId: ws.userId,
                 });
         }
     }
@@ -172,9 +172,9 @@ export class WebSocketManager {
             const fullMessage = {
                 ...message,
                 userId,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
             };
-            userConnections.forEach(ws => {
+            userConnections.forEach((ws) => {
                 this.sendMessage(ws, fullMessage);
             });
         }
@@ -185,9 +185,9 @@ export class WebSocketManager {
             const fullMessage = {
                 ...message,
                 companyId,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
             };
-            companyConnections.forEach(ws => {
+            companyConnections.forEach((ws) => {
                 this.sendMessage(ws, fullMessage);
             });
         }
@@ -195,7 +195,7 @@ export class WebSocketManager {
     broadcastToAll(message) {
         const fullMessage = {
             ...message,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
         };
         this.wss.clients.forEach((ws) => {
             this.sendMessage(ws, fullMessage);
@@ -207,8 +207,8 @@ export class WebSocketManager {
             payload: {
                 projectId,
                 update,
-                message: 'Project has been updated'
-            }
+                message: 'Project has been updated',
+            },
         };
         if (companyId) {
             this.sendToCompany(companyId, message);
@@ -223,8 +223,8 @@ export class WebSocketManager {
             payload: {
                 fileId,
                 status,
-                message: `File upload ${status}`
-            }
+                message: `File upload ${status}`,
+            },
         });
     }
     sendForgeProcessingStatus(urn, status, userId) {
@@ -233,8 +233,8 @@ export class WebSocketManager {
             payload: {
                 urn,
                 status,
-                message: `Forge processing ${status}`
-            }
+                message: `Forge processing ${status}`,
+            },
         });
     }
     sendQuickBooksSyncStatus(syncId, status, companyId) {
@@ -243,14 +243,14 @@ export class WebSocketManager {
             payload: {
                 syncId,
                 status,
-                message: `QuickBooks sync ${status}`
-            }
+                message: `QuickBooks sync ${status}`,
+            },
         });
     }
     sendNotification(userId, notification) {
         this.sendToUser(userId, {
             type: 'notification',
-            payload: notification
+            payload: notification,
         });
     }
     startHeartbeat() {
@@ -258,7 +258,7 @@ export class WebSocketManager {
             this.wss.clients.forEach((ws) => {
                 if (!ws.isAlive) {
                     logger.debug('Terminating inactive WebSocket connection', {
-                        userId: ws.userId
+                        userId: ws.userId,
                     });
                     this.removeConnection(ws);
                     ws.terminate();
@@ -276,7 +276,7 @@ export class WebSocketManager {
         return {
             totalConnections: this.wss.clients.size,
             userConnections: this.connections.size,
-            companyConnections: this.companyConnections.size
+            companyConnections: this.companyConnections.size,
         };
     }
 }
