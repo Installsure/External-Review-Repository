@@ -12,6 +12,8 @@ import Upload from './pages/Upload';
 import Viewer from './pages/Viewer';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import BlueprintsPage from './pages/BlueprintsPage';
+import DocsPage from './pages/DocsPage';
 
 // Initialize Sentry
 initSentry();
@@ -42,6 +44,18 @@ function App() {
                       Upload
                     </a>
                     <a
+                      href="/blueprints"
+                      className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Blueprints
+                    </a>
+                    <a
+                      href="/docs"
+                      className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Docs
+                    </a>
+                    <a
                       href="/reports"
                       className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                     >
@@ -63,6 +77,8 @@ function App() {
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/upload" element={<Upload />} />
                 <Route path="/viewer/:urn" element={<Viewer />} />
+                <Route path="/blueprints" element={<BlueprintsPage />} />
+                <Route path="/docs" element={<DocsPage />} />
                 <Route path="/reports" element={<Reports />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>

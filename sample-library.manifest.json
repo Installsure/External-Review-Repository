@@ -1,0 +1,61 @@
+{
+  "projectId": "DEMO",
+  "items": [
+    {
+      "docType": "Blueprint",
+      "title": "Plan A1.1 – Sample Floor Plan",
+      "category": "Drawings",
+      "standard": "Field",
+      "tags": ["plan", "floor"],
+      "url": "https://YOUR-PUBLIC-URL/planA1_1.pdf"
+    },
+    {
+      "docType": "RFI",
+      "title": "RFI-001 – Clarify wall assembly at grid B",
+      "category": "Contract Admin",
+      "standard": "Procore",
+      "tags": ["rfi","wall"],
+      "url": "https://YOUR-PUBLIC-URL/rfi-template.pdf"
+    },
+    {
+      "docType": "Submittal",
+      "title": "Submittal – Rough Carpentry 06 10 00",
+      "category": "Submittals",
+      "standard": "Procore",
+      "tags": ["submittal","06 10 00"],
+      "url": "https://YOUR-PUBLIC-URL/submittal-sample.pdf"
+    },
+    {
+      "docType": "ChangeOrder",
+      "title": "Change Order (AIA G701) – Blocking at corridor",
+      "category": "Change Orders",
+      "standard": "AIA G701",
+      "tags": ["co","g701"],
+      "url": "https://YOUR-PUBLIC-URL/aia-g701-sample.pdf"
+    },
+    {
+      "docType": "DailyReport",
+      "title": "Daily Report – Example",
+      "category": "Reports",
+      "standard": "Fieldwire",
+      "tags": ["daily","report"],
+      "url": "https://YOUR-PUBLIC-URL/daily-report-sample.pdf"
+    },
+    {
+      "docType": "LienWaiver",
+      "title": "Conditional Waiver – Progress Payment",
+      "category": "Liens",
+      "standard": "State-Std",
+      "tags": ["lien","progress","conditional"],
+      "url": "https://YOUR-PUBLIC-URL/lien-waiver-conditional-progress.pdf"
+    },
+    {
+      "docType": "Workforce",
+      "title": "New Hire Safety Orientation Checklist",
+      "category": "Workforce",
+      "standard": "Safety",
+      "tags": ["workforce","safety","orientation"],
+      "url": "https://YOUR-PUBLIC-URL/safety-orientation-checklist.pdf"
+    }
+  ]
+}

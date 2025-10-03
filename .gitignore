@@ -103,6 +103,14 @@ temp/
 *.sqlite
 *.sqlite3
 
+# Sample library downloads (keep structure but ignore downloaded files)
+samples/library/*.pdf
+samples/library/*.png
+samples/library/*.jpg
+samples/library/*.jpeg
+samples/library/*.svg
+samples/library-download-report.json
+
 # Python
 __pycache__/
 *.py[cod]
