@@ -8,11 +8,13 @@ import fs from 'fs';
 import { z } from 'zod';
 
 // Configuration
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || 'http://localhost:5173';
 const config = {
   NODE_ENV: process.env.NODE_ENV || 'development',
-  PORT: parseInt(process.env.PORT || '8000'),
+  PORT: parseInt(process.env.PORT || '8080'),
   CORS_ORIGINS: process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()) || [
     'http://localhost:3000',
+    FRONTEND_ORIGIN,
   ],
   DATABASE_URL: process.env.DATABASE_URL,
   FORGE_CLIENT_ID: process.env.FORGE_CLIENT_ID,
@@ -28,7 +30,9 @@ app.use(helmet());
 app.use(
   cors({
     origin: config.CORS_ORIGINS,
-    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: false,
   }),
 );
 app.use(morgan('combined'));
@@ -65,8 +69,11 @@ const upload = multer({
 
 // Health endpoints
 app.get('/api/health', (req, res) => {
+  const forgeConfigured = Boolean(config.FORGE_CLIENT_ID && config.FORGE_CLIENT_SECRET);
   res.json({
     ok: true,
+    forgeConfigured,
+    port: config.PORT,
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     version: '1.0.0',
@@ -74,7 +81,7 @@ app.get('/api/health', (req, res) => {
     services: {
       database: 'connected',
       redis: 'connected',
-      forge: config.FORGE_CLIENT_ID ? 'configured' : 'not_configured',
+      forge: forgeConfigured ? 'configured' : 'not_configured',
     },
   });
 });
@@ -371,6 +378,130 @@ app.get('/api/autocad/takeoff/:urn', (req, res) => {
       volumes: [{ name: 'Total Volume', value: 125625.0, unit: 'm³' }],
     },
   });
+});
+
+// Demo pipeline endpoints
+app.post('/api/models/translate', (req, res) => {
+  try {
+    // Mock translation endpoint for demo
+    const { blueprint, urn, sheets, meta } = req.body;
+    res.json({
+      success: true,
+      data: {
+        jobId: 'translate-job-' + Date.now(),
+        urn: urn || 'urn:mock:' + Date.now(),
+        blueprint: blueprint || 'Untitled',
+        status: 'in_progress',
+        sheets: sheets || [],
+        meta: meta || {},
+      },
+    });
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+
+app.post('/api/takeoff/sync', (req, res) => {
+  try {
+    // Mock sync endpoint - simulates syncing takeoff data
+    res.json({
+      success: true,
+      data: {
+        syncId: 'sync-' + Date.now(),
+        status: 'completed',
+        itemsProcessed: 150,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+
+app.get('/api/takeoff/items', (req, res) => {
+  try {
+    // Mock takeoff items
+    const mockItems = [
+      {
+        itemName: 'Drywall - Interior',
+        quantity: 2400,
+        unit: 'sf',
+        properties: { typeName: 'Walls' },
+      },
+      {
+        itemName: '2x4 Lumber - Framing',
+        quantity: 850,
+        unit: 'lf',
+        properties: { typeName: 'Framing' },
+      },
+      {
+        itemName: 'Concrete - Foundation',
+        quantity: 45,
+        unit: 'cy',
+        properties: { typeName: 'Foundation' },
+      },
+      {
+        itemName: 'Roofing Shingles',
+        quantity: 1800,
+        unit: 'sf',
+        properties: { typeName: 'Roofing' },
+      },
+    ];
+    res.json({ data: mockItems });
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
+});
+
+app.get('/api/estimate/lines', (req, res) => {
+  try {
+    // Mock estimate lines with enriched data
+    const mockItems = [
+      {
+        name: 'Drywall - Interior',
+        quantity: 2400,
+        unit: 'sf',
+        category: 'Walls',
+        assemblyCode: 'ASMB-001',
+        unitCost: 17.5,
+        totalCost: Number((2400 * 17.5).toFixed(2)),
+        laborHours: Number((2400 * 0.2).toFixed(2)),
+      },
+      {
+        name: '2x4 Lumber - Framing',
+        quantity: 850,
+        unit: 'lf',
+        category: 'Framing',
+        assemblyCode: 'ASMB-002',
+        unitCost: 12.25,
+        totalCost: Number((850 * 12.25).toFixed(2)),
+        laborHours: Number((850 * 0.15).toFixed(2)),
+      },
+      {
+        name: 'Concrete - Foundation',
+        quantity: 45,
+        unit: 'cy',
+        category: 'Foundation',
+        assemblyCode: 'ASMB-003',
+        unitCost: 185.0,
+        totalCost: Number((45 * 185.0).toFixed(2)),
+        laborHours: Number((45 * 2.5).toFixed(2)),
+      },
+      {
+        name: 'Roofing Shingles',
+        quantity: 1800,
+        unit: 'sf',
+        category: 'Roofing',
+        assemblyCode: 'ASMB-004',
+        unitCost: 22.75,
+        totalCost: Number((1800 * 22.75).toFixed(2)),
+        laborHours: Number((1800 * 0.25).toFixed(2)),
+      },
+    ];
+    res.json({ data: mockItems });
+  } catch (e) {
+    res.status(500).json({ error: String(e) });
+  }
 });
 
 // QuickBooks endpoint
