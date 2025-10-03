@@ -10,6 +10,7 @@ import projectRoutes from './api/routes/projects.js';
 import fileRoutes from './api/routes/files.js';
 import forgeRoutes from './api/routes/forge.js';
 import qbRoutes from './api/routes/qb.js';
+import libraryRoutes from './api/routes/library.js';
 export const createApp = () => {
     const app = express();
     // Initialize Sentry early
@@ -25,6 +26,7 @@ export const createApp = () => {
     app.use('/api/files', fileRoutes);
     app.use('/api/autocad', forgeRoutes);
     app.use('/api/qb', qbRoutes);
+    app.use('/api', libraryRoutes);
     // 404 handler
     app.use(notFoundHandler);
     // Error handling middleware (must be last)

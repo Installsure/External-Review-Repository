@@ -11,15 +11,15 @@ const registerSchema = z.object({
     password: z.string().min(8, 'Password must be at least 8 characters'),
     name: z.string().min(1, 'Name is required'),
     role: z.enum(['admin', 'manager', 'user']).optional(),
-    companyId: z.number().optional()
+    companyId: z.number().optional(),
 });
 const loginSchema = z.object({
     email: z.string().email('Invalid email address'),
-    password: z.string().min(1, 'Password is required')
+    password: z.string().min(1, 'Password is required'),
 });
 const changePasswordSchema = z.object({
     currentPassword: z.string().min(1, 'Current password is required'),
-    newPassword: z.string().min(8, 'New password must be at least 8 characters')
+    newPassword: z.string().min(8, 'New password must be at least 8 characters'),
 });
 // POST /api/auth/register - Register new user
 router.post('/register', validateBody(registerSchema), asyncHandler(async (req, res) => {
@@ -28,7 +28,7 @@ router.post('/register', validateBody(registerSchema), asyncHandler(async (req, 
         message: 'User registered successfully',
         user: result.user,
         token: result.token,
-        expiresIn: result.expiresIn
+        expiresIn: result.expiresIn,
     });
 }));
 // POST /api/auth/login - User login
@@ -38,7 +38,7 @@ router.post('/login', validateBody(loginSchema), asyncHandler(async (req, res) =
         message: 'Login successful',
         user: result.user,
         token: result.token,
-        expiresIn: result.expiresIn
+        expiresIn: result.expiresIn,
     });
 }));
 // POST /api/auth/refresh - Refresh JWT token
@@ -53,21 +53,21 @@ router.post('/refresh', asyncHandler(async (req, res) => {
         message: 'Token refreshed successfully',
         user: result.user,
         token: result.token,
-        expiresIn: result.expiresIn
+        expiresIn: result.expiresIn,
     });
 }));
 // GET /api/auth/verify - Verify JWT token
 router.get('/verify', authenticateToken, asyncHandler(async (req, res) => {
     res.json({
         message: 'Token is valid',
-        user: req.user
+        user: req.user,
     });
 }));
 // POST /api/auth/change-password - Change user password
 router.post('/change-password', authenticateToken, validateBody(changePasswordSchema), asyncHandler(async (req, res) => {
     await authService.changePassword(req.user.id, req.body.currentPassword, req.body.newPassword, req.requestId);
     res.json({
-        message: 'Password changed successfully'
+        message: 'Password changed successfully',
     });
 }));
 // POST /api/auth/logout - User logout (client-side token removal)
@@ -75,7 +75,7 @@ router.post('/logout', authenticateToken, asyncHandler(async (req, res) => {
     // In a stateless JWT system, logout is handled client-side
     // In production, you might want to implement a token blacklist
     res.json({
-        message: 'Logout successful'
+        message: 'Logout successful',
     });
 }));
 export default router;

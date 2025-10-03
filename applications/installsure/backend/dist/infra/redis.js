@@ -15,7 +15,7 @@ class RedisManager {
                 db: 0,
                 retryDelayOnFailover: 100,
                 maxRetriesPerRequest: 3,
-                lazyConnect: true
+                lazyConnect: true,
             };
             // Parse Redis URL if provided
             if (config.REDIS_URL) {
@@ -145,7 +145,7 @@ class RedisManager {
             return [];
         try {
             const values = await this.client.mget(...keys);
-            return values.map(value => value ? JSON.parse(value) : null);
+            return values.map((value) => (value ? JSON.parse(value) : null));
         }
         catch (error) {
             logger.error({ error: error.message, keys }, 'Failed to get multiple cache values');
@@ -286,7 +286,7 @@ class RedisManager {
             return [];
         try {
             const values = await this.client.lrange(key, start, stop);
-            return values.map(value => JSON.parse(value));
+            return values.map((value) => JSON.parse(value));
         }
         catch (error) {
             logger.error({ error: error.message, key }, 'Failed to get list range');
@@ -303,7 +303,7 @@ class RedisManager {
             return {
                 connected: this.isConnected,
                 dbSize,
-                memoryInfo: info
+                memoryInfo: info,
             };
         }
         catch (error) {
@@ -346,7 +346,7 @@ export const cache = {
             logger.error({ error: error.message, pattern }, 'Failed to invalidate cache pattern');
             return false;
         }
-    }
+    },
 };
 export default redisManager;
 //# sourceMappingURL=redis.js.map

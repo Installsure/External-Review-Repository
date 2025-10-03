@@ -10,11 +10,11 @@ const createUserSchema = z.object({
     password: z.string().min(8, 'Password must be at least 8 characters'),
     name: z.string().min(1, 'Name is required'),
     role: z.enum(['admin', 'manager', 'user']).optional(),
-    companyId: z.number().optional()
+    companyId: z.number().optional(),
 });
 const loginSchema = z.object({
     email: z.string().email('Invalid email address'),
-    password: z.string().min(1, 'Password is required')
+    password: z.string().min(1, 'Password is required'),
 });
 export class AuthService {
     async register(data, requestId) {
@@ -34,7 +34,7 @@ export class AuthService {
                 type: argon2.argon2id,
                 memoryCost: 2 ** 16, // 64 MB
                 timeCost: 3,
-                parallelism: 1
+                parallelism: 1,
             });
             // Create user
             const result = await db.query(`INSERT INTO auth_users (email, password_hash, name, role, company_id)
@@ -45,7 +45,7 @@ export class AuthService {
                 hashedPassword,
                 validatedData.name,
                 validatedData.role || 'user',
-                validatedData.companyId || null
+                validatedData.companyId || null,
             ], requestId);
             const user = result.rows[0];
             // Generate JWT token
@@ -53,11 +53,11 @@ export class AuthService {
                 userId: user.id,
                 email: user.email,
                 role: user.role,
-                companyId: user.companyId
+                companyId: user.companyId,
             });
             childLogger.info({
                 userId: user.id,
-                email: user.email
+                email: user.email,
             }, 'User registered successfully');
             return {
                 user: {
@@ -67,15 +67,15 @@ export class AuthService {
                     role: user.role,
                     companyId: user.companyId,
                     createdAt: user.createdAt,
-                    updatedAt: user.updatedAt
+                    updatedAt: user.updatedAt,
                 },
                 token,
-                expiresIn: '24h'
+                expiresIn: '24h',
             };
         }
         catch (error) {
             if (error instanceof z.ZodError) {
-                throw createError('Validation error: ' + error.errors.map(e => e.message).join(', '), 400);
+                throw createError('Validation error: ' + error.errors.map((e) => e.message).join(', '), 400);
             }
             if (error instanceof Error && error.message.includes('already exists')) {
                 throw error;
@@ -107,7 +107,7 @@ export class AuthService {
             catch (error) {
                 childLogger.warn({
                     userId: user.id,
-                    email: validatedCredentials.email
+                    email: validatedCredentials.email,
                 }, 'Login failed: Invalid password');
                 throw createError('Invalid email or password', 401);
             }
@@ -116,11 +116,11 @@ export class AuthService {
                 userId: user.id,
                 email: user.email,
                 role: user.role,
-                companyId: user.companyId
+                companyId: user.companyId,
             });
             childLogger.info({
                 userId: user.id,
-                email: user.email
+                email: user.email,
             }, 'User logged in successfully');
             return {
                 user: {
@@ -130,17 +130,18 @@ export class AuthService {
                     role: user.role,
                     companyId: user.companyId,
                     createdAt: user.createdAt,
-                    updatedAt: user.updatedAt
+                    updatedAt: user.updatedAt,
                 },
                 token,
-                expiresIn: '24h'
+                expiresIn: '24h',
             };
         }
         catch (error) {
             if (error instanceof z.ZodError) {
-                throw createError('Validation error: ' + error.errors.map(e => e.message).join(', '), 400);
+                throw createError('Validation error: ' + error.errors.map((e) => e.message).join(', '), 400);
             }
-            if (error instanceof Error && (error.message.includes('Invalid') || error.message.includes('not found'))) {
+            if (error instanceof Error &&
+                (error.message.includes('Invalid') || error.message.includes('not found'))) {
                 throw error;
             }
             childLogger.error({ error: error.message }, 'Login failed');
@@ -175,12 +176,12 @@ export class AuthService {
             userId: user.id,
             email: user.email,
             role: user.role,
-            companyId: user.companyId
+            companyId: user.companyId,
         });
         return {
             user,
             token: newToken,
-            expiresIn: '24h'
+            expiresIn: '24h',
         };
     }
     async changePassword(userId, currentPassword, newPassword, requestId) {
@@ -198,7 +199,7 @@ export class AuthService {
                 type: argon2.argon2id,
                 memoryCost: 2 ** 16,
                 timeCost: 3,
-                parallelism: 1
+                parallelism: 1,
             });
             // Update password
             await db.query('UPDATE auth_users SET password_hash = $1, updated_at = NOW() WHERE id = $2', [hashedNewPassword, userId], requestId);

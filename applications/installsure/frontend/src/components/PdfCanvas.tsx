@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 // @ts-ignore
 import * as pdfjsLib from 'pdfjs-dist/build/pdf';
-// @ts-ignore
-import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+// Use CDN worker for compatibility
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 export default function PdfCanvas({ src }: { src: string }) {
   const ref = useRef<HTMLCanvasElement>(null);

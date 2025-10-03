@@ -98,7 +98,7 @@ export const createTranslationWorker = () => {
         try {
             // This would contain the actual translation logic
             // For now, we'll just simulate processing
-            await new Promise(resolve => setTimeout(resolve, 5000));
+            await new Promise((resolve) => setTimeout(resolve, 5000));
             jobLogger.info({ urn }, 'Translation job completed');
             return { success: true, urn };
         }
@@ -119,7 +119,7 @@ export const createEmailWorker = () => {
         try {
             // This would contain the actual email sending logic
             // For now, we'll just simulate sending
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise((resolve) => setTimeout(resolve, 1000));
             jobLogger.info({ to }, 'Email job completed');
             return { success: true };
         }
