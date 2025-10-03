@@ -53,7 +53,7 @@ const upload = multer({
   storage: storage,
   limits: { fileSize: 100 * 1024 * 1024 }, // 100MB
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['.ifc', '.dwg', '.rvt', '.step', '.obj', '.gltf', '.glb'];
+    const allowedTypes = ['.ifc', '.dwg', '.rvt', '.step', '.obj', '.gltf', '.glb', '.pdf', '.jpg', '.jpeg', '.png', '.gif'];
     const ext = path.extname(file.originalname).toLowerCase();
     if (allowedTypes.includes(ext)) {
       cb(null, true);
@@ -383,6 +383,37 @@ app.get('/api/qb/health', (req, res) => {
       message: 'QuickBooks integration not configured',
     },
   });
+});
+
+// QTO Demo endpoint
+app.post('/api/qto-demo', (req, res) => {
+  try {
+    const { assembly, params } = req.body;
+
+    let result: { quantity: number; unit: string; cost: number };
+
+    if (assembly === "paint_wall") {
+      const area = (params.length || 10) * (params.height || 3); // m²
+      const cost = area * (params.unitCost || 2.5);              // $/m²
+      result = { quantity: area, unit: "m2", cost: Math.round(cost * 100) / 100 };
+    } else if (assembly === "concrete_slab") {
+      const volume = (params.length || 5) * (params.width || 5) * (params.thickness || 0.1); // m³
+      const cost = volume * (params.unitCost || 120);                                        // $/m³
+      result = { quantity: volume, unit: "m3", cost: Math.round(cost * 100) / 100 };
+    } else {
+      result = { quantity: 0, unit: "", cost: 0 };
+    }
+
+    res.json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to calculate QTO',
+    });
+  }
 });
 
 // Error handler
