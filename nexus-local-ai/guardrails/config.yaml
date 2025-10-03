@@ -1,0 +1,40 @@
+# NexusLocalAI Guardrails Configuration
+
+guardrails:
+  # Rate limiting
+  rate_limits:
+    requests_per_minute: 60
+    tokens_per_minute: 10000
+    
+  # Content filtering
+  content_filters:
+    enabled: true
+    block_patterns:
+      - "(?i)(api[_-]?key|secret|password|token)\\s*[=:]\\s*['\"]?[a-zA-Z0-9_-]+"
+      - "(?i)(private[_-]?key)"
+    
+  # Model constraints
+  model_constraints:
+    max_tokens: 4096
+    temperature_range: [0.0, 1.0]
+    max_context_window: 8192
+    
+  # Safety checks
+  safety:
+    enabled: true
+    reject_harmful_requests: true
+    log_suspicious_activity: true
+    
+  # Allowed operations
+  allowed_operations:
+    - code_generation
+    - code_review
+    - documentation
+    - debugging
+    - refactoring
+    
+  # Blocked operations
+  blocked_operations:
+    - credential_generation
+    - malware_creation
+    - exploit_development
