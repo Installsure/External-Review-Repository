@@ -128,3 +128,6 @@ playwright/.cache/
 
 # Local development
 .local
+
+# Temporary demo files
+samples/
