@@ -6,6 +6,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { z } from 'zod';
+import seedRoutes from './routes/seed.js';
 
 // Configuration
 const config = {
@@ -203,6 +204,9 @@ app.get('/api/qb/health', (req, res) => {
     message: 'QuickBooks integration not configured',
   });
 });
+
+// Seed routes
+app.use('/api', seedRoutes);
 
 // Error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
