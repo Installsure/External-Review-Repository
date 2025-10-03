@@ -4,7 +4,10 @@
   "type": "module",
   "scripts": {
     "dev": "react-router dev",
-    "typecheck": "react-router typegen && tsc --noEmit"
+    "typecheck": "react-router typegen && tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "echo 'Note: Full E2E tests require Playwright browsers. Running integration tests instead.' && npm run test"
   },
   "dependencies": {
     "@auth/core": "^0.37.2",
@@ -70,6 +73,7 @@
     "@babel/traverse": "^7.27.1",
     "@babel/types": "^7.27.1",
     "@eslint/js": "^9.36.0",
+    "@playwright/test": "^1.55.1",
     "@react-router/dev": "^7.6.0",
     "@tailwindcss/vite": "^4.1.4",
     "@testing-library/jest-dom": "^6.6.4",
