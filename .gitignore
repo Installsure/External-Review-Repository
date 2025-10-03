@@ -128,3 +128,10 @@ playwright/.cache/
 
 # Local development
 .local
+
+# Nexus runtime directories
+nexus/
+prompts/
+samples/
+sample-library.manifest.json
+frontend/public/library/

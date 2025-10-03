@@ -120,6 +120,7 @@ npm run test:e2e
 - `.\scripts\start-all.ps1` - Start all applications
 - `.\scripts\stop-all.ps1` - Stop all applications
 - `.\scripts\test-all.ps1` - Run all tests
+- `.\scripts\bootstrap-nexus.ps1` - Bootstrap Nexus + InstallSure AI system
 - `.\tools\preflight-check.ps1` - System requirements check
 
 ### **NPM Scripts**
@@ -129,6 +130,49 @@ npm run test:e2e
 - `npm run test:e2e` - Run E2E tests
 - `npm run lint` - Run ESLint
 - `npm run format` - Format code with Prettier
+
+---
+
+## 🤖 **NEXUS AI SYSTEM**
+
+### **Overview**
+Nexus is an AI-powered learning and memory system integrated with InstallSure for enhanced productivity and knowledge management.
+
+### **Features**
+- **Daily Learning**: Automatically harvests and summarizes content from HN, arXiv, and GitHub
+- **Memory System**: Persistent memory with Jarvis-style recall
+- **YouTube Integration**: Extract and index video transcripts
+- **Library Management**: Document ingestion and knowledge base building
+- **Local LLM**: Runs entirely on your machine via Ollama
+
+### **Quick Start**
+```powershell
+# Run the bootstrap script
+.\scripts\bootstrap-nexus.ps1
+
+# The script will:
+# 1. Install/start Ollama with required models
+# 2. Create project structure
+# 3. Install Python dependencies
+# 4. Start FastAPI server on port 5323
+# 5. Run demo to verify functionality
+```
+
+### **API Endpoints**
+- `GET /verify` - Check system status
+- `POST /learn/daily` - Trigger daily learning harvest
+- `POST /memory/add` - Add memory entry
+- `GET /memory/dump` - List memory entries
+- `POST /youtube/add` - Add YouTube transcript
+- `POST /library/ingest` - Ingest document library
+- `POST /demo/installsure` - Run full demo
+
+### **Configuration**
+Point your IDE (Cursor, VS Code + Copilot) to the local LLM:
+- **Provider**: OpenAI-compatible
+- **Base URL**: http://localhost:11434/v1
+- **API Key**: ollama
+- **Model**: qwen2.5-coder:7b (or custom via `$env:OLLAMA_MODEL_CHAT`)
 
 ---
 
