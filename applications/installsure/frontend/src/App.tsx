@@ -12,6 +12,7 @@ import Upload from './pages/Upload';
 import Viewer from './pages/Viewer';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import DemoPage from './routes/DemoPage';
 
 // Initialize Sentry
 initSentry();
@@ -61,6 +62,7 @@ function App() {
             <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
               <Routes>
                 <Route path="/" element={<Dashboard />} />
+                <Route path="/demo" element={<DemoPage />} />
                 <Route path="/upload" element={<Upload />} />
                 <Route path="/viewer/:urn" element={<Viewer />} />
                 <Route path="/reports" element={<Reports />} />

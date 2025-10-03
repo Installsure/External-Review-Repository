@@ -11,15 +11,15 @@ export const securityMiddleware = (app) => {
         contentSecurityPolicy: {
             directives: {
                 defaultSrc: ["'self'"],
-                styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-                fontSrc: ["'self'", "https://fonts.gstatic.com"],
-                imgSrc: ["'self'", "data:", "https:"],
+                styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+                fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+                imgSrc: ["'self'", 'data:', 'https:'],
                 scriptSrc: ["'self'"],
                 connectSrc: [
                     "'self'",
-                    "https://developer.api.autodesk.com",
-                    "https://quickbooks.api.intuit.com",
-                    "https://api.sentry.io"
+                    'https://developer.api.autodesk.com',
+                    'https://quickbooks.api.intuit.com',
+                    'https://api.sentry.io',
                 ],
             },
         },
@@ -50,19 +50,19 @@ export const securityMiddleware = (app) => {
         verify: (req, res, buf) => {
             // Store raw body for webhook verification if needed
             req.rawBody = buf;
-        }
+        },
     }));
     app.use(express.urlencoded({
         extended: true,
-        limit: '10mb'
+        limit: '10mb',
     }));
     // Request logging
     app.use(morgan('combined', {
         stream: {
             write: (message) => {
                 logger.info(message.trim());
-            }
-        }
+            },
+        },
     }));
     // Global rate limiting
     const globalRateLimit = rateLimit({
@@ -70,20 +70,20 @@ export const securityMiddleware = (app) => {
         max: config.RATE_LIMIT_MAX_REQUESTS,
         message: {
             error: 'Too many requests, please try again later.',
-            retryAfter: Math.ceil(config.RATE_LIMIT_WINDOW_MS / 1000)
+            retryAfter: Math.ceil(config.RATE_LIMIT_WINDOW_MS / 1000),
         },
         standardHeaders: true,
         legacyHeaders: false,
         handler: (req, res) => {
             logger.warn({
                 ip: req.ip,
-                requestId: req.requestId
+                requestId: req.requestId,
             }, 'Rate limit exceeded');
             res.status(429).json({
                 error: 'Too many requests, please try again later.',
-                retryAfter: Math.ceil(config.RATE_LIMIT_WINDOW_MS / 1000)
+                retryAfter: Math.ceil(config.RATE_LIMIT_WINDOW_MS / 1000),
             });
-        }
+        },
     });
     app.use(globalRateLimit);
     // File upload rate limiting (more restrictive)
@@ -92,7 +92,7 @@ export const securityMiddleware = (app) => {
         max: 15, // 15 uploads per 15 minutes per IP
         message: {
             error: 'Too many file uploads, please try again later.',
-            retryAfter: 900
+            retryAfter: 900,
         },
         skipSuccessfulRequests: true,
     });

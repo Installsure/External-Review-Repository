@@ -44,7 +44,7 @@ export class FilesService {
             requestId,
             service: 'files',
             originalName: file.originalname,
-            size: file.size
+            size: file.size,
         });
         try {
             childLogger.debug('Starting file upload');
@@ -82,7 +82,7 @@ export class FilesService {
             childLogger.info({
                 fileId: dbFile.id,
                 originalName: file.originalname,
-                size: file.size
+                size: file.size,
             }, 'File uploaded successfully');
             return dbFile;
         }

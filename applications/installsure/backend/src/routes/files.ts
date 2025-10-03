@@ -29,13 +29,13 @@ const upload = multer({
     fileSize: 100 * 1024 * 1024, // 100MB limit
   },
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['.ifc', '.dwg', '.rvt', '.step', '.obj', '.gltf', '.glb'];
+    const allowedTypes = ['.ifc', '.dwg', '.rvt', '.step', '.obj', '.gltf', '.glb', '.pdf', '.jpg', '.jpeg', '.png', '.gif'];
     const ext = path.extname(file.originalname).toLowerCase();
 
     if (allowedTypes.includes(ext)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Allowed: IFC, DWG, RVT, STEP, OBJ, GLTF, GLB'));
+      cb(new Error('Invalid file type. Allowed: IFC, DWG, RVT, STEP, OBJ, GLTF, GLB, PDF, JPG, PNG, GIF'));
     }
   },
 });

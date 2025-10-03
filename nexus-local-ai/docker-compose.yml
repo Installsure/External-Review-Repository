@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: nexus-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ./qdrant_storage:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    restart: unless-stopped
+    
+  router:
+    build:
+      context: .
+      dockerfile: Dockerfile.router
+    container_name: nexus-router
+    ports:
+      - "8099:8099"
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - ROUTER_PORT=8099
+      - ROUTER_HOST=0.0.0.0
+    volumes:
+      - ./guardrails:/app/guardrails:ro
+    depends_on:
+      - qdrant
+    restart: unless-stopped
+    
+  avatar:
+    build:
+      context: .
+      dockerfile: Dockerfile.avatar
+    container_name: nexus-avatar
+    ports:
+      - "8765:8765"
+    environment:
+      - AVATAR_PORT=8765
+      - AVATAR_HOST=0.0.0.0
+    restart: unless-stopped
+
+volumes:
+  qdrant_storage:
+    driver: local
