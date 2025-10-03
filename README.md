@@ -12,12 +12,18 @@ This repository contains a complete application suite for external review and re
 
 ### **Applications Included:**
 - **InstallSure** - Construction Management Platform (Production Ready)
+  - **NEW**: A→Z Demo Flow with plan viewer, pin management, IFC 3D viewer, and QTO calculations
 - **Demo Dashboard** - Central Control Panel (Demo Ready)
 - **FF4U** - Adult Entertainment Platform (Development Ready)
 - **RedEye** - Project Management System (Development Ready)
 - **ZeroStack** - Infrastructure Management (Development Ready)
 - **Hello** - Digital Business Cards (Development Ready)
 - **Avatar** - AI Avatar Platform (Development Ready)
+- **NexusLocalAI** - Local AI Infrastructure (New Scaffold)
+  - OpenAI-compatible API router
+  - Memory snapshot service
+  - Avatar WebSocket bridge
+  - Qdrant vector database support
 
 ---
 
@@ -47,17 +53,63 @@ npm install
 
 ### **Access Applications**
 - **InstallSure**: http://localhost:3000
+  - **Demo Flow**: http://localhost:3000/demo (A→Z workflow)
 - **Demo Dashboard**: http://localhost:3001
 - **FF4U**: http://localhost:3002
 - **RedEye**: http://localhost:3003
 - **ZeroStack**: http://localhost:3004
 - **Hello**: http://localhost:3005
 - **Avatar**: http://localhost:3006
+- **NexusLocalAI Router**: http://localhost:8099 (after bootstrap)
+- **NexusLocalAI Avatar Bridge**: ws://localhost:8765 (after bootstrap)
+
+---
+
+## 🎯 **NEW FEATURES**
+
+### InstallSure A→Z Demo Flow
+Complete end-to-end demonstration workflow:
+- Upload and view PDF plans
+- Interactive pin placement with annotations
+- Photo attachments and notes
+- IFC 3D model viewer
+- Quantity Takeoff (QTO) calculations
+- Local storage persistence
+
+**Get Started:**
+```bash
+cd applications/installsure
+# See QUICK_START.md for detailed instructions
+```
+
+### NexusLocalAI Infrastructure
+Local AI development environment:
+- OpenAI-compatible API router
+- Intelligent model routing based on prompt patterns
+- Memory snapshot service with automatic persistence
+- WebSocket avatar bridge
+- Content guardrails and filtering
+- Qdrant vector database integration
+
+**Bootstrap NexusLocalAI:**
+```powershell
+cd nexus-local-ai
+powershell -ExecutionPolicy Bypass -File .\scripts\bootstrap.ps1
+```
+
+**Documentation:**
+- [QUICK_START.md](QUICK_START.md) - Complete setup guide
+- [IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md) - Technical details
+- [UI_LAYOUT_GUIDE.md](UI_LAYOUT_GUIDE.md) - UI structure and workflows
+- [nexus-local-ai/README.md](nexus-local-ai/README.md) - NexusLocalAI docs
 
 ---
 
 ## 📚 **DOCUMENTATION**
 
+- **[Quick Start Guide](QUICK_START.md)** - Get up and running quickly ⭐ NEW
+- **[Implementation Summary](IMPLEMENTATION_SUMMARY.md)** - Technical overview ⭐ NEW
+- **[UI Layout Guide](UI_LAYOUT_GUIDE.md)** - Interface diagrams ⭐ NEW
 - **[Setup Guide](documentation/SETUP_GUIDE.md)** - Complete setup instructions
 - **[API Documentation](documentation/API_DOCUMENTATION.md)** - Comprehensive API reference
 - **[Troubleshooting Guide](documentation/TROUBLESHOOTING.md)** - Common issues and solutions
