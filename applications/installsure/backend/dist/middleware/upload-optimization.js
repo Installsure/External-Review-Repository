@@ -17,7 +17,7 @@ const defaultOptions = {
         'model/gltf+json', // GLTF
     ],
     chunkSize: 1024 * 1024, // 1MB chunks
-    tempDir: './uploads/temp'
+    tempDir: './uploads/temp',
 };
 export class UploadOptimizer {
     options;
@@ -46,7 +46,7 @@ export class UploadOptimizer {
                 const ext = path.extname(file.originalname);
                 const filename = `upload_${timestamp}_${hash}${ext}`;
                 cb(null, filename);
-            }
+            },
         });
     }
     // Create optimized multer instance
@@ -60,14 +60,12 @@ export class UploadOptimizer {
             },
             fileFilter: (req, file, cb) => {
                 this.validateFile(file, cb);
-            }
+            },
         });
     }
     // Validate uploaded file
     validateFile(file, cb) {
-        const allowedTypes = [
-            '.ifc', '.dwg', '.rvt', '.step', '.obj', '.gltf', '.glb'
-        ];
+        const allowedTypes = ['.ifc', '.dwg', '.rvt', '.step', '.obj', '.gltf', '.glb'];
         const ext = path.extname(file.originalname).toLowerCase();
         if (!allowedTypes.includes(ext)) {
             return cb(createError(`Invalid file type: ${ext}. Allowed types: ${allowedTypes.join(', ')}`, 400));
@@ -92,7 +90,7 @@ export class UploadOptimizer {
         const childLogger = logger.child({
             requestId,
             filename: file.originalname,
-            size: file.size
+            size: file.size,
         });
         try {
             childLogger.debug('Starting file processing');
@@ -115,7 +113,7 @@ export class UploadOptimizer {
                 size: file.size,
                 hash,
                 path: permanentPath,
-                processedAt: new Date().toISOString()
+                processedAt: new Date().toISOString(),
             };
             childLogger.info({ fileId, hash }, 'File processed successfully');
             return result;
@@ -168,8 +166,8 @@ export class UploadOptimizer {
                         payload: {
                             progress: Math.round(progress),
                             uploadedBytes,
-                            totalBytes: fileSize
-                        }
+                            totalBytes: fileSize,
+                        },
                     });
                 }
             });
@@ -188,7 +186,7 @@ export class UploadOptimizer {
                     chunkNumber,
                     totalChunks,
                     chunkSize,
-                    isComplete: chunkNumber === totalChunks - 1
+                    isComplete: chunkNumber === totalChunks - 1,
                 };
             }
             next();

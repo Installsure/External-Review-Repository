@@ -26,7 +26,7 @@ class RetryableHttpClient {
             logger.debug({
                 url: response.config.url,
                 method: response.config.method,
-                status: response.status
+                status: response.status,
             }, 'HTTP response');
             return response;
         }, (error) => {
@@ -34,7 +34,7 @@ class RetryableHttpClient {
                 url: error.config?.url,
                 method: error.config?.method,
                 status: error.response?.status,
-                error: error.message
+                error: error.message,
             }, 'HTTP response error');
             return Promise.reject(error);
         });
@@ -67,7 +67,7 @@ class RetryableHttpClient {
                     maxRetries,
                     delay,
                     error: error.message,
-                    status: error.response?.status
+                    status: error.response?.status,
                 }, 'HTTP request failed, retrying');
                 await this.sleep(delay);
             }
@@ -75,7 +75,7 @@ class RetryableHttpClient {
         throw lastError;
     }
     sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        return new Promise((resolve) => setTimeout(resolve, ms));
     }
     get(url, config) {
         return this.request({ ...config, method: 'GET', url });

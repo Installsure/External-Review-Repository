@@ -10,5 +10,6 @@ declare class Database {
     getPool(): Pool;
 }
 export declare const db: Database;
+export declare const initDatabase: () => Promise<void>;
 export {};
 //# sourceMappingURL=db.d.ts.map
