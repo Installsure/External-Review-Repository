@@ -53,7 +53,7 @@ const upload = multer({
   storage: storage,
   limits: { fileSize: 100 * 1024 * 1024 }, // 100MB
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['.ifc', '.dwg', '.rvt', '.step', '.obj', '.gltf', '.glb'];
+    const allowedTypes = ['.ifc', '.dwg', '.rvt', '.step', '.obj', '.gltf', '.glb', '.pdf', '.jpg', '.jpeg', '.png'];
     const ext = path.extname(file.originalname).toLowerCase();
     if (allowedTypes.includes(ext)) {
       cb(null, true);
@@ -383,6 +383,67 @@ app.get('/api/qb/health', (req, res) => {
       message: 'QuickBooks integration not configured',
     },
   });
+});
+
+// QTO Demo endpoint
+const qtoDemoSchema = z.object({
+  assembly: z.enum(['paint_wall', 'concrete_slab']),
+  inputs: z.record(z.number()),
+});
+
+app.post('/api/qto-demo', (req, res) => {
+  try {
+    const { assembly, inputs } = qtoDemoSchema.parse(req.body);
+    
+    let result = { quantity: 0, unit: '', cost: 0 };
+
+    if (assembly === 'paint_wall') {
+      const length = inputs.length || 10;
+      const height = inputs.height || 3;
+      const unitCost = inputs.unitCost || 2.5;
+      
+      const area = length * height; // m²
+      const cost = area * unitCost;  // $/m²
+      
+      result = {
+        quantity: area,
+        unit: 'm2',
+        cost: Math.round(cost * 100) / 100,
+      };
+    } else if (assembly === 'concrete_slab') {
+      const length = inputs.length || 5;
+      const width = inputs.width || 5;
+      const thickness = inputs.thickness || 0.1;
+      const unitCost = inputs.unitCost || 120;
+      
+      const volume = length * width * thickness; // m³
+      const cost = volume * unitCost;            // $/m³
+      
+      result = {
+        quantity: volume,
+        unit: 'm3',
+        cost: Math.round(cost * 100) / 100,
+      };
+    }
+
+    res.json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid input',
+        details: error.errors,
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        error: 'Internal server error',
+      });
+    }
+  }
 });
 
 // Error handler
