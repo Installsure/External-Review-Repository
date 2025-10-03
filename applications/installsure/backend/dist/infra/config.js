@@ -35,7 +35,9 @@ const configSchema = z.object({
 // Parse environment variables
 const env = process.env;
 // Parse CORS_ORIGINS as comma-separated string
-const corsOrigins = env.CORS_ORIGINS?.split(',').map(origin => origin.trim()) || ['http://localhost:3000'];
+const corsOrigins = env.CORS_ORIGINS?.split(',').map((origin) => origin.trim()) || [
+    'http://localhost:3000',
+];
 const config = {
     ...configSchema.parse(env),
     CORS_ORIGINS: corsOrigins,

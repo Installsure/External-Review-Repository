@@ -9,7 +9,9 @@ router.get('/health', (req, res) => {
     res.json({
         ok: true,
         connected: config.FEATURE_QB && !!(config.QB_CLIENT_ID && config.QB_CLIENT_SECRET),
-        message: config.FEATURE_QB ? 'QuickBooks integration enabled' : 'QuickBooks integration disabled',
+        message: config.FEATURE_QB
+            ? 'QuickBooks integration enabled'
+            : 'QuickBooks integration disabled',
         configured: !!(config.QB_CLIENT_ID && config.QB_CLIENT_SECRET),
     });
 });

@@ -15,25 +15,25 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-    }
+    },
 });
 const upload = multer({
     storage: storage,
     limits: {
-        fileSize: 100 * 1024 * 1024 // 100MB limit
+        fileSize: 100 * 1024 * 1024, // 100MB limit
     },
     fileFilter: (req, file, cb) => {
-        const allowedTypes = ['.ifc', '.dwg', '.rvt', '.step', '.obj', '.gltf', '.glb'];
+        const allowedTypes = ['.ifc', '.dwg', '.rvt', '.step', '.obj', '.gltf', '.glb', '.pdf', '.jpg', '.jpeg', '.png', '.gif'];
         const ext = path.extname(file.originalname).toLowerCase();
         if (allowedTypes.includes(ext)) {
             cb(null, true);
         }
         else {
-            cb(new Error('Invalid file type. Allowed: IFC, DWG, RVT, STEP, OBJ, GLTF, GLB'));
+            cb(new Error('Invalid file type. Allowed: IFC, DWG, RVT, STEP, OBJ, GLTF, GLB, PDF, JPG, PNG, GIF'));
         }
-    }
+    },
 });
 // Create files table if not exists
 const initFilesTable = async () => {
