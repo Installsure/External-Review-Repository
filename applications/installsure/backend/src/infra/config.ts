@@ -30,7 +30,10 @@ const configSchema = z.object({
   QB_CLIENT_ID: z.string().optional(),
   QB_CLIENT_SECRET: z.string().optional(),
   // Authentication
-  AUTH_SECRET: z.string().min(32, 'AUTH_SECRET must be at least 32 characters'),
+  AUTH_SECRET: z
+    .string()
+    .min(32, 'AUTH_SECRET must be at least 32 characters')
+    .default('test-secret-key-for-development-only-min-32-chars'),
   JWT_EXPIRES_IN: z.string().default('24h'),
 });
 
