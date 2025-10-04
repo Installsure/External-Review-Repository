@@ -18,6 +18,7 @@ This repository contains a complete application suite for external review and re
 - **ZeroStack** - Infrastructure Management (Development Ready)
 - **Hello** - Digital Business Cards (Development Ready)
 - **Avatar** - AI Avatar Platform (Development Ready)
+- **Nexus Calendar** - Calendar API for Construction Events (Production Ready)
 
 ---
 
@@ -111,6 +112,7 @@ npm run test:e2e
 | **ZeroStack** | ⚠️ Development Ready | 3004 | React + Vite | - | ⚠️ | ⚠️ |
 | **Hello** | ⚠️ Development Ready | 3005 | React + Vite | - | ⚠️ | ⚠️ |
 | **Avatar** | ⚠️ Development Ready | 3006 | React + Vite | - | ⚠️ | ⚠️ |
+| **Nexus Calendar** | ✅ Production Ready | 8000 | - | FastAPI | ✅ | - |
 
 ---
 
