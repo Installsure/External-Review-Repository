@@ -10,8 +10,8 @@ export const GET = requireAuth(async (request, context) => {
     const query = url.searchParams.get('q');
     const orgId = url.searchParams.get('org');
     const kinds = url.searchParams.get('kinds')?.split(',') || ['project', 'task', 'comment'];
-    const limit = Math.min(parseInt(url.searchParams.get('limit')) || 20, 50);
-    const offset = parseInt(url.searchParams.get('offset')) || 0;
+    const limit = Math.min(parseInt(url.searchParams.get('limit'), 10) || 20, 50);
+    const offset = parseInt(url.searchParams.get('offset'), 10) || 0;
 
     if (!query || query.trim().length < 2) {
       return Response.json(

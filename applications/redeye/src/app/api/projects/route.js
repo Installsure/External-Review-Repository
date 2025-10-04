@@ -10,8 +10,8 @@ export const GET = requireAuth(async (request, context) => {
     const orgId = url.searchParams.get('org');
     const status = url.searchParams.get('status');
     const search = url.searchParams.get('q');
-    const limit = Math.min(parseInt(url.searchParams.get('limit')) || 20, 100);
-    const offset = parseInt(url.searchParams.get('offset')) || 0;
+    const limit = Math.min(parseInt(url.searchParams.get('limit'), 10) || 20, 100);
+    const offset = parseInt(url.searchParams.get('offset'), 10) || 0;
 
     if (!orgId) {
       return Response.json({ error: 'Organization ID is required' }, { status: 400 });

@@ -40,7 +40,7 @@ export async function GET(request) {
     // Get total count for pagination
     const countQuery = `SELECT COUNT(*) as total FROM memory ${whereClause}`;
     const countResult = await sql(countQuery, params.slice(0, -2)); // Remove limit/offset params
-    const total = parseInt(countResult[0].total);
+    const total = parseInt(countResult[0].total, 10);
 
     return Response.json({
       success: true,

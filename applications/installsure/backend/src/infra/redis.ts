@@ -40,9 +40,9 @@ class RedisManager {
       if (config.REDIS_URL) {
         const redisUrl = new URL(config.REDIS_URL);
         redisConfig.host = redisUrl.hostname;
-        redisConfig.port = parseInt(redisUrl.port) || 6379;
+        redisConfig.port = parseInt(redisUrl.port, 10) || 6379;
         redisConfig.password = redisUrl.password || undefined;
-        redisConfig.db = parseInt(redisUrl.pathname.slice(1)) || 0;
+        redisConfig.db = parseInt(redisUrl.pathname.slice(1), 10) || 0;
       }
 
       this.client = new Redis(redisConfig);

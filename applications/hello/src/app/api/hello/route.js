@@ -92,8 +92,8 @@ export async function GET(request) {
     const url = new URL(request.url);
     const direction = url.searchParams.get('direction') || 'both';
     const status = url.searchParams.get('status');
-    const limit = parseInt(url.searchParams.get('limit') || '50');
-    const offset = parseInt(url.searchParams.get('offset') || '0');
+    const limit = parseInt(url.searchParams.get('limit') || '50', 10);
+    const offset = parseInt(url.searchParams.get('offset') || '0', 10);
 
     let hellos = [];
 
