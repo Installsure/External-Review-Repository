@@ -4,7 +4,7 @@ dotenv.config();
 
 export const config = {
   NODE_ENV: process.env.NODE_ENV || 'development',
-  PORT: parseInt(process.env.PORT || '8000'),
+  PORT: parseInt(process.env.PORT || '8000', 10),
   CORS_ORIGINS: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000'],
   DATABASE_URL: process.env.DATABASE_URL || '',
   FORGE_CLIENT_ID: process.env.FORGE_CLIENT_ID || '',

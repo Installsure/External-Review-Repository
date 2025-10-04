@@ -10,8 +10,8 @@ export const GET = requireAuth(async (request, context) => {
     const projectId = url.searchParams.get('project_id');
     const status = url.searchParams.get('status');
     const assignee = url.searchParams.get('assignee');
-    const limit = Math.min(parseInt(url.searchParams.get('limit')) || 50, 100);
-    const offset = parseInt(url.searchParams.get('offset')) || 0;
+    const limit = Math.min(parseInt(url.searchParams.get('limit'), 10) || 50, 100);
+    const offset = parseInt(url.searchParams.get('offset'), 10) || 0;
 
     if (!projectId) {
       return Response.json({ error: 'Project ID is required' }, { status: 400 });

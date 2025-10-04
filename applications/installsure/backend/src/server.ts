@@ -10,7 +10,7 @@ import { z } from 'zod';
 // Configuration
 const config = {
   NODE_ENV: process.env.NODE_ENV || 'development',
-  PORT: parseInt(process.env.PORT || '8000'),
+  PORT: parseInt(process.env.PORT || '8000', 10),
   CORS_ORIGINS: process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()) || [
     'http://localhost:3000',
   ],
