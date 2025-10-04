@@ -110,7 +110,7 @@ if echo "$DEMO_RESPONSE" | jq -e '.ok' > /dev/null; then
   if echo "$DEMO_RESPONSE" | jq -e '.error' > /dev/null; then
     info "Residential demo skipped: $(echo $DEMO_RESPONSE | jq -r '.error')"
   else
-    check "Residential demo completed"
+    info "Residential demo completed successfully"
     PLAN_PATH=$(echo "$DEMO_RESPONSE" | jq -r '.plan // "N/A"')
     info "Plan: $PLAN_PATH"
   fi

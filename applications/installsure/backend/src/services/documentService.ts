@@ -29,7 +29,7 @@ function slug(s: string): string {
 }
 
 export async function ingestAIALibrary(): Promise<IngestAIAResponse> {
-  const manifestPath = path.join(process.cwd(), '../../aia-library.manifest.json');
+  const manifestPath = path.join(process.cwd(), '../../../aia-library.manifest.json');
   
   if (!fsSync.existsSync(manifestPath)) {
     return { ok: false, error: 'aia-library.manifest.json missing' };
@@ -140,7 +140,7 @@ export function createChangeOrder(body: ChangeOrderRequest): ChangeOrderResponse
 }
 
 export async function processResidentialDemo(): Promise<ResidentialDemoResponse> {
-  const manifestPath = path.join(process.cwd(), '../../residential-plan.manifest.json');
+  const manifestPath = path.join(process.cwd(), '../../../residential-plan.manifest.json');
   
   if (!fsSync.existsSync(manifestPath)) {
     return { ok: false, error: 'residential-plan.manifest.json missing' };
