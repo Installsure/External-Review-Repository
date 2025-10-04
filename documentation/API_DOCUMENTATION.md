@@ -18,6 +18,7 @@ This documentation covers the APIs for all applications in the External Review R
 | **ZeroStack** | 3004 | `http://localhost:3004/api` | ⚠️ Development Ready |
 | **Hello** | 3005 | `http://localhost:3005/api` | ⚠️ Development Ready |
 | **Avatar** | 3006 | `http://localhost:3006/api` | ⚠️ Development Ready |
+| **Nexus Calendar** | 8000 | `http://localhost:8000/api` | ✅ Production Ready |
 
 ---
 
@@ -448,6 +449,98 @@ for port in 3000 3001 3002 3003 3004 3005 3006; do
   curl -s http://localhost:$port/api/health || echo "Failed"
 done
 ```
+
+---
+
+## 📅 **NEXUS CALENDAR API**
+
+### **Base URL:** `http://localhost:8000/api`
+
+The Nexus Calendar API provides endpoints for managing calendar events for construction projects.
+
+### **Get Calendar Events**
+```http
+GET /api/calendar/events?projectId=DEMO
+```
+
+**Query Parameters:**
+- `projectId` (optional, default: "DEMO") - Project identifier
+
+**Response:**
+```json
+{
+  "ok": true,
+  "events": [
+    {
+      "id": "rfi-001",
+      "title": "RFI 001 Response Due",
+      "type": "RFI",
+      "date": "2025-10-09T18:00:00.000000",
+      "linked": "/docs/rfi/rfi-001.txt"
+    },
+    {
+      "id": "co-001",
+      "title": "CO-001 Approval Deadline",
+      "type": "Change Order",
+      "date": "2025-10-11T18:00:00.000000",
+      "linked": "/docs/co/co-001.txt"
+    }
+  ]
+}
+```
+
+### **Add Calendar Event**
+```http
+POST /api/calendar/events
+Content-Type: application/json
+
+{
+  "id": "custom-id",
+  "title": "Event Title",
+  "type": "General",
+  "date": "2025-10-10T10:00:00",
+  "linked": "/path/to/resource"
+}
+```
+
+**Request Body Parameters:**
+- `id` (optional) - Custom event ID (auto-generated if not provided)
+- `title` (required) - Event title
+- `type` (optional, default: "General") - Event type (RFI, Change Order, Workforce, Payment, General)
+- `date` (optional) - Event date in ISO 8601 format (defaults to current time)
+- `linked` (optional) - Path to linked resource/document
+
+**Response:**
+```json
+{
+  "ok": true,
+  "event": {
+    "id": "custom-id",
+    "title": "Event Title",
+    "type": "General",
+    "date": "2025-10-10T10:00:00",
+    "linked": "/path/to/resource"
+  }
+}
+```
+
+### **Event Types**
+- **RFI** - Request for Information
+- **Change Order** - Change Order deadlines
+- **Workforce** - Workforce-related events (toolbox talks, safety meetings)
+- **Payment** - Payment application deadlines
+- **General** - General events
+
+### **Running the Calendar API**
+```bash
+cd nexus
+pip install -r requirements.txt
+uvicorn server:app --port 8000
+```
+
+**API Documentation (Swagger):** `http://localhost:8000/docs`
+
+---
 
 ### **API Testing with Postman**
 Import the Postman collection from `testing/postman/` directory.
