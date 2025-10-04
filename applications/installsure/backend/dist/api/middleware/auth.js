@@ -6,14 +6,14 @@ export const generateToken = (payload) => {
     return jwt.sign(payload, config.AUTH_SECRET, {
         expiresIn: config.JWT_EXPIRES_IN || '24h',
         issuer: 'installsure',
-        audience: 'installsure-users'
+        audience: 'installsure-users',
     });
 };
 export const verifyToken = (token) => {
     try {
         return jwt.verify(token, config.AUTH_SECRET, {
             issuer: 'installsure',
-            audience: 'installsure-users'
+            audience: 'installsure-users',
         });
     }
     catch (error) {
@@ -27,7 +27,7 @@ export const authenticateToken = async (req, res, next) => {
         logger.warn({
             ip: req.ip,
             userAgent: req.get('User-Agent'),
-            url: req.url
+            url: req.url,
         }, 'Authentication failed: No token provided');
         next(createError('Access token required', 401));
         return;
@@ -39,13 +39,13 @@ export const authenticateToken = async (req, res, next) => {
             id: decoded.userId,
             email: decoded.email,
             role: decoded.role,
-            companyId: decoded.companyId
+            companyId: decoded.companyId,
         };
         // Add user context to logger
         req.logger = logger.child({
             userId: decoded.userId,
             email: decoded.email,
-            role: decoded.role
+            role: decoded.role,
         });
         next();
     }
@@ -54,7 +54,7 @@ export const authenticateToken = async (req, res, next) => {
             error: error.message,
             ip: req.ip,
             userAgent: req.get('User-Agent'),
-            url: req.url
+            url: req.url,
         }, 'Authentication failed: Invalid token');
         next(error);
     }
@@ -70,7 +70,7 @@ export const requireRole = (allowedRoles) => {
                 userId: req.user.id,
                 userRole: req.user.role,
                 requiredRoles: allowedRoles,
-                url: req.url
+                url: req.url,
             }, 'Authorization failed: Insufficient permissions');
             next(createError('Insufficient permissions', 403));
             return;
@@ -91,12 +91,12 @@ export const optionalAuth = async (req, res, next) => {
             id: decoded.userId,
             email: decoded.email,
             role: decoded.role,
-            companyId: decoded.companyId
+            companyId: decoded.companyId,
         };
         req.logger = logger.child({
             userId: decoded.userId,
             email: decoded.email,
-            role: decoded.role
+            role: decoded.role,
         });
     }
     catch (error) {

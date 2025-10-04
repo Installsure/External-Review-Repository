@@ -385,6 +385,43 @@ app.get('/api/qb/health', (req, res) => {
   });
 });
 
+// Calendar events endpoint
+app.get('/api/calendar/events', (req, res) => {
+  const events = [
+    {
+      id: '1',
+      title: 'Project Kickoff Meeting',
+      type: 'meeting',
+      date: new Date(Date.now() + 86400000).toISOString(), // Tomorrow
+      linked: '/projects/1',
+    },
+    {
+      id: '2',
+      title: 'Site Inspection',
+      type: 'inspection',
+      date: new Date(Date.now() + 172800000).toISOString(), // 2 days from now
+    },
+    {
+      id: '3',
+      title: 'Design Review',
+      type: 'review',
+      date: new Date(Date.now() + 259200000).toISOString(), // 3 days from now
+      linked: '/reports',
+    },
+    {
+      id: '4',
+      title: 'Material Delivery',
+      type: 'delivery',
+      date: new Date(Date.now() + 432000000).toISOString(), // 5 days from now
+    },
+  ];
+
+  res.json({
+    success: true,
+    events: events,
+  });
+});
+
 // Error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err);
