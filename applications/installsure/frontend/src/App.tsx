@@ -12,6 +12,7 @@ import Upload from './pages/Upload';
 import Viewer from './pages/Viewer';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import CalendarPage from './pages/Calendar';
 
 // Initialize Sentry
 initSentry();
@@ -48,6 +49,12 @@ function App() {
                       Reports
                     </a>
                     <a
+                      href="/calendar"
+                      className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      📅 Calendar
+                    </a>
+                    <a
                       href="/settings"
                       className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                     >
@@ -64,6 +71,7 @@ function App() {
                 <Route path="/upload" element={<Upload />} />
                 <Route path="/viewer/:urn" element={<Viewer />} />
                 <Route path="/reports" element={<Reports />} />
+                <Route path="/calendar" element={<CalendarPage />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>
             </main>
