@@ -200,6 +200,39 @@ code external-review-repository.code-workspace
 
 ---
 
+## 💡 **VSCODE QUICK REFERENCE**
+
+### **One-Click Links**
+- 🖥️ [Open in VSCode Desktop](vscode://vscode.git/clone?url=https://github.com/Installsure/External-Review-Repository)
+- ☁️ [Open in GitHub Codespaces](https://github.com/Installsure/External-Review-Repository/codespaces)
+- 🌐 [Open in vscode.dev](https://vscode.dev/github/Installsure/External-Review-Repository)
+
+### **Essential Commands**
+```bash
+# Open workspace
+code external-review-repository.code-workspace
+
+# Run tasks
+Ctrl+Shift+P → "Tasks: Run Task"
+
+# Debug apps
+F5 → Select configuration
+
+# Run tests
+Ctrl+Shift+P → "Tasks: Run Task" → "Run All Tests"
+```
+
+### **Recommended Extensions** (Auto-installed)
+- ✅ ESLint & Prettier (Code formatting)
+- ✅ Python & Pylance (Backend development)
+- ✅ Tailwind CSS IntelliSense
+- ✅ Vitest & Playwright (Testing)
+- ✅ GitLens (Git integration)
+
+📖 **Full Guide:** See [VSCode Setup Guide](documentation/VSCODE_SETUP.md)
+
+---
+
 ## 🤝 **CONTRIBUTING**
 
 We welcome contributions from external reviewers! Please see our [Contributing Guide](CONTRIBUTING.md) for:
