@@ -24,9 +24,47 @@
 
 ## 🔧 **INSTALLATION STEPS**
 
+### **Step 0: Visual Studio Code Setup (Recommended)**
+
+**Quick Start with VSCode:**
+
+1. **One-Click Open Options:**
+   - **Desktop VSCode**: Click [Open in VSCode](vscode://vscode.git/clone?url=https://github.com/Installsure/External-Review-Repository)
+   - **GitHub Codespaces**: Visit [Codespaces](https://github.com/Installsure/External-Review-Repository/codespaces)
+   - **Browser VSCode**: Open in [vscode.dev](https://vscode.dev/github/Installsure/External-Review-Repository)
+
+2. **Manual VSCode Setup:**
+   ```bash
+   # Clone the repository
+   git clone https://github.com/Installsure/External-Review-Repository.git
+   cd External-Review-Repository
+   
+   # Open the workspace in VSCode
+   code external-review-repository.code-workspace
+   ```
+
+3. **Install Recommended Extensions:**
+   - VSCode will prompt you to install recommended extensions
+   - Click "Install All" when prompted
+   - Extensions include: ESLint, Prettier, Python, Tailwind CSS, and more
+
+4. **Verify Setup:**
+   - Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac)
+   - Type "Tasks: Run Task"
+   - Select "Install All Dependencies" to verify everything works
+
+**Benefits of VSCode Setup:**
+- ✅ Pre-configured settings for consistent code style
+- ✅ Debugging configurations for all applications
+- ✅ Integrated terminal tasks for build, test, and run
+- ✅ Git integration with GitLens
+- ✅ IntelliSense and autocompletion optimized
+
+---
+
 ### **Step 1: Clone Repository**
 ```bash
-git clone <repository-url>
+git clone https://github.com/Installsure/External-Review-Repository.git
 cd External-Review-Repository
 ```
 
@@ -219,6 +257,57 @@ npm run verify:release
 ---
 
 ## 🛠️ **DEVELOPMENT WORKFLOW**
+
+### **Visual Studio Code Development**
+
+**Using VSCode Tasks:**
+```bash
+# Press Ctrl+Shift+P (Cmd+Shift+P on Mac) and type "Tasks: Run Task"
+# Available tasks:
+- "Install All Dependencies"      # Install all npm packages
+- "Start All Applications"        # Start all apps at once
+- "Run All Tests"                 # Execute test suite
+- "InstallSure Frontend - Dev"    # Start InstallSure frontend
+- "InstallSure Backend - Dev"     # Start InstallSure backend
+- "TypeScript: Check All"         # Type checking
+- "ESLint: Fix All"              # Lint and fix code
+- "Prettier: Format All"         # Format all files
+```
+
+**Using VSCode Debugging:**
+```bash
+# Press F5 or go to Run and Debug (Ctrl+Shift+D)
+# Available debug configurations:
+- "InstallSure Frontend (Chrome)"  # Debug frontend in Chrome
+- "InstallSure Backend (Python)"   # Debug Python backend
+- "InstallSure Full Stack"         # Debug both frontend & backend
+- Individual configs for all apps
+```
+
+**VSCode Multi-Root Workspace:**
+```bash
+# The workspace is organized with folders for easy navigation:
+📁 Root                    # Repository root
+📁 InstallSure Frontend    # React + TypeScript
+📁 InstallSure Backend     # Python + FastAPI
+📁 Demo Dashboard          # React + TypeScript
+📁 FF4U                    # React + TypeScript
+📁 RedEye                  # React + TypeScript
+📁 ZeroStack               # React + TypeScript
+📁 Hello                   # React + TypeScript
+📁 Avatar                  # React + TypeScript
+📁 Documentation           # Markdown files
+
+# Each folder has its own terminal, settings, and context
+```
+
+**Quick Commands in VSCode:**
+- `Ctrl+Shift+B` - Run build task
+- `Ctrl+Shift+T` - Run test task
+- `F5` - Start debugging
+- `Ctrl+Shift+P` - Command palette
+- `Ctrl+P` - Quick file open
+- `Ctrl+Shift+F` - Search across all files
 
 ### **Code Quality**
 ```bash

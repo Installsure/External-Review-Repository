@@ -1,0 +1,72 @@
+{
+  "folders": [
+    {
+      "name": "🏠 Root",
+      "path": "."
+    },
+    {
+      "name": "📦 InstallSure Frontend",
+      "path": "applications/installsure/frontend"
+    },
+    {
+      "name": "🐍 InstallSure Backend",
+      "path": "applications/installsure/backend"
+    },
+    {
+      "name": "📊 Demo Dashboard",
+      "path": "applications/demo-dashboard"
+    },
+    {
+      "name": "🎬 FF4U",
+      "path": "applications/ff4u"
+    },
+    {
+      "name": "👁️ RedEye",
+      "path": "applications/redeye"
+    },
+    {
+      "name": "⚡ ZeroStack",
+      "path": "applications/zerostack"
+    },
+    {
+      "name": "👋 Hello",
+      "path": "applications/hello"
+    },
+    {
+      "name": "🤖 Avatar",
+      "path": "applications/avatar"
+    },
+    {
+      "name": "📚 Documentation",
+      "path": "documentation"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.git": true,
+      "**/.DS_Store": true,
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/build": true,
+      "**/__pycache__": true,
+      "**/*.pyc": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "ms-python.python",
+      "bradlc.vscode-tailwindcss",
+      "vitest.explorer",
+      "ms-playwright.playwright",
+      "eamodio.gitlens",
+      "github.vscode-pull-request-github"
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [],
+    "compounds": []
+  }
+}

@@ -23,16 +23,24 @@ This repository contains a complete application suite for external review and re
 
 ## 🚀 **QUICK START**
 
+### **Open in Visual Studio Code**
+
+**One-Click Setup:**
+- **[Open in VSCode (Desktop)](vscode://vscode.git/clone?url=https://github.com/Installsure/External-Review-Repository)** - Clone and open in VSCode Desktop
+- **[Open in GitHub Codespaces](https://github.com/Installsure/External-Review-Repository/codespaces)** - Launch cloud development environment
+- **[Open in vscode.dev](https://vscode.dev/github/Installsure/External-Review-Repository)** - Open in browser-based VSCode
+
 ### **Prerequisites**
 - Node.js v20+ (v22.19.0 recommended)
 - npm v8+ (v10.9.3 recommended)
 - Python v3.10+ (for InstallSure backend)
 - Git v2.47+
+- **Visual Studio Code** (recommended)
 
 ### **Installation**
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/Installsure/External-Review-Repository.git
 cd External-Review-Repository
 
 # Run preflight check
@@ -58,6 +66,7 @@ npm install
 
 ## 📚 **DOCUMENTATION**
 
+- **[VSCode Setup Guide](documentation/VSCODE_SETUP.md)** - Visual Studio Code integration and configuration
 - **[Setup Guide](documentation/SETUP_GUIDE.md)** - Complete setup instructions
 - **[API Documentation](documentation/API_DOCUMENTATION.md)** - Comprehensive API reference
 - **[Troubleshooting Guide](documentation/TROUBLESHOOTING.md)** - Common issues and solutions
@@ -81,6 +90,27 @@ npm run test:e2e
 ---
 
 ## 🔧 **DEVELOPMENT**
+
+### **Visual Studio Code Setup**
+This repository includes comprehensive VSCode configuration:
+- **Recommended Extensions**: Automatically suggested on first open
+- **Workspace Settings**: Consistent formatting and linting
+- **Debug Configurations**: Launch configs for all applications
+- **Tasks**: Build, test, and run tasks pre-configured
+- **Multi-root Workspace**: Organized folder structure
+
+**Open Workspace in VSCode:**
+```bash
+# Open the multi-root workspace
+code external-review-repository.code-workspace
+```
+
+**Recommended VSCode Extensions (auto-installed):**
+- ESLint & Prettier for code quality
+- Python & Pylance for backend development
+- Tailwind CSS IntelliSense
+- Vitest & Playwright for testing
+- GitLens for Git integration
 
 ### **Code Quality**
 - **TypeScript**: Full type safety across all applications
@@ -167,6 +197,39 @@ npm run test:e2e
 - Check [Troubleshooting Guide](documentation/TROUBLESHOOTING.md)
 - Review application logs
 - Open a GitHub issue for support
+
+---
+
+## 💡 **VSCODE QUICK REFERENCE**
+
+### **One-Click Links**
+- 🖥️ [Open in VSCode Desktop](vscode://vscode.git/clone?url=https://github.com/Installsure/External-Review-Repository)
+- ☁️ [Open in GitHub Codespaces](https://github.com/Installsure/External-Review-Repository/codespaces)
+- 🌐 [Open in vscode.dev](https://vscode.dev/github/Installsure/External-Review-Repository)
+
+### **Essential Commands**
+```bash
+# Open workspace
+code external-review-repository.code-workspace
+
+# Run tasks
+Ctrl+Shift+P → "Tasks: Run Task"
+
+# Debug apps
+F5 → Select configuration
+
+# Run tests
+Ctrl+Shift+P → "Tasks: Run Task" → "Run All Tests"
+```
+
+### **Recommended Extensions** (Auto-installed)
+- ✅ ESLint & Prettier (Code formatting)
+- ✅ Python & Pylance (Backend development)
+- ✅ Tailwind CSS IntelliSense
+- ✅ Vitest & Playwright (Testing)
+- ✅ GitLens (Git integration)
+
+📖 **Full Guide:** See [VSCode Setup Guide](documentation/VSCODE_SETUP.md)
 
 ---
 
