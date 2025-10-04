@@ -1,0 +1,198 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Install All Dependencies",
+      "type": "shell",
+      "command": "npm",
+      "args": ["install"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Start All Applications",
+      "type": "shell",
+      "windows": {
+        "command": ".\\scripts\\start-all.ps1"
+      },
+      "linux": {
+        "command": "./scripts/start-all.sh"
+      },
+      "osx": {
+        "command": "./scripts/start-all.sh"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Run All Tests",
+      "type": "shell",
+      "windows": {
+        "command": ".\\scripts\\test-all.ps1"
+      },
+      "linux": {
+        "command": "./scripts/test-all.sh"
+      },
+      "osx": {
+        "command": "./scripts/test-all.sh"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "InstallSure Frontend - Dev",
+      "type": "npm",
+      "script": "dev",
+      "path": "applications/installsure/frontend/",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "InstallSure Backend - Dev",
+      "type": "shell",
+      "command": "python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000",
+      "options": {
+        "cwd": "${workspaceFolder}/applications/installsure/backend"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Demo Dashboard - Dev",
+      "type": "npm",
+      "script": "dev",
+      "path": "applications/demo-dashboard/",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "FF4U - Dev",
+      "type": "npm",
+      "script": "dev",
+      "path": "applications/ff4u/",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "RedEye - Dev",
+      "type": "npm",
+      "script": "dev",
+      "path": "applications/redeye/",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "ZeroStack - Dev",
+      "type": "npm",
+      "script": "dev",
+      "path": "applications/zerostack/",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Hello - Dev",
+      "type": "npm",
+      "script": "dev",
+      "path": "applications/hello/",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Avatar - Dev",
+      "type": "npm",
+      "script": "dev",
+      "path": "applications/avatar/",
+      "group": "build",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "TypeScript: Check All",
+      "type": "shell",
+      "command": "npm run type-check",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": "$tsc",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "ESLint: Fix All",
+      "type": "shell",
+      "command": "npm run lint:fix",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Prettier: Format All",
+      "type": "shell",
+      "command": "npm run format",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    }
+  ]
+}

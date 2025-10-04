@@ -1,0 +1,110 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "InstallSure Frontend (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/applications/installsure/frontend",
+      "sourceMaps": true
+    },
+    {
+      "name": "Demo Dashboard (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3001",
+      "webRoot": "${workspaceFolder}/applications/demo-dashboard",
+      "sourceMaps": true
+    },
+    {
+      "name": "FF4U (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3002",
+      "webRoot": "${workspaceFolder}/applications/ff4u",
+      "sourceMaps": true
+    },
+    {
+      "name": "RedEye (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3003",
+      "webRoot": "${workspaceFolder}/applications/redeye",
+      "sourceMaps": true
+    },
+    {
+      "name": "ZeroStack (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3004",
+      "webRoot": "${workspaceFolder}/applications/zerostack",
+      "sourceMaps": true
+    },
+    {
+      "name": "Hello (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3005",
+      "webRoot": "${workspaceFolder}/applications/hello",
+      "sourceMaps": true
+    },
+    {
+      "name": "Avatar (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3006",
+      "webRoot": "${workspaceFolder}/applications/avatar",
+      "sourceMaps": true
+    },
+    {
+      "name": "InstallSure Backend (Python)",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "main:app",
+        "--reload",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000"
+      ],
+      "cwd": "${workspaceFolder}/applications/installsure/backend",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/applications/installsure/backend"
+      },
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Python: Current File",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Attach to Chrome",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "InstallSure Full Stack",
+      "configurations": [
+        "InstallSure Frontend (Chrome)",
+        "InstallSure Backend (Python)"
+      ],
+      "presentation": {
+        "hidden": false,
+        "group": "Full Stack",
+        "order": 1
+      }
+    }
+  ]
+}
