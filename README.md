@@ -60,6 +60,8 @@ npm install
 
 - **[Setup Guide](documentation/SETUP_GUIDE.md)** - Complete setup instructions
 - **[API Documentation](documentation/API_DOCUMENTATION.md)** - Comprehensive API reference
+- **[Nexus AI Guide](documentation/NEXUS_AI_GUIDE.md)** - Complete Nexus AI system guide
+- **[Nexus Quick Reference](documentation/NEXUS_QUICK_REFERENCE.md)** - Quick command reference
 - **[Troubleshooting Guide](documentation/TROUBLESHOOTING.md)** - Common issues and solutions
 - **[Contributing Guide](CONTRIBUTING.md)** - Guidelines for external reviewers
 - **[Comprehensive Review Report](documentation/COMPREHENSIVE_REVIEW_REPORT.md)** - Detailed analysis
