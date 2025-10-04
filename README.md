@@ -6,6 +6,10 @@
 
 ---
 
+> **🎬 Want to run a full demo?** Check out **[HOW_TO_RUN_DEMO.md](HOW_TO_RUN_DEMO.md)** for the complete guide!
+
+---
+
 ## 📋 **REPOSITORY OVERVIEW**
 
 This repository contains a complete application suite for external review and repair services. All applications have been professionally reviewed, repaired, and prepared for external access.
@@ -23,6 +27,9 @@ This repository contains a complete application suite for external review and re
 
 ## 🚀 **QUICK START**
 
+### **For a Quick Demo (Recommended)**
+See **[HOW_TO_RUN_DEMO.md](HOW_TO_RUN_DEMO.md)** for three easy ways to run the complete demo!
+
 ### **Prerequisites**
 - Node.js v20+ (v22.19.0 recommended)
 - npm v8+ (v10.9.3 recommended)
@@ -35,29 +42,43 @@ This repository contains a complete application suite for external review and re
 git clone <repository-url>
 cd External-Review-Repository
 
-# Run preflight check
-.\tools\preflight-check.ps1
-
-# Install dependencies
+# Install dependencies for demo dashboard
+cd applications/demo-dashboard
 npm install
+cd ../..
 
-# Start all applications
-.\scripts\start-all.ps1
+# Start the demo dashboard
+cd applications/demo-dashboard
+npm run dev
+
+# OR start all applications
+./scripts/start-all.sh    # Linux/macOS
+.\scripts\start-all.ps1   # Windows
 ```
 
 ### **Access Applications**
+- **Demo Dashboard** (START HERE): http://localhost:3001
 - **InstallSure**: http://localhost:3000
-- **Demo Dashboard**: http://localhost:3001
 - **FF4U**: http://localhost:3002
 - **RedEye**: http://localhost:3003
 - **ZeroStack**: http://localhost:3004
 - **Hello**: http://localhost:3005
 - **Avatar**: http://localhost:3006
 
+### **Verify Demo**
+```bash
+./scripts/verify-demo.sh    # Linux/macOS
+.\scripts\verify-demo.ps1   # Windows
+```
+
 ---
 
 ## 📚 **DOCUMENTATION**
 
+- **[🎬 How to Run Demo](HOW_TO_RUN_DEMO.md)** - Complete guide to running the E2E demo
+- **[🚀 Quick Start Demo](QUICK_START_DEMO.md)** - Get the demo running in 5 minutes!
+- **[🎬 E2E Demo Guide](documentation/E2E_DEMO_GUIDE.md)** - Complete walkthrough of all applications
+- **[🔐 Demo Credentials](documentation/DEMO_CREDENTIALS.md)** - Test accounts and scenarios
 - **[Setup Guide](documentation/SETUP_GUIDE.md)** - Complete setup instructions
 - **[API Documentation](documentation/API_DOCUMENTATION.md)** - Comprehensive API reference
 - **[Troubleshooting Guide](documentation/TROUBLESHOOTING.md)** - Common issues and solutions
