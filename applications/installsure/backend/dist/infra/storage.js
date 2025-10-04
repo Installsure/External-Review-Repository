@@ -89,7 +89,10 @@ export const storage = createStorageProvider();
 // Utility function to generate unique file keys
 export const generateFileKey = (originalName, prefix = 'uploads') => {
     const timestamp = Date.now();
-    const hash = createHash('md5').update(originalName + timestamp).digest('hex').substring(0, 8);
+    const hash = createHash('md5')
+        .update(originalName + timestamp)
+        .digest('hex')
+        .substring(0, 8);
     const ext = path.extname(originalName);
     return `${prefix}/${timestamp}-${hash}${ext}`;
 };

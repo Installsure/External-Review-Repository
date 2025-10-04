@@ -20,14 +20,14 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-    }
+    },
 });
 const upload = multer({
     storage: storage,
     limits: {
-        fileSize: 100 * 1024 * 1024 // 100MB limit
+        fileSize: 100 * 1024 * 1024, // 100MB limit
     },
     fileFilter: (req, file, cb) => {
         const allowedTypes = ['.ifc', '.dwg', '.rvt', '.step', '.obj', '.gltf', '.glb'];
@@ -39,7 +39,7 @@ const upload = multer({
             const error = new Error(`Invalid file type. Allowed: ${allowedTypes.join(', ')}`);
             cb(error);
         }
-    }
+    },
 });
 // GET /api/files - List all files
 router.get('/', asyncHandler(async (req, res) => {

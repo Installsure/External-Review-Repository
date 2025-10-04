@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { forgeService } from '../../services/forgeService.js';
 import { validateBody, validateParams } from '../middleware/validate.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
-import { forgeUploadSchema, forgeTranslateSchema } from '../schemas/files.js';
+import { forgeUploadSchema, forgeTranslateSchema, } from '../schemas/files.js';
 import { z } from 'zod';
 const router = Router();
 // POST /api/autocad/auth - Get 2-legged token
@@ -10,7 +10,7 @@ router.post('/auth', asyncHandler(async (req, res) => {
     // This is a simple endpoint that returns a mock token
     // In a real implementation, this would call the Forge service
     res.json({
-        token: 'mock-forge-token'
+        token: 'mock-forge-token',
     });
 }));
 // POST /api/autocad/upload - Upload file to Forge
