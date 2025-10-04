@@ -12,6 +12,7 @@ import Upload from './pages/Upload';
 import Viewer from './pages/Viewer';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import DemoPanel from './pages/DemoPanel';
 
 // Initialize Sentry
 initSentry();
@@ -53,6 +54,12 @@ function App() {
                     >
                       Settings
                     </a>
+                    <a
+                      href="/demo"
+                      className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Demo
+                    </a>
                   </div>
                 </div>
               </div>
@@ -65,6 +72,7 @@ function App() {
                 <Route path="/viewer/:urn" element={<Viewer />} />
                 <Route path="/reports" element={<Reports />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/demo" element={<DemoPanel />} />
               </Routes>
             </main>
           </div>
