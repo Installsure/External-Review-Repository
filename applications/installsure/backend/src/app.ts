@@ -12,6 +12,8 @@ import projectRoutes from './api/routes/projects.js';
 import fileRoutes from './api/routes/files.js';
 import forgeRoutes from './api/routes/forge.js';
 import qbRoutes from './api/routes/qb.js';
+import docsRoutes from './api/routes/docs.js';
+import demoRoutes from './api/routes/demo.js';
 
 export const createApp = (): express.Application => {
   const app = express();
@@ -32,6 +34,8 @@ export const createApp = (): express.Application => {
   app.use('/api/files', fileRoutes);
   app.use('/api/autocad', forgeRoutes);
   app.use('/api/qb', qbRoutes);
+  app.use('/api/docs', docsRoutes);
+  app.use('/api/demo', demoRoutes);
 
   // 404 handler
   app.use(notFoundHandler);

@@ -9,6 +9,12 @@ import type {
   ForgeManifestResponse,
   ForgePropertiesResponse,
   QBHealthResponse,
+  RFIRequest,
+  RFIResponse,
+  ChangeOrderRequest,
+  ChangeOrderResponse,
+  IngestAIAResponse,
+  ResidentialDemoResponse,
 } from '../types/api.js';
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:8000';
@@ -168,6 +174,33 @@ export class ApiClient {
   // QuickBooks
   async getQBHealth(): Promise<QBHealthResponse> {
     return this.request<QBHealthResponse>('/api/qb/health');
+  }
+
+  // Document Management
+  async ingestAIALibrary(): Promise<IngestAIAResponse> {
+    return this.request<IngestAIAResponse>('/api/docs/ingestAIA', {
+      method: 'POST',
+    });
+  }
+
+  async createRFI(data: RFIRequest): Promise<RFIResponse> {
+    return this.request<RFIResponse>('/api/docs/rfi', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async createChangeOrder(data: ChangeOrderRequest): Promise<ChangeOrderResponse> {
+    return this.request<ChangeOrderResponse>('/api/docs/co', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async processResidentialDemo(): Promise<ResidentialDemoResponse> {
+    return this.request<ResidentialDemoResponse>('/api/demo/residential', {
+      method: 'POST',
+    });
   }
 }
 

@@ -10,7 +10,9 @@ import { z } from 'zod';
 const config = {
     NODE_ENV: process.env.NODE_ENV || 'development',
     PORT: parseInt(process.env.PORT || '8000'),
-    CORS_ORIGINS: process.env.CORS_ORIGINS?.split(',').map(o => o.trim()) || ['http://localhost:3000'],
+    CORS_ORIGINS: process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()) || [
+        'http://localhost:3000',
+    ],
     DATABASE_URL: process.env.DATABASE_URL,
     FORGE_CLIENT_ID: process.env.FORGE_CLIENT_ID,
     FORGE_CLIENT_SECRET: process.env.FORGE_CLIENT_SECRET,
@@ -22,7 +24,7 @@ const app = express();
 app.use(helmet());
 app.use(cors({
     origin: config.CORS_ORIGINS,
-    credentials: true
+    credentials: true,
 }));
 app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
@@ -36,9 +38,9 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-    }
+    },
 });
 const upload = multer({
     storage: storage,
@@ -52,7 +54,7 @@ const upload = multer({
         else {
             cb(new Error(`Invalid file type. Allowed: ${allowedTypes.join(', ')}`));
         }
-    }
+    },
 });
 // Health endpoints
 app.get('/api/health', (req, res) => {
@@ -61,7 +63,7 @@ app.get('/api/health', (req, res) => {
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
         version: '1.0.0',
-        environment: config.NODE_ENV
+        environment: config.NODE_ENV,
     });
 });
 app.get('/livez', (req, res) => {
@@ -77,7 +79,7 @@ app.get('/api/projects', (req, res) => {
 });
 const projectSchema = z.object({
     name: z.string().min(1),
-    description: z.string().optional()
+    description: z.string().optional(),
 });
 app.post('/api/projects', (req, res) => {
     try {
@@ -86,7 +88,7 @@ app.post('/api/projects', (req, res) => {
             id: Date.now().toString(),
             name: data.name,
             description: data.description || '',
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
         };
         res.status(201).json(project);
     }
@@ -114,7 +116,7 @@ app.post('/api/files/upload', upload.single('file'), (req, res) => {
         original_name: req.file.originalname,
         file_size: req.file.size,
         mime_type: req.file.mimetype,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
     };
     res.status(201).json(file);
 });
@@ -123,7 +125,7 @@ app.post('/api/autocad/auth', (req, res) => {
     if (!config.FORGE_CLIENT_ID || !config.FORGE_CLIENT_SECRET) {
         return res.status(400).json({
             error: 'FORGE_CLIENT_ID/SECRET missing',
-            message: 'Configure Forge credentials to enable this feature'
+            message: 'Configure Forge credentials to enable this feature',
         });
     }
     res.json({ token: 'mock-token', expires_in: 3600 });
@@ -132,7 +134,7 @@ app.post('/api/autocad/upload', (req, res) => {
     if (!config.FORGE_CLIENT_ID || !config.FORGE_CLIENT_SECRET) {
         return res.status(400).json({
             error: 'FORGE_CLIENT_ID/SECRET missing',
-            message: 'Configure Forge credentials to enable this feature'
+            message: 'Configure Forge credentials to enable this feature',
         });
     }
     res.json({ objectId: 'mock-object-id', bucketKey: config.FORGE_BUCKET || 'installsure-dev' });
@@ -141,7 +143,7 @@ app.post('/api/autocad/translate', (req, res) => {
     if (!config.FORGE_CLIENT_ID || !config.FORGE_CLIENT_SECRET) {
         return res.status(400).json({
             error: 'FORGE_CLIENT_ID/SECRET missing',
-            message: 'Configure Forge credentials to enable this feature'
+            message: 'Configure Forge credentials to enable this feature',
         });
     }
     res.json({ jobId: 'mock-job-id', urn: 'mock-urn' });
@@ -150,7 +152,7 @@ app.get('/api/autocad/manifest/:urn', (req, res) => {
     if (!config.FORGE_CLIENT_ID || !config.FORGE_CLIENT_SECRET) {
         return res.status(400).json({
             error: 'FORGE_CLIENT_ID/SECRET missing',
-            message: 'Configure Forge credentials to enable this feature'
+            message: 'Configure Forge credentials to enable this feature',
         });
     }
     res.json({ status: 'success', derivatives: [] });
@@ -159,7 +161,7 @@ app.get('/api/autocad/properties/:urn', (req, res) => {
     if (!config.FORGE_CLIENT_ID || !config.FORGE_CLIENT_SECRET) {
         return res.status(400).json({
             error: 'FORGE_CLIENT_ID/SECRET missing',
-            message: 'Configure Forge credentials to enable this feature'
+            message: 'Configure Forge credentials to enable this feature',
         });
     }
     res.json({ properties: [] });
@@ -168,7 +170,7 @@ app.get('/api/autocad/takeoff/:urn', (req, res) => {
     if (!config.FORGE_CLIENT_ID || !config.FORGE_CLIENT_SECRET) {
         return res.status(400).json({
             error: 'FORGE_CLIENT_ID/SECRET missing',
-            message: 'Configure Forge credentials to enable this feature'
+            message: 'Configure Forge credentials to enable this feature',
         });
     }
     res.json({ areas: [], lengths: [] });
@@ -178,7 +180,7 @@ app.get('/api/qb/health', (req, res) => {
     res.json({
         ok: true,
         connected: false,
-        message: 'QuickBooks integration not configured'
+        message: 'QuickBooks integration not configured',
     });
 });
 // Error handler

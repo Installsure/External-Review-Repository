@@ -1,0 +1,20 @@
+{
+  "projectId": "DEMO-RESI",
+  "planUrl": "https://YOUR-PUBLIC-PLAN-URL/sample_house_plan.pdf",
+  "tags": [
+    {
+      "id": "T-100",
+      "sheet": "A1.1",
+      "title": "Wall type @ grid B",
+      "body": "Confirm 2x6 vs 2x4 exterior wall.",
+      "type": "RFI"
+    },
+    {
+      "id": "T-101",
+      "sheet": "A2.2",
+      "title": "Ceiling insulation change",
+      "body": "Upgrade to R-38 blown insulation.",
+      "type": "CO"
+    }
+  ]
+}

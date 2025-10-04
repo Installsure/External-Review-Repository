@@ -3,7 +3,7 @@ import { logger } from '../../infra/logger.js';
 // Cache middleware for GET requests
 export const cacheMiddleware = (options = {}) => {
     const { ttl = 300, // 5 minutes default
-    prefix = 'api', keyGenerator = defaultKeyGenerator, condition = defaultCondition } = options;
+    prefix = 'api', keyGenerator = defaultKeyGenerator, condition = defaultCondition, } = options;
     return async (req, res, next) => {
         // Only cache GET requests
         if (req.method !== 'GET') {
@@ -28,7 +28,7 @@ export const cacheMiddleware = (options = {}) => {
             const originalJson = res.json.bind(res);
             res.json = function (data) {
                 // Cache the response data
-                cache.set(cacheKey, data, { prefix, ttl }).catch(error => {
+                cache.set(cacheKey, data, { prefix, ttl }).catch((error) => {
                     childLogger.error({ error: error.message }, 'Failed to cache response');
                 });
                 res.set('X-Cache', 'MISS');
@@ -69,7 +69,7 @@ export const invalidateCache = (patterns) => {
                         logger.error({
                             error: error.message,
                             pattern,
-                            requestId: req.requestId
+                            requestId: req.requestId,
                         }, 'Failed to invalidate cache');
                     }
                 }
@@ -85,7 +85,9 @@ export const cached = (options = {}) => {
     return function (target, propertyName, descriptor) {
         const method = descriptor.value;
         descriptor.value = async function (...args) {
-            const cacheKey = keyGenerator ? keyGenerator(...args) : `${target.constructor.name}:${propertyName}:${JSON.stringify(args)}`;
+            const cacheKey = keyGenerator
+                ? keyGenerator(...args)
+                : `${target.constructor.name}:${propertyName}:${JSON.stringify(args)}`;
             try {
                 // Try to get from cache
                 const cachedResult = await cache.get(cacheKey, { prefix, ttl });
@@ -103,7 +105,7 @@ export const cached = (options = {}) => {
             catch (error) {
                 logger.error({
                     error: error.message,
-                    cacheKey
+                    cacheKey,
                 }, 'Service cache error');
                 // Fall back to original method
                 return method.apply(this, args);
@@ -134,8 +136,8 @@ export const getCacheStats = async (req, res) => {
         res.json({
             cache: {
                 enabled: true,
-                stats: stats || { message: 'Cache stats not available' }
-            }
+                stats: stats || { message: 'Cache stats not available' },
+            },
         });
     }
     catch (error) {

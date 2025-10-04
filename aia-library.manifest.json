@@ -1,0 +1,35 @@
+{
+  "notes": "Add URLs you have rights to (licensed copies, enterprise Share, or vendor samples). This script will NOT bypass paywalls.",
+  "items": [
+    {
+      "docType": "ChangeOrder",
+      "title": "AIA G701 – Change Order (YOUR LICENSED URL)",
+      "url": "https://YOUR-LICENSED-LINK/g701.pdf"
+    },
+    {
+      "docType": "PaymentApp",
+      "title": "AIA G702 – Application for Payment (YOUR LICENSED URL)",
+      "url": "https://YOUR-LICENSED-LINK/g702.pdf"
+    },
+    {
+      "docType": "ContWaiver",
+      "title": "Lien Waiver – Conditional Progress",
+      "url": "https://YOUR-LICENSED-LINK/waiver-conditional-progress.pdf"
+    },
+    {
+      "docType": "UncWaiver",
+      "title": "Lien Waiver – Unconditional Final",
+      "url": "https://YOUR-LICENSED-LINK/waiver-unconditional-final.pdf"
+    },
+    {
+      "docType": "RFI",
+      "title": "RFI Template",
+      "url": "https://YOUR-LICENSED-LINK/rfi-template.pdf"
+    },
+    {
+      "docType": "Submittal",
+      "title": "Submittal Transmittal",
+      "url": "https://YOUR-LICENSED-LINK/submittal-transmittal.pdf"
+    }
+  ]
+}

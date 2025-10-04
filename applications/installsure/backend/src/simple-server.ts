@@ -385,6 +385,80 @@ app.get('/api/qb/health', (req, res) => {
   });
 });
 
+// Document Management Routes
+import {
+  ingestAIALibrary,
+  createRFI,
+  createChangeOrder,
+  processResidentialDemo,
+} from './services/documentService.js';
+
+app.post('/api/docs/ingestAIA', async (req, res) => {
+  try {
+    const result = await ingestAIALibrary();
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      ok: false,
+      error: error.message || 'Internal server error',
+    });
+  }
+});
+
+app.post('/api/docs/rfi', (req, res) => {
+  try {
+    const body = req.body;
+    
+    if (!body.project || !body.title || !body.question) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Missing required fields: project, title, question',
+      });
+    }
+
+    const result = createRFI(body);
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      ok: false,
+      error: error.message || 'Internal server error',
+    });
+  }
+});
+
+app.post('/api/docs/co', (req, res) => {
+  try {
+    const body = req.body;
+    
+    if (!body.project || !body.desc) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Missing required fields: project, desc',
+      });
+    }
+
+    const result = createChangeOrder(body);
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      ok: false,
+      error: error.message || 'Internal server error',
+    });
+  }
+});
+
+app.post('/api/demo/residential', async (req, res) => {
+  try {
+    const result = await processResidentialDemo();
+    res.json(result);
+  } catch (error: any) {
+    res.status(500).json({
+      ok: false,
+      error: error.message || 'Internal server error',
+    });
+  }
+});
+
 // Error handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err);
