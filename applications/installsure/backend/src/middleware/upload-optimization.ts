@@ -206,7 +206,7 @@ export class UploadOptimizer {
   // Middleware for file upload progress tracking
   static progressMiddleware() {
     return (req: Request, res: Response, next: NextFunction) => {
-      const fileSize = req.headers['content-length'] ? parseInt(req.headers['content-length']) : 0;
+      const fileSize = req.headers['content-length'] ? parseInt(req.headers['content-length'], 10) : 0;
       let uploadedBytes = 0;
 
       req.on('data', (chunk) => {
@@ -233,9 +233,9 @@ export class UploadOptimizer {
   // Middleware for chunked upload support
   static chunkedUploadMiddleware() {
     return (req: Request, res: Response, next: NextFunction) => {
-      const chunkNumber = parseInt(req.headers['x-chunk-number'] as string) || 0;
-      const totalChunks = parseInt(req.headers['x-total-chunks'] as string) || 1;
-      const chunkSize = parseInt(req.headers['x-chunk-size'] as string) || 0;
+      const chunkNumber = parseInt(req.headers['x-chunk-number'] as string, 10) || 0;
+      const totalChunks = parseInt(req.headers['x-total-chunks'] as string, 10) || 1;
+      const chunkSize = parseInt(req.headers['x-chunk-size'] as string, 10) || 0;
 
       if (chunkNumber > 0) {
         // Handle chunked upload

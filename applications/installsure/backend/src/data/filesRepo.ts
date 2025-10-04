@@ -60,7 +60,7 @@ export class FilesRepository {
       [],
       requestId,
     );
-    return parseInt(result.rows[0].total_size);
+    return parseInt(result.rows[0].total_size, 10);
   }
 
   async getFileCount(requestId?: string): Promise<number> {
@@ -69,7 +69,7 @@ export class FilesRepository {
       [],
       requestId,
     );
-    return parseInt(result.rows[0].count);
+    return parseInt(result.rows[0].count, 10);
   }
 
   async getStats(
@@ -87,7 +87,7 @@ export class FilesRepository {
 
     const byType: Record<string, number> = {};
     byTypeResult.rows.forEach((row) => {
-      byType[row.file_type] = parseInt(row.count);
+      byType[row.file_type] = parseInt(row.count, 10);
     });
 
     return {
