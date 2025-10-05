@@ -36,6 +36,12 @@ python estimator.py ..\viewer\tags_export.csv > estimate_out.csv
 
 View the results in `estimate_out.csv`
 
+**Testing with Sample Data:**
+```powershell
+cd .\estimator
+python estimator.py sample_data.csv > sample_estimate.csv
+```
+
 ### 4. Set Up Database
 
 ```powershell
