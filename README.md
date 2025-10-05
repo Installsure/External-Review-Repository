@@ -26,8 +26,71 @@ This repository contains a complete application suite for external review and re
 ### **Prerequisites**
 - Node.js v20+ (v22.19.0 recommended)
 - npm v8+ (v10.9.3 recommended)
-- Python v3.10+ (for InstallSure backend)
 - Git v2.47+
+
+### **5-Minute Demo - InstallSure**
+
+Get InstallSure running in under 5 minutes with the automated smoke test:
+
+#### **Windows (PowerShell)**
+```powershell
+# From repository root
+powershell -ExecutionPolicy Bypass -File scripts\smoke.ps1
+```
+
+#### **macOS/Linux/WSL**
+```bash
+# From repository root
+bash scripts/smoke.sh
+```
+
+The smoke script will:
+1. ✅ Install all dependencies (backend, frontend, tests)
+2. ✅ Start the backend API on port 8099
+3. ✅ Start the frontend dev server on port 3000
+4. ✅ Wait for services to be ready
+5. ✅ Install Playwright browsers
+6. ✅ Run E2E tests
+7. ✅ Run backend unit tests
+8. ✅ Display test summary and exit
+
+**Manual Setup (if needed):**
+
+```bash
+# Backend
+cd applications/installsure/backend
+npm install
+npm run dev  # Starts on http://127.0.0.1:8099
+
+# Frontend (new terminal)
+cd applications/installsure/frontend
+npm install
+npm run dev  # Starts on http://127.0.0.1:3000
+
+# E2E Tests (new terminal)
+cd tests
+npm install
+npx playwright install --with-deps
+npx playwright test
+```
+
+### **Verify Installation**
+
+1. **Backend Health Check:**
+   ```bash
+   curl http://127.0.0.1:8099/api/health
+   # Should return: {"ok":true,"uptime":...}
+   ```
+
+2. **Frontend Access:**
+   - Open http://127.0.0.1:3000 in your browser
+   - You should see the InstallSure dashboard
+
+3. **API Test:**
+   ```bash
+   curl http://127.0.0.1:8099/api/projects
+   # Should return: {"success":true,"data":[...],"count":2}
+   ```
 
 ### **Installation**
 ```bash
@@ -53,6 +116,84 @@ npm install
 - **ZeroStack**: http://localhost:3004
 - **Hello**: http://localhost:3005
 - **Avatar**: http://localhost:3006
+
+---
+
+## 🔧 **TROUBLESHOOTING**
+
+### **Common Issues**
+
+#### **1. Backend fails to start**
+```bash
+# Issue: "EADDRINUSE: address already in use :::8099"
+# Solution: Kill process on port 8099
+lsof -ti:8099 | xargs kill -9  # macOS/Linux
+netstat -ano | findstr :8099  # Windows (then use taskkill /PID <pid> /F)
+```
+
+#### **2. Frontend build errors**
+```bash
+# Issue: "Cannot find type definition file for 'node'"
+# Solution: Install missing type definitions
+cd applications/installsure/frontend
+npm install --save-dev @types/node
+```
+
+#### **3. esbuild platform mismatch**
+```bash
+# Issue: "You installed esbuild for another platform"
+# Solution: Reinstall dependencies on the correct platform
+cd applications/installsure/backend
+rm -rf node_modules package-lock.json
+npm install
+```
+
+#### **4. Playwright browser download fails**
+```bash
+# Issue: Timeout or network error during browser download
+# Solution: Install with system dependencies
+cd tests
+npx playwright install --with-deps chromium
+```
+
+#### **5. Permission denied errors (Unix/macOS)**
+```bash
+# Solution: Make scripts executable
+chmod +x scripts/*.sh
+chmod +x applications/*/node_modules/.bin/*
+```
+
+### **Environment Variables**
+
+**Backend (.env):**
+```env
+PORT=8099
+CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+AUTH_SECRET=dev-secret-change-me-minimum-32-characters-required-for-security
+```
+
+**Frontend (.env.local):**
+```env
+VITE_APP_NAME=InstallSure
+VITE_API_BASE=http://127.0.0.1:8099
+```
+
+### **Logs and Debugging**
+
+```bash
+# Backend logs (when run with smoke script)
+tail -f /tmp/installsure-backend.log
+
+# Frontend logs
+tail -f /tmp/installsure-frontend.log
+
+# Check health endpoint
+curl http://127.0.0.1:8099/api/health
+
+# Test specific API endpoints
+curl http://127.0.0.1:8099/api/projects
+curl http://127.0.0.1:8099/api/rfis
+```
 
 ---
 
