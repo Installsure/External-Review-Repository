@@ -98,6 +98,12 @@ npm run test:e2e
 - **Tailwind CSS**: Utility-first styling
 - **TypeScript**: Compile-time type checking
 
+### **InstallSure Development Tools**
+For setting up InstallSure-specific development environments (Core Pack, Demo Extended, UE5 Walkthrough):
+- See [tools/README.md](tools/README.md) for detailed documentation
+- Use `installsure-structure-repair.ps1` to create development environment structure
+- Creates minimal stubs for VS Code setup, PDF viewer, estimator, and Unreal Engine build scripts
+
 ---
 
 ## 📊 **APPLICATION STATUS**
@@ -121,6 +127,7 @@ npm run test:e2e
 - `.\scripts\stop-all.ps1` - Stop all applications
 - `.\scripts\test-all.ps1` - Run all tests
 - `.\tools\preflight-check.ps1` - System requirements check
+- `.\tools\installsure-structure-repair.ps1` - InstallSure development environment setup
 
 ### **NPM Scripts**
 - `npm run dev` - Start development server
