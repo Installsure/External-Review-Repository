@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -29,30 +29,30 @@ function App() {
                     <h1 className="text-xl font-bold text-gray-900">InstallSure</h1>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <a
-                      href="/"
+                    <Link
+                      to="/"
                       className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                     >
                       Dashboard
-                    </a>
-                    <a
-                      href="/upload"
+                    </Link>
+                    <Link
+                      to="/upload"
                       className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                     >
-                      Upload
-                    </a>
-                    <a
-                      href="/reports"
+                      Plans
+                    </Link>
+                    <Link
+                      to="/reports"
                       className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                     >
-                      Reports
-                    </a>
-                    <a
-                      href="/settings"
+                      RFIs
+                    </Link>
+                    <Link
+                      to="/settings"
                       className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                     >
                       Settings
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -62,6 +62,8 @@ function App() {
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/upload" element={<Upload />} />
+                <Route path="/plans" element={<Upload />} />
+                <Route path="/rfis" element={<Reports />} />
                 <Route path="/viewer/:urn" element={<Viewer />} />
                 <Route path="/reports" element={<Reports />} />
                 <Route path="/settings" element={<Settings />} />

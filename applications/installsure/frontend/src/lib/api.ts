@@ -11,7 +11,7 @@ import type {
   QBHealthResponse,
 } from '../types/api.js';
 
-const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:8000';
+const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://127.0.0.1:8099';
 
 export interface ApiError {
   error: string;
@@ -168,6 +168,87 @@ export class ApiClient {
   // QuickBooks
   async getQBHealth(): Promise<QBHealthResponse> {
     return this.request<QBHealthResponse>('/api/qb/health');
+  }
+
+  // Plans
+  async getPlans() {
+    const response = await this.request<{ success: boolean; data: any[] }>('/api/plans');
+    return response.data;
+  }
+
+  async uploadPlan(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${this.baseUrl}/api/plans/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error: ApiError = await response.json().catch(() => ({
+        error: `HTTP ${response.status}: ${response.statusText}`,
+      }));
+      throw error;
+    }
+
+    return response.json();
+  }
+
+  // Tags
+  async getTags() {
+    const response = await this.request<{ success: boolean; data: any[] }>('/api/tags');
+    return response.data;
+  }
+
+  async createTag(data: { plan_id: string; x: number; y: number; type: string; label?: string }) {
+    const response = await this.request<{ success: boolean; data: any; message?: string }>(
+      '/api/tags',
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      },
+    );
+    return response.data;
+  }
+
+  // RFIs
+  async getRFIs() {
+    const response = await this.request<{ success: boolean; data: any[] }>('/api/rfis');
+    return response.data;
+  }
+
+  async createRFI(data: { title: string; description?: string; project_id?: string; tag_id?: string }) {
+    const response = await this.request<{ success: boolean; data: any; message?: string }>(
+      '/api/rfis',
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      },
+    );
+    return response.data;
+  }
+
+  async updateRFI(id: string, data: any) {
+    const response = await this.request<{ success: boolean; data: any }>(`/api/rfis/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    return response.data;
+  }
+
+  // Change Orders
+  async getChangeOrders() {
+    const response = await this.request<{ success: boolean; data: any[] }>('/api/change-orders');
+    return response.data;
+  }
+
+  async createChangeOrder(data: any) {
+    const response = await this.request<{ success: boolean; data: any }>('/api/change-orders', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    return response.data;
   }
 }
 
