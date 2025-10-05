@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Local storage files
+tags.local.json
+uploads/*.pdf
+uploads/*.dwg
+uploads/*.ifc
+uploads/manifest.json
+
+# Keep uploads directory but ignore content
+!uploads/.gitkeep
+
+# Environment variables
+.env.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
