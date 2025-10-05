@@ -41,8 +41,6 @@ export const fileUploadSchema = z.object({
     filename: z.string(),
     path: z.string(),
 });
-export const allowedFileTypes = [
-    '.ifc', '.dwg', '.rvt', '.step', '.obj', '.gltf', '.glb'
-];
+export const allowedFileTypes = ['.ifc', '.dwg', '.rvt', '.step', '.obj', '.gltf', '.glb'];
 export const fileTypeSchema = z.enum(allowedFileTypes);
 //# sourceMappingURL=common.js.map

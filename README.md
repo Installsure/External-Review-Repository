@@ -35,15 +35,36 @@ This repository contains a complete application suite for external review and re
 git clone <repository-url>
 cd External-Review-Repository
 
-# Run preflight check
-.\tools\preflight-check.ps1
+# IMPORTANT: Install dependencies for each application
+# node_modules are NOT included in git due to platform compatibility
+cd applications/demo-dashboard && npm install
+cd ../installsure/frontend && npm install
+cd ../installsure/backend && npm install
+cd ../avatar && npm install
+cd ../ff4u && npm install
+cd ../hello && npm install
+cd ../redeye && npm install
+cd ../zerostack && npm install
 
-# Install dependencies
-npm install
+# Start applications individually
+# For demo-dashboard:
+cd applications/demo-dashboard && npm run dev
 
-# Start all applications
-.\scripts\start-all.ps1
+# For InstallSure frontend:
+cd applications/installsure/frontend && npm run dev
+
+# For InstallSure backend:
+cd applications/installsure/backend && npm run dev
+
+# For React Router 7 apps (avatar, ff4u, hello, redeye, zerostack):
+cd applications/avatar && npm run dev
 ```
+
+**⚠️ Important Notes:**
+- node_modules are platform-specific and NOT committed to git
+- You MUST run `npm install` in each application directory after cloning
+- Windows users may need to reinstall dependencies if switching to Linux/Mac
+- All dependencies are specified in each application's package.json
 
 ### **Access Applications**
 - **InstallSure**: http://localhost:3000

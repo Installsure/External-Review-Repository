@@ -36,16 +36,16 @@ export class FilesRepository {
         const [totalSize, total, byTypeResult] = await Promise.all([
             this.getTotalSize(requestId),
             this.getFileCount(requestId),
-            db.query('SELECT file_type, COUNT(*) as count FROM files GROUP BY file_type', [], requestId)
+            db.query('SELECT file_type, COUNT(*) as count FROM files GROUP BY file_type', [], requestId),
         ]);
         const byType = {};
-        byTypeResult.rows.forEach(row => {
+        byTypeResult.rows.forEach((row) => {
             byType[row.file_type] = parseInt(row.count);
         });
         return {
             total,
             totalSize,
-            byType
+            byType,
         };
     }
 }
