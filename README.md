@@ -77,6 +77,8 @@ npm install
 
 ## 📚 **DOCUMENTATION**
 
+- **[Quick Start Guide](QUICK_START.md)** - Fast reference for Nexus Setup
+- **[Nexus Setup Guide](documentation/NEXUS_SETUP.md)** - Complete BIM workflow guide
 - **[Setup Guide](documentation/SETUP_GUIDE.md)** - Complete setup instructions
 - **[API Documentation](documentation/API_DOCUMENTATION.md)** - Comprehensive API reference
 - **[Troubleshooting Guide](documentation/TROUBLESHOOTING.md)** - Common issues and solutions

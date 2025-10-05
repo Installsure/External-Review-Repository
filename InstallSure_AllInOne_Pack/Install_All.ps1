@@ -3,9 +3,7 @@
 # Description: Installs essential VS Code extensions for InstallSure development
 
 [CmdletBinding()]
-param(
-    [switch]$Verbose
-)
+param()
 
 $ErrorActionPreference = "Stop"
 
@@ -90,7 +88,7 @@ foreach ($ext in $extensions) {
                 $successCount++
             } else {
                 Write-Host "   ❌ Installation failed" -ForegroundColor Red
-                if ($Verbose) {
+                if ($PSCmdlet.MyInvocation.BoundParameters["Verbose"].IsPresent) {
                     Write-Host "   Output: $output" -ForegroundColor Gray
                 }
                 $failCount++
