@@ -2,7 +2,7 @@ import { Pool } from 'pg';
 import { config } from '../config/env.js';
 const pool = new Pool({
     connectionString: config.DATABASE_URL,
-    ssl: config.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+    ssl: config.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 export const db = {
     async query(text, params) {
@@ -30,6 +30,6 @@ export const db = {
         finally {
             client.release();
         }
-    }
+    },
 };
 //# sourceMappingURL=db.js.map

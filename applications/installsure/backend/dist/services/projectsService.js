@@ -51,7 +51,7 @@ export class ProjectsService {
             childLogger.debug({ name: data.name }, 'Creating new project');
             // Validate project name uniqueness (optional business rule)
             const existingProjects = await projectsRepo.findAll(requestId);
-            const nameExists = existingProjects.some(p => p.name.toLowerCase() === data.name.toLowerCase());
+            const nameExists = existingProjects.some((p) => p.name.toLowerCase() === data.name.toLowerCase());
             if (nameExists) {
                 childLogger.warn({ name: data.name }, 'Project name already exists');
                 throw createError('Project name already exists', 409);
@@ -83,7 +83,7 @@ export class ProjectsService {
             // Validate name uniqueness if name is being updated
             if (data.name) {
                 const existingProjects = await projectsRepo.findAll(requestId);
-                const nameExists = existingProjects.some(p => p.id !== id && p.name.toLowerCase() === data.name.toLowerCase());
+                const nameExists = existingProjects.some((p) => p.id !== id && p.name.toLowerCase() === data.name.toLowerCase());
                 if (nameExists) {
                     childLogger.warn({ name: data.name }, 'Project name already exists');
                     throw createError('Project name already exists', 409);
@@ -97,7 +97,8 @@ export class ProjectsService {
             return project;
         }
         catch (error) {
-            if (error instanceof Error && (error.message === 'Project not found' || error.message === 'Project name already exists')) {
+            if (error instanceof Error &&
+                (error.message === 'Project not found' || error.message === 'Project name already exists')) {
                 throw error;
             }
             childLogger.error({ error: error.message }, 'Failed to update project');

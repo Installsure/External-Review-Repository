@@ -41,7 +41,7 @@ class Database {
                 error: error.message,
                 query: text,
                 params,
-                duration
+                duration,
             }, 'Query failed');
             throw error;
         }
@@ -102,4 +102,18 @@ class Database {
     }
 }
 export const db = new Database();
+export const initDatabase = async () => {
+    try {
+        // Test database connection
+        await db.healthCheck();
+        logger.info('Database connection established');
+        // Run migrations if needed
+        // This would typically run database migrations here
+        logger.info('Database initialization completed');
+    }
+    catch (error) {
+        logger.error({ error: error.message }, 'Database initialization failed');
+        throw error;
+    }
+};
 //# sourceMappingURL=db.js.map
