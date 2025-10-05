@@ -60,6 +60,7 @@ npm install
 
 - **[Setup Guide](documentation/SETUP_GUIDE.md)** - Complete setup instructions
 - **[API Documentation](documentation/API_DOCUMENTATION.md)** - Comprehensive API reference
+- **[E2E Testing Guide](documentation/E2E_TESTING_GUIDE.md)** - End-to-end testing documentation
 - **[Troubleshooting Guide](documentation/TROUBLESHOOTING.md)** - Common issues and solutions
 - **[Contributing Guide](CONTRIBUTING.md)** - Guidelines for external reviewers
 - **[Comprehensive Review Report](documentation/COMPREHENSIVE_REVIEW_REPORT.md)** - Detailed analysis
@@ -68,15 +69,42 @@ npm install
 
 ## 🧪 **TESTING**
 
+### Running All Tests
 ```bash
-# Run all tests
+# Run all tests (unit + E2E)
 .\scripts\test-all.ps1
+```
 
-# Run individual application tests
+### Running E2E Tests
+```bash
+# Run E2E tests for a specific application
+cd applications\<app-name>
+npm run test:e2e
+
+# Run E2E tests with interactive UI
+npm run test:e2e:ui
+
+# Run E2E tests in headed mode
+npm run test:e2e:headed
+```
+
+### Running Unit Tests
+```bash
+# Run unit tests for individual application
 cd applications\installsure
 npm run test
-npm run test:e2e
 ```
+
+For detailed E2E testing documentation, see the **[E2E Testing Guide](documentation/E2E_TESTING_GUIDE.md)**.
+
+### GitHub Actions
+
+All E2E tests run automatically on:
+- Every push to main/master/develop branches
+- Every pull request
+- Manual workflow trigger
+
+View test results in the **Actions** tab on GitHub.
 
 ---
 
