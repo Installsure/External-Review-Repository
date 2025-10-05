@@ -1,0 +1,66 @@
+{
+  "projects": [
+    {
+      "id": "proj-1",
+      "name": "Downtown Office Building",
+      "description": "Modern 20-story office complex with sustainable design",
+      "status": "active",
+      "created_at": "2024-01-15T10:00:00Z"
+    },
+    {
+      "id": "proj-2",
+      "name": "Residential Complex",
+      "description": "Mixed-use residential development with retail space",
+      "status": "planning",
+      "created_at": "2024-02-01T10:00:00Z"
+    }
+  ],
+  "plans": [
+    {
+      "id": "plan-1",
+      "project_id": "proj-1",
+      "name": "Floor Plan - Level 1",
+      "file_name": "floor-plan-l1.pdf",
+      "file_type": "pdf",
+      "uploaded_at": "2024-01-20T10:00:00Z"
+    }
+  ],
+  "tags": [
+    {
+      "id": "tag-1",
+      "plan_id": "plan-1",
+      "x": 0.35,
+      "y": 0.45,
+      "type": "RFI",
+      "label": "RFI-001",
+      "created_at": "2024-01-25T10:00:00Z"
+    }
+  ],
+  "rfis": [
+    {
+      "id": "rfi-1",
+      "project_id": "proj-1",
+      "tag_id": "tag-1",
+      "title": "RFI-001: Framing Header Detail",
+      "description": "Need clarification on header beam size for opening",
+      "status": "open",
+      "priority": "medium",
+      "created_at": "2024-01-25T10:30:00Z",
+      "created_by": "John Smith"
+    }
+  ],
+  "change_orders": [
+    {
+      "id": "co-1",
+      "project_id": "proj-1",
+      "title": "CO-001: Additional HVAC Unit",
+      "description": "Add supplemental HVAC unit for server room",
+      "status": "approved",
+      "amount": 15000.00,
+      "created_at": "2024-02-01T10:00:00Z"
+    }
+  ],
+  "liens": [],
+  "photos": [],
+  "time_entries": []
+}
