@@ -72,11 +72,21 @@ npm install
 # Run all tests
 .\scripts\test-all.ps1
 
+# Run E2E tests with automatic service startup
+.\run-e2e.ps1
+
 # Run individual application tests
 cd applications\installsure
 npm run test
 npm run test:e2e
 ```
+
+**E2E Testing Script Features:**
+- Automatically starts all services
+- Waits for health checks
+- Runs Playwright tests
+- Generates HTML reports
+- Supports multiple package managers (npm/yarn/pnpm)
 
 ---
 
@@ -120,6 +130,7 @@ npm run test:e2e
 - `.\scripts\start-all.ps1` - Start all applications
 - `.\scripts\stop-all.ps1` - Stop all applications
 - `.\scripts\test-all.ps1` - Run all tests
+- `.\run-e2e.ps1` - E2E testing with automated service startup
 - `.\tools\preflight-check.ps1` - System requirements check
 
 ### **NPM Scripts**

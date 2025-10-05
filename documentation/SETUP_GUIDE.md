@@ -179,6 +179,35 @@ npm run test:e2e
 npm run test:all
 ```
 
+### **E2E Testing with Service Startup**
+The `run-e2e.ps1` script provides automated E2E testing with full service startup:
+
+```powershell
+# Run E2E tests with automatic service startup (Windows)
+PowerShell -ExecutionPolicy Bypass -File .\run-e2e.ps1
+```
+
+**What it does:**
+- Detects package manager (npm/yarn/pnpm)
+- Installs dependencies for all applications
+- Installs Playwright browsers if configured
+- Starts all services in separate windows
+- Waits for services to be ready (health checks)
+- Runs Playwright E2E tests
+- Generates HTML test reports
+
+**Services started:**
+- Demo Dashboard (http://localhost:3001)
+- InstallSure Frontend (http://localhost:3000)
+- InstallSure Backend (http://localhost:8000)
+- Avatar (http://localhost:3006)
+- FF4U (http://localhost:3002)
+- RedEye (http://localhost:3003)
+- ZeroStack (http://localhost:3004)
+- Hello (http://localhost:3005)
+
+**Note:** This script requires Playwright to be configured in at least one application. If Playwright is not found, services will start but tests will be skipped.
+
 ### **Individual Application Testing**
 ```bash
 # InstallSure
