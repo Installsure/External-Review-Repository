@@ -11,7 +11,7 @@
 This repository contains a complete application suite for external review and repair services. All applications have been professionally reviewed, repaired, and prepared for external access.
 
 ### **Applications Included:**
-- **InstallSure** - Construction Management Platform (Production Ready)
+- **InstallSure** - Construction Management Platform (Production Ready) - [📖 Documentation](applications/installsure/README.md)
 - **Demo Dashboard** - Central Control Panel (Demo Ready)
 - **FF4U** - Adult Entertainment Platform (Development Ready)
 - **RedEye** - Project Management System (Development Ready)
@@ -58,11 +58,15 @@ npm install
 
 ## 📚 **DOCUMENTATION**
 
+### **General Documentation**
 - **[Setup Guide](documentation/SETUP_GUIDE.md)** - Complete setup instructions
 - **[API Documentation](documentation/API_DOCUMENTATION.md)** - Comprehensive API reference
 - **[Troubleshooting Guide](documentation/TROUBLESHOOTING.md)** - Common issues and solutions
 - **[Contributing Guide](CONTRIBUTING.md)** - Guidelines for external reviewers
 - **[Comprehensive Review Report](documentation/COMPREHENSIVE_REVIEW_REPORT.md)** - Detailed analysis
+
+### **Application-Specific Documentation**
+- **[InstallSure README](applications/installsure/README.md)** - Complete guide for the InstallSure application
 
 ---
 
