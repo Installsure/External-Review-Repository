@@ -20,7 +20,13 @@ A minimal but functional InstallSure application for uploading blueprints (PDFs)
    npm install
    ```
 
-3. **Start the server:**
+3. **(Optional) Configure environment:**
+   ```bash
+   cp .env.example .env
+   # Edit .env to set PORT or PG_URL if needed
+   ```
+
+4. **Start the server:**
    ```bash
    npm start
    ```
@@ -70,7 +76,9 @@ A minimal but functional InstallSure application for uploading blueprints (PDFs)
 
 ## 🔧 Configuration
 
-### Environment Variables (.env)
+### Environment Variables (.env.example)
+
+Copy `.env.example` to `.env` and customize:
 
 ```bash
 # Server port (default: 3000)
@@ -153,7 +161,7 @@ Create a new tag
 rescue-app/
 ├── server.js           # Express server with all backend logic
 ├── package.json        # Dependencies and scripts
-├── .env                # Configuration (optional)
+├── .env.example        # Configuration template
 ├── public/
 │   └── index.html      # Frontend UI
 ├── uploads/            # Uploaded PDFs and manifest.json
