@@ -10,9 +10,10 @@ import { z } from 'zod';
 // Configuration
 const config = {
   NODE_ENV: process.env.NODE_ENV || 'development',
-  PORT: parseInt(process.env.PORT || '8000'),
+  PORT: parseInt(process.env.PORT || '8099'),
   CORS_ORIGINS: process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()) || [
     'http://localhost:3000',
+    'http://127.0.0.1:3000',
   ],
   DATABASE_URL: process.env.DATABASE_URL,
   FORGE_CLIENT_ID: process.env.FORGE_CLIENT_ID,
@@ -66,16 +67,13 @@ const upload = multer({
 // Health endpoints
 app.get('/api/health', (req, res) => {
   res.json({
-    ok: true,
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    version: '1.0.0',
-    environment: config.NODE_ENV,
-    services: {
-      database: 'connected',
-      redis: 'connected',
-      forge: config.FORGE_CLIENT_ID ? 'configured' : 'not_configured',
-    },
+    status: 'ok',
+  });
+});
+
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
   });
 });
 
@@ -381,6 +379,386 @@ app.get('/api/qb/health', (req, res) => {
       ok: true,
       connected: false,
       message: 'QuickBooks integration not configured',
+    },
+  });
+});
+
+// In-memory storage for new features
+let tags: any[] = [];
+let rfis: any[] = [];
+let changeOrders: any[] = [];
+let liens: any[] = [];
+let photos: any[] = [];
+let timeEntries: any[] = [];
+let plans: any[] = [];
+
+// Tags endpoints
+app.get('/api/tags', (req, res) => {
+  res.json({
+    success: true,
+    data: tags,
+  });
+});
+
+const tagSchema = z.object({
+  x: z.number().min(0).max(1),
+  y: z.number().min(0).max(1),
+  type: z.string().optional(),
+  label: z.string().optional(),
+  planId: z.string().optional(),
+});
+
+app.post('/api/tags', (req, res) => {
+  try {
+    const data = tagSchema.parse(req.body);
+    const tag = {
+      id: Date.now().toString(),
+      ...data,
+      created_at: new Date().toISOString(),
+    };
+    tags.push(tag);
+    res.status(201).json({
+      success: true,
+      data: tag,
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid input',
+        details: error.errors,
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        error: 'Internal server error',
+      });
+    }
+  }
+});
+
+// RFIs endpoints
+app.get('/api/rfis', (req, res) => {
+  res.json({
+    success: true,
+    data: rfis,
+  });
+});
+
+const rfiSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().optional(),
+  tagId: z.string().optional(),
+  planId: z.string().optional(),
+  status: z.string().optional().default('open'),
+});
+
+app.post('/api/rfis', (req, res) => {
+  try {
+    const data = rfiSchema.parse(req.body);
+    const rfi = {
+      id: Date.now().toString(),
+      ...data,
+      status: data.status || 'open',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    rfis.push(rfi);
+    res.status(201).json({
+      success: true,
+      data: rfi,
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid input',
+        details: error.errors,
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        error: 'Internal server error',
+      });
+    }
+  }
+});
+
+// Change Orders endpoints
+app.get('/api/change-orders', (req, res) => {
+  res.json({
+    success: true,
+    data: changeOrders,
+  });
+});
+
+const changeOrderSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().optional(),
+  amount: z.number().optional(),
+  status: z.string().optional().default('draft'),
+});
+
+app.post('/api/change-orders', (req, res) => {
+  try {
+    const data = changeOrderSchema.parse(req.body);
+    const changeOrder = {
+      id: Date.now().toString(),
+      ...data,
+      status: data.status || 'draft',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    changeOrders.push(changeOrder);
+    res.status(201).json({
+      success: true,
+      data: changeOrder,
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid input',
+        details: error.errors,
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        error: 'Internal server error',
+      });
+    }
+  }
+});
+
+// Liens endpoints
+app.get('/api/liens', (req, res) => {
+  res.json({
+    success: true,
+    data: liens,
+  });
+});
+
+app.post('/api/liens', (req, res) => {
+  const lien = {
+    id: Date.now().toString(),
+    ...req.body,
+    created_at: new Date().toISOString(),
+  };
+  liens.push(lien);
+  res.status(201).json({
+    success: true,
+    data: lien,
+  });
+});
+
+// Photos endpoints
+app.get('/api/photos', (req, res) => {
+  res.json({
+    success: true,
+    data: photos,
+  });
+});
+
+const photoUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      const uploadDir = './uploads/photos';
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(null, 'photo-' + uniqueSuffix + path.extname(file.originalname));
+    },
+  }),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['.jpg', '.jpeg', '.png'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowedTypes.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error(`Invalid file type. Allowed: ${allowedTypes.join(', ')}`));
+    }
+  },
+});
+
+app.post('/api/photos/upload', photoUpload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      error: 'No file uploaded',
+    });
+  }
+
+  const photo = {
+    id: Date.now().toString(),
+    filename: req.file.filename,
+    original_name: req.file.originalname,
+    size: req.file.size,
+    path: req.file.path,
+    created_at: new Date().toISOString(),
+  };
+  photos.push(photo);
+
+  res.status(201).json({
+    success: true,
+    data: photo,
+  });
+});
+
+// Time entries endpoints
+app.get('/api/time', (req, res) => {
+  res.json({
+    success: true,
+    data: timeEntries,
+  });
+});
+
+app.post('/api/time', (req, res) => {
+  const entry = {
+    id: Date.now().toString(),
+    ...req.body,
+    created_at: new Date().toISOString(),
+  };
+  timeEntries.push(entry);
+  res.status(201).json({
+    success: true,
+    data: entry,
+  });
+});
+
+// Plans endpoints
+app.get('/api/plans', (req, res) => {
+  res.json({
+    success: true,
+    data: plans,
+  });
+});
+
+const planUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      const uploadDir = './uploads/plans';
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      cb(null, 'plan-' + uniqueSuffix + path.extname(file.originalname));
+    },
+  }),
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['.pdf', '.png', '.jpg', '.jpeg'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowedTypes.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error(`Invalid file type. Allowed: ${allowedTypes.join(', ')}`));
+    }
+  },
+});
+
+app.post('/api/plans/upload', planUpload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      error: 'No file uploaded',
+    });
+  }
+
+  const plan = {
+    id: Date.now().toString(),
+    filename: req.file.filename,
+    original_name: req.file.originalname,
+    size: req.file.size,
+    path: req.file.path,
+    type: path.extname(req.file.originalname).toLowerCase(),
+    created_at: new Date().toISOString(),
+  };
+  plans.push(plan);
+
+  res.status(201).json({
+    success: true,
+    data: plan,
+  });
+});
+
+// Debug seed endpoint
+app.get('/debug/seed', (req, res) => {
+  // Reset all data
+  tags = [];
+  rfis = [];
+  changeOrders = [];
+  liens = [];
+  photos = [];
+  timeEntries = [];
+  plans = [];
+  projects = [
+    {
+      id: '1',
+      name: 'Downtown Office Building',
+      description: 'Modern 20-story office complex with sustainable design',
+      status: 'active',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      files: [
+        { id: '1', name: 'architectural.dwg', size: 15728640, type: 'dwg' },
+        { id: '2', name: 'structural.rvt', size: 25165824, type: 'rvt' },
+      ],
+    },
+    {
+      id: '2',
+      name: 'Residential Complex',
+      description: 'Mixed-use residential development with retail space',
+      status: 'planning',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      files: [{ id: '3', name: 'site_plan.dwg', size: 8388608, type: 'dwg' }],
+    },
+  ];
+
+  // Add demo data
+  const demoTag = {
+    id: 'demo-tag-1',
+    x: 0.5,
+    y: 0.3,
+    type: 'rfi',
+    label: 'Demo Tag',
+    planId: 'demo-plan-1',
+    created_at: new Date().toISOString(),
+  };
+  tags.push(demoTag);
+
+  const demoRFI = {
+    id: 'demo-rfi-1',
+    title: 'RFI-001: Sample Issue',
+    description: 'This is a demo RFI',
+    tagId: 'demo-tag-1',
+    planId: 'demo-plan-1',
+    status: 'open',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+  rfis.push(demoRFI);
+
+  res.json({
+    success: true,
+    message: 'Demo data loaded',
+    data: {
+      projects: projects.length,
+      tags: tags.length,
+      rfis: rfis.length,
+      changeOrders: changeOrders.length,
+      liens: liens.length,
+      photos: photos.length,
+      timeEntries: timeEntries.length,
+      plans: plans.length,
     },
   });
 });

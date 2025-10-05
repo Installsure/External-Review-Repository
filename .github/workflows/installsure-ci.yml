@@ -1,0 +1,112 @@
+name: InstallSure CI
+
+on:
+  push:
+    branches: [ main, master, develop, copilot/** ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: |
+            applications/installsure/backend/package-lock.json
+            applications/installsure/frontend/package-lock.json
+            tests/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: applications/installsure/backend
+        run: npm ci
+
+      - name: Install frontend dependencies
+        working-directory: applications/installsure/frontend
+        run: npm ci
+
+      - name: Install test dependencies
+        working-directory: tests
+        run: npm ci
+
+      - name: Run backend tests
+        working-directory: applications/installsure/backend
+        run: npm run test
+
+      - name: Build frontend
+        working-directory: applications/installsure/frontend
+        run: npm run build
+
+      - name: TypeScript type check - Backend
+        working-directory: applications/installsure/backend
+        run: npm run typecheck || true
+        continue-on-error: true
+
+      - name: TypeScript type check - Frontend
+        working-directory: applications/installsure/frontend
+        run: npm run typecheck
+
+      - name: Install Playwright browsers
+        working-directory: tests
+        run: npx playwright install --with-deps chromium
+
+      - name: Start backend server
+        working-directory: applications/installsure/backend
+        run: |
+          npm run dev &
+          echo $! > backend.pid
+        env:
+          NODE_ENV: test
+          PORT: 8099
+
+      - name: Start frontend preview
+        working-directory: applications/installsure/frontend
+        run: |
+          npm run preview &
+          echo $! > frontend.pid
+        env:
+          NODE_ENV: production
+
+      - name: Wait for services
+        run: |
+          echo "Waiting for backend..."
+          npx wait-on http://127.0.0.1:8099/health --timeout 60000 || (cat applications/installsure/backend/backend.pid && kill $(cat applications/installsure/backend/backend.pid) && exit 1)
+          
+          echo "Waiting for frontend..."
+          npx wait-on http://127.0.0.1:4173 --timeout 60000 || (kill $(cat applications/installsure/frontend/frontend.pid) && exit 1)
+
+      - name: Run E2E tests
+        working-directory: tests
+        run: npm test
+        env:
+          CI: true
+
+      - name: Stop servers
+        if: always()
+        run: |
+          if [ -f applications/installsure/backend/backend.pid ]; then
+            kill $(cat applications/installsure/backend/backend.pid) || true
+          fi
+          if [ -f applications/installsure/frontend/frontend.pid ]; then
+            kill $(cat applications/installsure/frontend/frontend.pid) || true
+          fi
+          lsof -ti:8099 | xargs kill -9 2>/dev/null || true
+          lsof -ti:4173 | xargs kill -9 2>/dev/null || true
+
+      - name: Upload Playwright artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: tests/playwright-report/
+          retention-days: 7

@@ -1,0 +1,11 @@
+This is a sample plan document for testing.
+It simulates a construction plan PDF.
+
+FLOOR PLAN - LEVEL 1
+-------------------
+Area: 5000 sq ft
+Walls: Standard framing
+Doors: 8 locations
+Windows: 12 locations
+
+For testing purposes, rename this file to .pdf if needed.

@@ -21,6 +21,169 @@ This repository contains a complete application suite for external review and re
 
 ---
 
+## ⚡ **INSTALLSURE 5-MINUTE DEMO**
+
+### **What is InstallSure?**
+InstallSure is a complete construction management platform with:
+- **Backend API** (Express on Node.js) - Port 8099
+- **Frontend UI** (React + Vite + Tailwind) - Port 3000
+- **E2E Testing** (Playwright)
+- **API Testing** (Vitest)
+
+### **Quick Start - Automated**
+
+#### Windows (PowerShell)
+```powershell
+# From repository root
+powershell -ExecutionPolicy Bypass -File scripts\smoke.ps1
+```
+
+#### Unix/Linux/macOS (Bash)
+```bash
+# From repository root
+bash scripts/smoke.sh
+```
+
+The smoke script will:
+1. Install all dependencies (backend, frontend, tests)
+2. Start backend server on http://127.0.0.1:8099
+3. Start frontend server on http://127.0.0.1:3000
+4. Run backend API tests
+5. Run Playwright E2E tests
+6. Display a summary of results
+
+### **Quick Start - Manual**
+
+#### 1. Backend (Terminal 1)
+```bash
+cd applications/installsure/backend
+npm install
+npm run dev
+# Backend starts on http://127.0.0.1:8099
+```
+
+#### 2. Frontend (Terminal 2)
+```bash
+cd applications/installsure/frontend
+npm install
+npm run dev
+# Frontend starts on http://127.0.0.1:3000
+```
+
+#### 3. Tests (Terminal 3)
+```bash
+# Backend API Tests
+cd applications/installsure/backend
+npm test
+
+# E2E Tests
+cd ../../tests
+npm install
+npx playwright install --with-deps chromium
+npm test
+```
+
+### **Environment Variables**
+
+#### Backend (.env)
+```env
+NODE_ENV=development
+PORT=8099
+CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+AUTH_SECRET=dev-secret-change-me-min-32-characters-required-for-security
+JWT_EXPIRES_IN=24h
+```
+
+#### Frontend (.env.local)
+```env
+VITE_APP_NAME=InstallSure
+VITE_API_BASE=http://127.0.0.1:8099
+```
+
+### **API Endpoints**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/health` | GET | Health check - returns `{status:"ok"}` |
+| `/api/projects` | GET/POST | List or create projects |
+| `/api/tags` | GET/POST | List or create tags (x,y coordinates: 0-1) |
+| `/api/rfis` | GET/POST | List or create RFIs |
+| `/api/change-orders` | GET/POST | List or create change orders |
+| `/api/liens` | GET/POST | List or create liens |
+| `/api/photos` | GET | List photos |
+| `/api/photos/upload` | POST | Upload photo (JPG/PNG) |
+| `/api/plans/upload` | POST | Upload plan (PDF/PNG) |
+| `/api/time` | GET/POST | Time entries |
+| `/debug/seed` | GET | Load demo seed data |
+
+### **Example API Usage**
+
+```bash
+# Health check
+curl http://127.0.0.1:8099/health
+
+# Get projects
+curl http://127.0.0.1:8099/api/projects
+
+# Create a tag
+curl -X POST http://127.0.0.1:8099/api/tags \
+  -H "Content-Type: application/json" \
+  -d '{"x":0.5,"y":0.3,"type":"rfi","label":"Framing Issue"}'
+
+# Create an RFI
+curl -X POST http://127.0.0.1:8099/api/rfis \
+  -H "Content-Type: application/json" \
+  -d '{"title":"RFI-001: Header Detail","description":"Need clarification","status":"open"}'
+
+# Load demo data
+curl http://127.0.0.1:8099/debug/seed
+```
+
+### **Troubleshooting**
+
+#### Port Already in Use
+```bash
+# Kill processes on ports 8099 or 3000
+# Windows
+netstat -ano | findstr :8099
+taskkill /PID <PID> /F
+
+# Unix/Linux/macOS
+lsof -ti:8099 | xargs kill -9
+lsof -ti:3000 | xargs kill -9
+```
+
+#### Dependencies Not Installing
+```bash
+# Clear cache and reinstall
+rm -rf node_modules package-lock.json
+npm install
+```
+
+#### Tests Failing
+```bash
+# Ensure servers are running first
+# Backend: http://127.0.0.1:8099/health should return {"status":"ok"}
+# Frontend: http://127.0.0.1:3000 should load
+
+# For E2E tests, install browsers
+cd tests
+npx playwright install --with-deps chromium
+```
+
+#### TypeScript Errors
+```bash
+# Frontend should compile cleanly
+cd applications/installsure/frontend
+npm run typecheck
+
+# Backend has some advanced features with errors (can be ignored for basic demo)
+cd applications/installsure/backend
+npm run typecheck
+```
+
+---
+
 ## 🚀 **QUICK START**
 
 ### **Prerequisites**

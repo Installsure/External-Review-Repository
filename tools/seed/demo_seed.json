@@ -1,0 +1,48 @@
+{
+  "projects": [
+    {
+      "id": "1",
+      "name": "Downtown Office Building",
+      "description": "Modern 20-story office complex with sustainable design",
+      "status": "active"
+    },
+    {
+      "id": "2",
+      "name": "Residential Complex",
+      "description": "Mixed-use residential development with retail space",
+      "status": "planning"
+    }
+  ],
+  "tags": [
+    {
+      "id": "tag-1",
+      "x": 0.5,
+      "y": 0.3,
+      "type": "rfi",
+      "label": "Framing Issue",
+      "planId": "plan-1"
+    }
+  ],
+  "rfis": [
+    {
+      "id": "rfi-1",
+      "title": "RFI-001: Framing Header Detail",
+      "description": "Need clarification on header beam sizing at entrance",
+      "tagId": "tag-1",
+      "planId": "plan-1",
+      "status": "open"
+    }
+  ],
+  "changeOrders": [
+    {
+      "id": "co-1",
+      "title": "CO-001: Additional HVAC Units",
+      "description": "Client requested 2 additional HVAC units for better climate control",
+      "amount": 15000,
+      "status": "approved"
+    }
+  ],
+  "liens": [],
+  "photos": [],
+  "timeEntries": []
+}
