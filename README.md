@@ -26,8 +26,8 @@ This repository contains a complete application suite for external review and re
 ### **Prerequisites**
 - Node.js v20+ (v22.19.0 recommended)
 - npm v8+ (v10.9.3 recommended)
-- Python v3.10+ (for InstallSure backend)
 - Git v2.47+
+- PowerShell 5.1+ (for running automation scripts on Windows)
 
 ### **Installation**
 ```bash
@@ -71,6 +71,9 @@ npm install
 ```bash
 # Run all tests
 .\scripts\test-all.ps1
+
+# Run E2E tests with automatic service startup
+.\scripts\run-e2e.ps1
 
 # Run individual application tests
 cd applications\installsure
@@ -120,6 +123,7 @@ npm run test:e2e
 - `.\scripts\start-all.ps1` - Start all applications
 - `.\scripts\stop-all.ps1` - Stop all applications
 - `.\scripts\test-all.ps1` - Run all tests
+- `.\scripts\run-e2e.ps1` - Start services and run E2E tests with Playwright
 - `.\tools\preflight-check.ps1` - System requirements check
 
 ### **NPM Scripts**
