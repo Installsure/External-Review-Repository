@@ -98,6 +98,16 @@ public
 tmp/
 temp/
 
+# UE5 BIM Walkthrough temporary files
+UE5_BIM_Walkthrough_AddOn_v2/Output/
+UE5_BIM_Walkthrough_AddOn_v2/Temp/
+UE5_BIM_Walkthrough_AddOn_v2/Logs/
+
+# Demo extended temporary files
+InstallSure_Demo_Extended/estimator/estimate_out.csv
+InstallSure_Demo_Extended/viewer/tags_export.csv
+InstallSure_Demo_Extended/viewer/takeoff_data.json
+
 # Database files
 *.db
 *.sqlite

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InstallSure Demo Viewer - BIM Quantity Takeoff</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .measurement-type {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .button:hover {
+            background: #5568d3;
+        }
+
+        .button-secondary {
+            background: #764ba2;
+        }
+
+        .button-secondary:hover {
+            background: #663d8f;
+        }
+
+        .demo-data {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .demo-data h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #bbdefb;
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .data-value {
+            color: #666;
+            font-family: 'Courier New', monospace;
+        }
+
+        .export-section {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid #ffc107;
+        }
+
+        .export-section h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #28a745;
+        }
+
+        .instructions h3 {
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 2;
+        }
+
+        .instructions code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+
+        footer {
+            background: #343a40;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-ready {
+            background: #28a745;
+        }
+
+        .status-pending {
+            background: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏗️ InstallSure Demo Viewer</h1>
+            <p class="subtitle">BIM Quantity Takeoff & Cost Estimation</p>
+        </header>
+
+        <div class="content">
+            <div class="section">
+                <h2>Measurement Types</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h3>📏 Linear Measurements</h3>
+                        <p>Track lengths of pipes, cables, framing, and linear elements.</p>
+                        <div style="margin-top: 15px;">
+                            <span class="measurement-type">Pipes</span>
+                            <span class="measurement-type">Cables</span>
+                            <span class="measurement-type">Framing</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>📐 Area Measurements</h3>
+                        <p>Calculate surface areas for walls, floors, ceilings, and coatings.</p>
+                        <div style="margin-top: 15px;">
+                            <span class="measurement-type">Walls</span>
+                            <span class="measurement-type">Floors</span>
+                            <span class="measurement-type">Ceilings</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>📦 Volume Measurements</h3>
+                        <p>Measure volumes for concrete, excavation, and material quantities.</p>
+                        <div style="margin-top: 15px;">
+                            <span class="measurement-type">Concrete</span>
+                            <span class="measurement-type">Excavation</span>
+                            <span class="measurement-type">Fill</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>🔢 Count Measurements</h3>
+                        <p>Count fixtures, doors, windows, and discrete components.</p>
+                        <div style="margin-top: 15px;">
+                            <span class="measurement-type">Fixtures</span>
+                            <span class="measurement-type">Doors</span>
+                            <span class="measurement-type">Windows</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Demo Data</h2>
+                <div class="demo-data">
+                    <h3>Sample Project Quantities</h3>
+                    <div class="data-row">
+                        <span class="data-label">Total Linear Feet:</span>
+                        <span class="data-value">2,450 LF</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Total Square Feet:</span>
+                        <span class="data-value">8,900 SF</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Total Cubic Yards:</span>
+                        <span class="data-value">145 CY</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Component Count:</span>
+                        <span class="data-value">342 items</span>
+                    </div>
+                </div>
+
+                <div class="export-section">
+                    <h3>📤 Export Takeoff Data</h3>
+                    <p>Export your quantity takeoff data to CSV format for use with the cost estimator.</p>
+                    <div class="button-group">
+                        <button class="button" onclick="exportCSV()">Export to CSV</button>
+                        <button class="button button-secondary" onclick="exportJSON()">Export to JSON</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Next Steps</h2>
+                <div class="instructions">
+                    <h3>🚀 Using the Estimator</h3>
+                    <ol>
+                        <li>Export your takeoff data using the button above (creates <code>tags_export.csv</code>)</li>
+                        <li>Navigate to the estimator directory:
+                            <br><code>cd .\InstallSure_Demo_Extended\estimator</code>
+                        </li>
+                        <li>Run the estimator script:
+                            <br><code>python estimator.py ..\viewer\tags_export.csv > estimate_out.csv</code>
+                        </li>
+                        <li>Review the cost estimates in <code>estimate_out.csv</code></li>
+                    </ol>
+                </div>
+
+                <div class="instructions" style="border-left-color: #007bff; margin-top: 20px;">
+                    <h3 style="color: #007bff;">💾 Database Integration</h3>
+                    <ol>
+                        <li>Open your Neon console or psql client</li>
+                        <li>Apply the schema: <code>.\InstallSure_Demo_Extended\neon\schema.sql</code></li>
+                        <li>Import your estimation data to the database</li>
+                        <li>Query and analyze your project costs</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>System Status</h2>
+                <div class="grid">
+                    <div class="card">
+                        <h3><span class="status-indicator status-ready"></span>Viewer</h3>
+                        <p>Demo viewer is ready and operational</p>
+                    </div>
+                    <div class="card">
+                        <h3><span class="status-indicator status-ready"></span>Estimator</h3>
+                        <p>Python estimator engine available</p>
+                    </div>
+                    <div class="card">
+                        <h3><span class="status-indicator status-ready"></span>Database</h3>
+                        <p>Neon schema ready to deploy</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>InstallSure Demo Extended - Quantity Takeoff & Cost Estimation System</p>
+            <p style="opacity: 0.7; margin-top: 10px;">Last Updated: 2025-09-29</p>
+        </footer>
+    </div>
+
+    <script>
+        function exportCSV() {
+            // Generate sample CSV data
+            const csvData = `Tag,Category,Type,Quantity,Unit,Material,Notes
+T001,Linear,Pipe,125,LF,Copper,"3/4 inch"
+T002,Linear,Cable,450,LF,Electrical,"12 AWG"
+T003,Area,Wall,2400,SF,Drywall,"Standard"
+T004,Area,Floor,1800,SF,Concrete,"4 inch slab"
+T005,Volume,Concrete,45,CY,Concrete,"3000 PSI"
+T006,Volume,Excavation,52,CY,Earth,"General"
+T007,Count,Fixture,24,EA,Plumbing,"Standard"
+T008,Count,Door,18,EA,Hardware,"Interior"
+T009,Count,Window,32,EA,Glass,"Vinyl frame"
+T010,Linear,Framing,890,LF,Steel,"C-channel"`;
+
+            // Create blob and download
+            const blob = new Blob([csvData], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'tags_export.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            alert('✅ CSV file exported successfully!\n\nFile saved as: tags_export.csv\n\nNext step: Run the estimator with this file.');
+        }
+
+        function exportJSON() {
+            // Generate sample JSON data
+            const jsonData = {
+                project: "InstallSure Demo Project",
+                date: new Date().toISOString().split('T')[0],
+                measurements: [
+                    { tag: "T001", category: "Linear", type: "Pipe", quantity: 125, unit: "LF", material: "Copper", notes: "3/4 inch" },
+                    { tag: "T002", category: "Linear", type: "Cable", quantity: 450, unit: "LF", material: "Electrical", notes: "12 AWG" },
+                    { tag: "T003", category: "Area", type: "Wall", quantity: 2400, unit: "SF", material: "Drywall", notes: "Standard" },
+                    { tag: "T004", category: "Area", type: "Floor", quantity: 1800, unit: "SF", material: "Concrete", notes: "4 inch slab" },
+                    { tag: "T005", category: "Volume", type: "Concrete", quantity: 45, unit: "CY", material: "Concrete", notes: "3000 PSI" },
+                    { tag: "T006", category: "Volume", type: "Excavation", quantity: 52, unit: "CY", material: "Earth", notes: "General" },
+                    { tag: "T007", category: "Count", type: "Fixture", quantity: 24, unit: "EA", material: "Plumbing", notes: "Standard" },
+                    { tag: "T008", category: "Count", type: "Door", quantity: 18, unit: "EA", material: "Hardware", notes: "Interior" },
+                    { tag: "T009", category: "Count", type: "Window", quantity: 32, unit: "EA", material: "Glass", notes: "Vinyl frame" },
+                    { tag: "T010", category: "Linear", type: "Framing", quantity: 890, unit: "LF", material: "Steel", notes: "C-channel" }
+                ],
+                summary: {
+                    totalLinear: 2450,
+                    totalArea: 8900,
+                    totalVolume: 145,
+                    totalCount: 342
+                }
+            };
+
+            // Create blob and download
+            const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'takeoff_data.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            alert('✅ JSON file exported successfully!\n\nFile saved as: takeoff_data.json');
+        }
+    </script>
+</body>
+</html>

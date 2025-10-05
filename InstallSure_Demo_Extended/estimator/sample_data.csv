@@ -1,0 +1,11 @@
+Tag,Category,Type,Quantity,Unit,Material,Notes
+T001,Linear,Pipe,125,LF,Copper,"3/4 inch"
+T002,Linear,Cable,450,LF,Electrical,"12 AWG"
+T003,Area,Wall,2400,SF,Drywall,"Standard"
+T004,Area,Floor,1800,SF,Concrete,"4 inch slab"
+T005,Volume,Concrete,45,CY,Concrete,"3000 PSI"
+T006,Volume,Excavation,52,CY,Earth,"General"
+T007,Count,Fixture,24,EA,Plumbing,"Standard"
+T008,Count,Door,18,EA,Hardware,"Interior"
+T009,Count,Window,32,EA,Glass,"Vinyl frame"
+T010,Linear,Framing,890,LF,Steel,"C-channel"

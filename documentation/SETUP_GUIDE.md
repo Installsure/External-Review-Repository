@@ -5,6 +5,27 @@
 
 ---
 
+## 🎯 **QUICK SETUP OPTIONS**
+
+### **Option 1: Nexus Setup (Recommended for InstallSure BIM)**
+Complete one-command setup for InstallSure BIM ecosystem:
+```powershell
+.\Nexus_Setup.ps1
+```
+
+This installs:
+- VS Code extensions
+- BIM viewer and cost estimator
+- Database schema
+- UE5 walkthrough environment
+
+See [Nexus Setup Guide](NEXUS_SETUP.md) for details.
+
+### **Option 2: Standard Setup (Web Applications)**
+Follow the standard installation steps below for the main web applications.
+
+---
+
 ## 📋 **PREREQUISITES**
 
 ### **System Requirements**
