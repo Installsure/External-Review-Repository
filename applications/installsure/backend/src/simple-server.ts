@@ -10,9 +10,10 @@ import { z } from 'zod';
 // Configuration
 const config = {
   NODE_ENV: process.env.NODE_ENV || 'development',
-  PORT: parseInt(process.env.PORT || '8000'),
+  PORT: parseInt(process.env.PORT || '8099'),
   CORS_ORIGINS: process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()) || [
     'http://localhost:3000',
+    'http://127.0.0.1:3000',
   ],
   DATABASE_URL: process.env.DATABASE_URL,
   FORGE_CLIENT_ID: process.env.FORGE_CLIENT_ID,
@@ -53,7 +54,7 @@ const upload = multer({
   storage: storage,
   limits: { fileSize: 100 * 1024 * 1024 }, // 100MB
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['.ifc', '.dwg', '.rvt', '.step', '.obj', '.gltf', '.glb'];
+    const allowedTypes = ['.ifc', '.dwg', '.rvt', '.step', '.obj', '.gltf', '.glb', '.pdf', '.png', '.jpg', '.jpeg'];
     const ext = path.extname(file.originalname).toLowerCase();
     if (allowedTypes.includes(ext)) {
       cb(null, true);
@@ -383,6 +384,205 @@ app.get('/api/qb/health', (req, res) => {
       message: 'QuickBooks integration not configured',
     },
   });
+});
+
+// Plans endpoints
+let plans: any[] = [];
+app.get('/api/plans', (req, res) => {
+  res.json({ success: true, data: plans });
+});
+
+app.post('/api/plans', (req, res) => {
+  const plan = {
+    id: Date.now().toString(),
+    ...req.body,
+    created_at: new Date().toISOString(),
+  };
+  plans.push(plan);
+  res.status(201).json({ success: true, data: plan });
+});
+
+app.post('/api/plans/upload', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, error: 'No file uploaded' });
+  }
+  const plan = {
+    id: Date.now().toString(),
+    name: req.file.originalname,
+    file_name: req.file.originalname,
+    file_type: path.extname(req.file.originalname).substring(1),
+    file_size: req.file.size,
+    uploaded_at: new Date().toISOString(),
+  };
+  plans.push(plan);
+  res.status(201).json({ success: true, data: plan, message: 'Upload complete' });
+});
+
+// Tags endpoints
+let tags: any[] = [];
+app.get('/api/tags', (req, res) => {
+  res.json({ success: true, data: tags });
+});
+
+app.post('/api/tags', (req, res) => {
+  const tag = {
+    id: Date.now().toString(),
+    ...req.body,
+    created_at: new Date().toISOString(),
+  };
+  tags.push(tag);
+  res.status(201).json({ success: true, data: tag, message: 'Tag created' });
+});
+
+app.get('/api/tags/:id', (req, res) => {
+  const tag = tags.find(t => t.id === req.params.id);
+  if (!tag) {
+    return res.status(404).json({ success: false, error: 'Tag not found' });
+  }
+  res.json({ success: true, data: tag });
+});
+
+// RFIs endpoints
+let rfis: any[] = [];
+app.get('/api/rfis', (req, res) => {
+  res.json({ success: true, data: rfis });
+});
+
+app.post('/api/rfis', (req, res) => {
+  const rfi = {
+    id: Date.now().toString(),
+    ...req.body,
+    status: req.body.status || 'open',
+    created_at: new Date().toISOString(),
+  };
+  rfis.push(rfi);
+  res.status(201).json({ success: true, data: rfi, message: 'RFI saved' });
+});
+
+app.get('/api/rfis/:id', (req, res) => {
+  const rfi = rfis.find(r => r.id === req.params.id);
+  if (!rfi) {
+    return res.status(404).json({ success: false, error: 'RFI not found' });
+  }
+  res.json({ success: true, data: rfi });
+});
+
+app.put('/api/rfis/:id', (req, res) => {
+  const index = rfis.findIndex(r => r.id === req.params.id);
+  if (index === -1) {
+    return res.status(404).json({ success: false, error: 'RFI not found' });
+  }
+  rfis[index] = { ...rfis[index], ...req.body, updated_at: new Date().toISOString() };
+  res.json({ success: true, data: rfis[index] });
+});
+
+// Change Orders endpoints
+let changeOrders: any[] = [];
+app.get('/api/change-orders', (req, res) => {
+  res.json({ success: true, data: changeOrders });
+});
+
+app.post('/api/change-orders', (req, res) => {
+  const co = {
+    id: Date.now().toString(),
+    ...req.body,
+    status: req.body.status || 'draft',
+    created_at: new Date().toISOString(),
+  };
+  changeOrders.push(co);
+  res.status(201).json({ success: true, data: co });
+});
+
+app.get('/api/change-orders/:id', (req, res) => {
+  const co = changeOrders.find(c => c.id === req.params.id);
+  if (!co) {
+    return res.status(404).json({ success: false, error: 'Change order not found' });
+  }
+  res.json({ success: true, data: co });
+});
+
+// Liens endpoints
+let liens: any[] = [];
+app.get('/api/liens', (req, res) => {
+  res.json({ success: true, data: liens });
+});
+
+app.post('/api/liens', (req, res) => {
+  const lien = {
+    id: Date.now().toString(),
+    ...req.body,
+    created_at: new Date().toISOString(),
+  };
+  liens.push(lien);
+  res.status(201).json({ success: true, data: lien });
+});
+
+// Photos endpoints  
+let photos: any[] = [];
+app.get('/api/photos', (req, res) => {
+  res.json({ success: true, data: photos });
+});
+
+app.post('/api/photos/upload', upload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, error: 'No file uploaded' });
+  }
+  const photo = {
+    id: Date.now().toString(),
+    file_name: req.file.originalname,
+    file_size: req.file.size,
+    uploaded_at: new Date().toISOString(),
+  };
+  photos.push(photo);
+  res.status(201).json({ success: true, data: photo });
+});
+
+// Time entries endpoints
+let timeEntries: any[] = [];
+app.get('/api/time', (req, res) => {
+  res.json({ success: true, data: timeEntries });
+});
+
+app.post('/api/time', (req, res) => {
+  const entry = {
+    id: Date.now().toString(),
+    ...req.body,
+    created_at: new Date().toISOString(),
+  };
+  timeEntries.push(entry);
+  res.status(201).json({ success: true, data: entry });
+});
+
+// Debug seed endpoint
+app.post('/api/debug/seed', (req, res) => {
+  try {
+    const seedData = req.body;
+    if (seedData.projects) projects = [...seedData.projects];
+    if (seedData.plans) plans = [...seedData.plans];
+    if (seedData.tags) tags = [...seedData.tags];
+    if (seedData.rfis) rfis = [...seedData.rfis];
+    if (seedData.change_orders) changeOrders = [...seedData.change_orders];
+    if (seedData.liens) liens = [...seedData.liens];
+    if (seedData.photos) photos = [...seedData.photos];
+    if (seedData.time_entries) timeEntries = [...seedData.time_entries];
+    
+    res.json({
+      success: true,
+      message: 'Seed data loaded successfully',
+      counts: {
+        projects: projects.length,
+        plans: plans.length,
+        tags: tags.length,
+        rfis: rfis.length,
+        changeOrders: changeOrders.length,
+        liens: liens.length,
+        photos: photos.length,
+        timeEntries: timeEntries.length,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'Failed to load seed data' });
+  }
 });
 
 // Error handler
