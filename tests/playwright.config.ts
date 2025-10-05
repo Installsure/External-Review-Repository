@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const baseURL = process.env.CI ? 'http://127.0.0.1:4173' : 'http://127.0.0.1:3000';
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -8,7 +10,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'http://127.0.0.1:3000',
+    baseURL,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -20,7 +22,7 @@ export default defineConfig({
   ],
   webServer: process.env.CI ? undefined : {
     command: 'echo "Assuming servers are already running"',
-    url: 'http://127.0.0.1:3000',
+    url: baseURL,
     reuseExistingServer: true,
     timeout: 5000,
   },

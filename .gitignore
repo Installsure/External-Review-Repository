@@ -128,3 +128,13 @@ playwright/.cache/
 
 # Local development
 .local
+
+# InstallSure specific
+uploads/
+*.pid
+backend.pid
+frontend.pid
+
+# Test logs
+/tmp/backend.log
+/tmp/frontend.log
