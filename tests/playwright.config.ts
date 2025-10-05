@@ -1,6 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const baseURL = process.env.CI ? 'http://127.0.0.1:4173' : 'http://127.0.0.1:3000';
+// In CI use preview (4173), locally use dev server (localhost:3000)
+const baseURL = process.env.CI ? 'http://127.0.0.1:4173' : 'http://localhost:3000';
 
 export default defineConfig({
   testDir: './e2e',
