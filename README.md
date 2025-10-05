@@ -19,17 +19,36 @@ This repository contains a complete application suite for external review and re
 - **Hello** - Digital Business Cards (Development Ready)
 - **Avatar** - AI Avatar Platform (Development Ready)
 
+### **InstallSure BIM Ecosystem:**
+- **InstallSure_AllInOne_Pack** - VS Code extensions for development
+- **InstallSure_Demo_Extended** - BIM viewer, cost estimator, and database
+- **UE5_BIM_Walkthrough_AddOn_v2** - Unreal Engine 5 walkthrough builder
+
 ---
 
 ## 🚀 **QUICK START**
 
-### **Prerequisites**
+### **Option 1: Nexus Setup (One-Command Installation)**
+```powershell
+# Complete InstallSure ecosystem setup - VS Code + Demo + UE5
+.\Nexus_Setup.ps1 -Verbose
+```
+
+This will set up:
+- ✅ VS Code with all required extensions
+- ✅ BIM viewer and cost estimator
+- ✅ Neon database schema
+- ✅ UE5 BIM walkthrough environment
+
+### **Option 2: Standard Installation**
+
+#### **Prerequisites**
 - Node.js v20+ (v22.19.0 recommended)
 - npm v8+ (v10.9.3 recommended)
 - Python v3.10+ (for InstallSure backend)
 - Git v2.47+
 
-### **Installation**
+#### **Installation**
 ```bash
 # Clone the repository
 git clone <repository-url>
@@ -114,7 +133,56 @@ npm run test:e2e
 
 ---
 
+## 🏗️ **INSTALLSURE BIM WORKFLOW**
+
+### **Complete Setup (Recommended)**
+```powershell
+# One command to set up everything
+.\Nexus_Setup.ps1 -Verbose
+```
+
+### **Manual Setup (Step by Step)**
+
+#### **1. VS Code Extensions**
+```powershell
+.\InstallSure_AllInOne_Pack\Install_All.ps1 -Verbose
+```
+
+#### **2. Demo Viewer & Estimator**
+```powershell
+# Open the viewer
+.\InstallSure_Demo_Extended\viewer\index.html
+# (Use VS Code Live Server extension)
+
+# Export tags from viewer, then run estimator
+cd .\InstallSure_Demo_Extended\estimator
+python estimator.py ..\viewer\tags_export.csv > estimate_out.csv
+```
+
+#### **3. Database Setup**
+```powershell
+# Apply the schema in Neon console or psql
+# File: .\InstallSure_Demo_Extended\neon\schema.sql
+```
+
+#### **4. UE5 Walkthrough**
+```powershell
+# Configure environment
+Copy-Item .\UE5_BIM_Walkthrough_AddOn_v2\.env.example .\UE5_BIM_Walkthrough_AddOn_v2\.env -Force
+notepad .\UE5_BIM_Walkthrough_AddOn_v2\.env
+# Set your PG_URL connection string
+
+# Drop IFC/RVT/DWG/PDF files into Input directory
+# Then build
+.\UE5_BIM_Walkthrough_AddOn_v2\Build_Walkthrough.ps1 -Verbose
+```
+
+---
+
 ## 🛠️ **SCRIPTS**
+
+### **Master Setup**
+- `.\Nexus_Setup.ps1` - Complete ecosystem setup (one command)
 
 ### **PowerShell Scripts (Windows)**
 - `.\scripts\start-all.ps1` - Start all applications
