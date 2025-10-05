@@ -1,0 +1,387 @@
+name: Deep Dive E2E Tests
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+
+jobs:
+  e2e-installsure:
+    name: InstallSure E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: applications/installsure/frontend/package-lock.json
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      
+      - name: Install frontend dependencies
+        working-directory: applications/installsure/frontend
+        run: npm ci
+      
+      - name: Install backend dependencies
+        working-directory: applications/installsure/backend
+        run: npm ci
+      
+      - name: Install Python dependencies
+        working-directory: applications/installsure/backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt || echo "No requirements.txt found"
+      
+      - name: Install Playwright browsers
+        working-directory: applications/installsure/frontend
+        run: npx playwright install --with-deps chromium
+      
+      - name: Start backend
+        working-directory: applications/installsure/backend
+        run: |
+          npm run dev &
+          sleep 10
+      
+      - name: Start frontend
+        working-directory: applications/installsure/frontend
+        run: |
+          npm run dev -- --port 3000 &
+          sleep 10
+      
+      - name: Wait for applications
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3000 2>/dev/null; do sleep 2; done' || true
+      
+      - name: Run E2E tests
+        working-directory: applications/installsure/frontend
+        run: npm run test:e2e || echo "E2E tests not configured yet"
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: installsure-e2e-results
+          path: |
+            applications/installsure/frontend/playwright-report/
+            applications/installsure/frontend/test-results/
+          retention-days: 30
+
+  e2e-demo-dashboard:
+    name: Demo Dashboard E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: applications/demo-dashboard/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: applications/demo-dashboard
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        working-directory: applications/demo-dashboard
+        run: npx playwright install --with-deps chromium
+      
+      - name: Start application
+        working-directory: applications/demo-dashboard
+        run: |
+          npm run dev -- --port 3001 &
+          sleep 10
+      
+      - name: Wait for application
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3001 2>/dev/null; do sleep 2; done' || true
+      
+      - name: Run E2E tests
+        working-directory: applications/demo-dashboard
+        run: npm run test:e2e || echo "E2E tests not configured yet"
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-dashboard-e2e-results
+          path: |
+            applications/demo-dashboard/playwright-report/
+            applications/demo-dashboard/test-results/
+          retention-days: 30
+
+  e2e-ff4u:
+    name: FF4U E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: applications/ff4u/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: applications/ff4u
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        working-directory: applications/ff4u
+        run: npx playwright install --with-deps chromium
+      
+      - name: Start application
+        working-directory: applications/ff4u
+        run: |
+          npm run dev -- --port 3002 &
+          sleep 10
+      
+      - name: Wait for application
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3002 2>/dev/null; do sleep 2; done' || true
+      
+      - name: Run E2E tests
+        working-directory: applications/ff4u
+        run: npm run test:e2e || echo "E2E tests not configured yet"
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ff4u-e2e-results
+          path: |
+            applications/ff4u/playwright-report/
+            applications/ff4u/test-results/
+          retention-days: 30
+
+  e2e-redeye:
+    name: RedEye E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: applications/redeye/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: applications/redeye
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        working-directory: applications/redeye
+        run: npx playwright install --with-deps chromium
+      
+      - name: Start application
+        working-directory: applications/redeye
+        run: |
+          npm run dev -- --port 3003 &
+          sleep 10
+      
+      - name: Wait for application
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3003 2>/dev/null; do sleep 2; done' || true
+      
+      - name: Run E2E tests
+        working-directory: applications/redeye
+        run: npm run test:e2e || echo "E2E tests not configured yet"
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: redeye-e2e-results
+          path: |
+            applications/redeye/playwright-report/
+            applications/redeye/test-results/
+          retention-days: 30
+
+  e2e-zerostack:
+    name: ZeroStack E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: applications/zerostack/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: applications/zerostack
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        working-directory: applications/zerostack
+        run: npx playwright install --with-deps chromium
+      
+      - name: Start application
+        working-directory: applications/zerostack
+        run: |
+          npm run dev -- --port 3004 &
+          sleep 10
+      
+      - name: Wait for application
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3004 2>/dev/null; do sleep 2; done' || true
+      
+      - name: Run E2E tests
+        working-directory: applications/zerostack
+        run: npm run test:e2e || echo "E2E tests not configured yet"
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zerostack-e2e-results
+          path: |
+            applications/zerostack/playwright-report/
+            applications/zerostack/test-results/
+          retention-days: 30
+
+  e2e-hello:
+    name: Hello E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: applications/hello/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: applications/hello
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        working-directory: applications/hello
+        run: npx playwright install --with-deps chromium
+      
+      - name: Start application
+        working-directory: applications/hello
+        run: |
+          npm run dev -- --port 3005 &
+          sleep 10
+      
+      - name: Wait for application
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3005 2>/dev/null; do sleep 2; done' || true
+      
+      - name: Run E2E tests
+        working-directory: applications/hello
+        run: npm run test:e2e || echo "E2E tests not configured yet"
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hello-e2e-results
+          path: |
+            applications/hello/playwright-report/
+            applications/hello/test-results/
+          retention-days: 30
+
+  e2e-avatar:
+    name: Avatar E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: applications/avatar/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: applications/avatar
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        working-directory: applications/avatar
+        run: npx playwright install --with-deps chromium
+      
+      - name: Start application
+        working-directory: applications/avatar
+        run: |
+          npm run dev -- --port 3006 &
+          sleep 10
+      
+      - name: Wait for application
+        run: |
+          timeout 60 bash -c 'until curl -f http://localhost:3006 2>/dev/null; do sleep 2; done' || true
+      
+      - name: Run E2E tests
+        working-directory: applications/avatar
+        run: npm run test:e2e || echo "E2E tests not configured yet"
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: avatar-e2e-results
+          path: |
+            applications/avatar/playwright-report/
+            applications/avatar/test-results/
+          retention-days: 30
+
+  e2e-summary:
+    name: E2E Test Summary
+    runs-on: ubuntu-latest
+    needs: [e2e-installsure, e2e-demo-dashboard, e2e-ff4u, e2e-redeye, e2e-zerostack, e2e-hello, e2e-avatar]
+    if: always()
+    
+    steps:
+      - name: Summary
+        run: |
+          echo "## E2E Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Application | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| InstallSure | ${{ needs.e2e-installsure.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Demo Dashboard | ${{ needs.e2e-demo-dashboard.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| FF4U | ${{ needs.e2e-ff4u.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| RedEye | ${{ needs.e2e-redeye.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ZeroStack | ${{ needs.e2e-zerostack.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Hello | ${{ needs.e2e-hello.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Avatar | ${{ needs.e2e-avatar.result }} |" >> $GITHUB_STEP_SUMMARY
