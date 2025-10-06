@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { RouteErrorBoundary } from './components/RouteErrorBoundary';
 import { Toaster } from './components/Toaster';
 import { queryClient } from './lib/query';
 import { initSentry } from './lib/sentry';
@@ -12,6 +13,7 @@ import Upload from './pages/Upload';
 import Viewer from './pages/Viewer';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import RFIs from './routes/RFIs';
 
 // Initialize Sentry
 initSentry();
@@ -34,6 +36,12 @@ function App() {
                       className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                     >
                       Dashboard
+                    </a>
+                    <a
+                      href="/rfis"
+                      className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      RFIs
                     </a>
                     <a
                       href="/upload"
@@ -61,6 +69,14 @@ function App() {
             <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
               <Routes>
                 <Route path="/" element={<Dashboard />} />
+                <Route 
+                  path="/rfis" 
+                  element={
+                    <ErrorBoundary fallback={<RouteErrorBoundary />}>
+                      <RFIs />
+                    </ErrorBoundary>
+                  } 
+                />
                 <Route path="/upload" element={<Upload />} />
                 <Route path="/viewer/:urn" element={<Viewer />} />
                 <Route path="/reports" element={<Reports />} />
