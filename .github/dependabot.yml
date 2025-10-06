@@ -1,0 +1,91 @@
+version: 2
+updates:
+  # Demo Dashboard
+  - package-ecosystem: "npm"
+    directory: "/applications/demo-dashboard"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "demo-dashboard"
+
+  # InstallSure Frontend
+  - package-ecosystem: "npm"
+    directory: "/applications/installsure/frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "installsure"
+
+  # InstallSure Backend
+  - package-ecosystem: "npm"
+    directory: "/applications/installsure/backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "installsure"
+
+  # Avatar
+  - package-ecosystem: "npm"
+    directory: "/applications/avatar"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "avatar"
+
+  # FF4U
+  - package-ecosystem: "npm"
+    directory: "/applications/ff4u"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ff4u"
+
+  # RedEye
+  - package-ecosystem: "npm"
+    directory: "/applications/redeye"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "redeye"
+
+  # ZeroStack
+  - package-ecosystem: "npm"
+    directory: "/applications/zerostack"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "zerostack"
+
+  # Hello
+  - package-ecosystem: "npm"
+    directory: "/applications/hello"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "hello"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"

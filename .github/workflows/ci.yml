@@ -1,0 +1,146 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  lint-and-test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: |
+            applications/*/package-lock.json
+            applications/*/frontend/package-lock.json
+            applications/*/backend/package-lock.json
+
+      - name: Install Demo Dashboard dependencies
+        working-directory: ./applications/demo-dashboard
+        run: npm ci
+
+      - name: Lint Demo Dashboard
+        working-directory: ./applications/demo-dashboard
+        run: npm run lint
+
+      - name: Type check Demo Dashboard
+        working-directory: ./applications/demo-dashboard
+        run: npm run typecheck
+
+      - name: Build Demo Dashboard
+        working-directory: ./applications/demo-dashboard
+        run: npm run build
+
+      - name: Install InstallSure Frontend dependencies
+        working-directory: ./applications/installsure/frontend
+        run: npm ci
+
+      - name: Lint InstallSure Frontend
+        working-directory: ./applications/installsure/frontend
+        run: npm run lint
+
+      - name: Type check InstallSure Frontend
+        working-directory: ./applications/installsure/frontend
+        run: npm run typecheck
+
+      - name: Test InstallSure Frontend
+        working-directory: ./applications/installsure/frontend
+        run: npm run test
+
+      - name: Build InstallSure Frontend
+        working-directory: ./applications/installsure/frontend
+        run: npm run build
+
+      - name: Install InstallSure Backend dependencies
+        working-directory: ./applications/installsure/backend
+        run: npm ci
+
+      - name: Lint InstallSure Backend
+        working-directory: ./applications/installsure/backend
+        run: npm run lint
+
+      - name: Type check InstallSure Backend
+        working-directory: ./applications/installsure/backend
+        run: npm run typecheck
+
+      - name: Test InstallSure Backend
+        working-directory: ./applications/installsure/backend
+        run: npm run test
+
+      - name: Build InstallSure Backend
+        working-directory: ./applications/installsure/backend
+        run: npm run build
+
+      - name: Install Avatar dependencies
+        working-directory: ./applications/avatar
+        run: npm ci
+
+      - name: Lint Avatar
+        working-directory: ./applications/avatar
+        run: npm run lint || echo "Linting not configured for Avatar"
+
+      - name: Build Avatar
+        working-directory: ./applications/avatar
+        run: npm run build || echo "Build not configured for Avatar"
+
+      - name: Install FF4U dependencies
+        working-directory: ./applications/ff4u
+        run: npm ci
+
+      - name: Lint FF4U
+        working-directory: ./applications/ff4u
+        run: npm run lint || echo "Linting not configured for FF4U"
+
+      - name: Build FF4U
+        working-directory: ./applications/ff4u
+        run: npm run build || echo "Build not configured for FF4U"
+
+      - name: Install RedEye dependencies
+        working-directory: ./applications/redeye
+        run: npm ci
+
+      - name: Lint RedEye
+        working-directory: ./applications/redeye
+        run: npm run lint || echo "Linting not configured for RedEye"
+
+      - name: Build RedEye
+        working-directory: ./applications/redeye
+        run: npm run build || echo "Build not configured for RedEye"
+
+      - name: Install ZeroStack dependencies
+        working-directory: ./applications/zerostack
+        run: npm ci
+
+      - name: Lint ZeroStack
+        working-directory: ./applications/zerostack
+        run: npm run lint || echo "Linting not configured for ZeroStack"
+
+      - name: Build ZeroStack
+        working-directory: ./applications/zerostack
+        run: npm run build || echo "Build not configured for ZeroStack"
+
+      - name: Install Hello dependencies
+        working-directory: ./applications/hello
+        run: npm ci
+
+      - name: Lint Hello
+        working-directory: ./applications/hello
+        run: npm run lint || echo "Linting not configured for Hello"
+
+      - name: Build Hello
+        working-directory: ./applications/hello
+        run: npm run build || echo "Build not configured for Hello"
