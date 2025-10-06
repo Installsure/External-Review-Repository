@@ -86,6 +86,7 @@ npm install
 - **[Troubleshooting Guide](documentation/TROUBLESHOOTING.md)** - Common issues and solutions
 - **[Contributing Guide](CONTRIBUTING.md)** - Guidelines for external reviewers
 - **[Comprehensive Review Report](documentation/COMPREHENSIVE_REVIEW_REPORT.md)** - Detailed analysis
+- **[InstallSure Fix Summary](documentation/INSTALLSURE_COMPREHENSIVE_FIX_SUMMARY.md)** - Production-ready improvements and fixes
 
 ---
 
