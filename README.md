@@ -28,6 +28,10 @@ This repository contains a complete application suite for external review and re
 - npm v8+ (v10.9.3 recommended)
 - Python v3.10+ (for InstallSure backend)
 - Git v2.47+
+- GitHub Copilot CLI (optional, recommended for code review assistance)
+  ```bash
+  npm install -g @github/copilot
+  ```
 
 ### **Installation**
 ```bash
