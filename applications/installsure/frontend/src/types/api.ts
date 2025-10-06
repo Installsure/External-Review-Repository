@@ -78,3 +78,13 @@ export interface QBHealthResponse {
   message: string;
   configured: boolean;
 }
+
+export interface Rfi {
+  id: number;
+  title: string;
+  description: string;
+  status: 'open' | 'closed' | 'pending';
+  project_id?: number;
+  created_at: string;
+  updated_at: string;
+}

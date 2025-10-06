@@ -9,6 +9,7 @@ import type {
   ForgeManifestResponse,
   ForgePropertiesResponse,
   QBHealthResponse,
+  Rfi,
 } from '../types/api.js';
 
 const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:8000';
@@ -168,6 +169,38 @@ export class ApiClient {
   // QuickBooks
   async getQBHealth(): Promise<QBHealthResponse> {
     return this.request<QBHealthResponse>('/api/qb/health');
+  }
+
+  // RFIs with normalization at the boundary
+  async getRfis(): Promise<Rfi[]> {
+    try {
+      const data = await this.request<any>('/api/rfis');
+      
+      // Normalize the response - API might return various shapes
+      const normalized: Rfi[] =
+        Array.isArray(data)         ? data :
+        Array.isArray(data?.rfis)   ? data.rfis :
+        Array.isArray(data?.items)  ? data.items :
+        Array.isArray(data?.data)   ? data.data :
+        data && typeof data === 'object' ? Object.values(data) as Rfi[] :
+        [];
+      
+      return normalized;
+    } catch (error) {
+      console.error('Error fetching RFIs:', error);
+      // Return empty array on error rather than throwing
+      return [];
+    }
+  }
+
+  async getRfi(id: number): Promise<Rfi | null> {
+    try {
+      const response = await this.request<any>(`/api/rfis/${id}`);
+      return response?.data || response || null;
+    } catch (error) {
+      console.error(`Error fetching RFI ${id}:`, error);
+      return null;
+    }
   }
 }
 
