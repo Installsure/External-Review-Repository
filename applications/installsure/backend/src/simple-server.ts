@@ -253,6 +253,27 @@ app.post('/api/files/upload', upload.single('file'), (req, res) => {
   });
 });
 
+// File stats endpoint
+app.get('/api/files/stats', (req, res) => {
+  // Mock file statistics
+  const stats = {
+    total: 5,
+    totalFiles: 5,
+    totalSize: 75497472, // ~75MB
+    byType: {
+      'dwg': 2,
+      'rvt': 1,
+      'ifc': 1,
+      'pdf': 1,
+    },
+  };
+
+  res.json({
+    success: true,
+    data: stats,
+  });
+});
+
 // Forge/AutoCAD endpoints with real functionality
 app.post('/api/autocad/auth', (req, res) => {
   if (!config.FORGE_CLIENT_ID || !config.FORGE_CLIENT_SECRET) {

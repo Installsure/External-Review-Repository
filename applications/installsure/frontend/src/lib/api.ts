@@ -9,9 +9,10 @@ import type {
   ForgeManifestResponse,
   ForgePropertiesResponse,
   QBHealthResponse,
-} from '../types/api.js';
+} from "../types/api.js";
 
-const API_BASE = (import.meta as any).env?.VITE_API_BASE || 'http://localhost:8000';
+const API_BASE =
+  (import.meta as any).env?.VITE_API_BASE || "http://localhost:8000";
 
 export interface ApiError {
   error: string;
@@ -27,12 +28,15 @@ export class ApiClient {
     this.baseUrl = baseUrl;
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit = {},
+  ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
     const response = await fetch(url, {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...options.headers,
       },
       ...options,
@@ -53,66 +57,80 @@ export class ApiClient {
 
   // Health
   async getHealth(): Promise<HealthResponse> {
-    return this.request<HealthResponse>('/api/health');
+    return this.request<HealthResponse>("/api/health");
   }
 
   // Projects
   async getProjects(): Promise<Project[]> {
-    const response = await this.request<{ success: boolean; data: Project[]; count: number }>(
-      '/api/projects',
+    const response = await this.request<{
+      success: boolean;
+      data: Project[];
+      count: number;
+    }>("/api/projects");
+    return response.data;
+  }
+
+  async getProject(id: string): Promise<Project> {
+    const response = await this.request<{ success: boolean; data: Project }>(
+      `/api/projects/${id}`,
     );
     return response.data;
   }
 
-  async getProject(id: number): Promise<Project> {
-    const response = await this.request<{ success: boolean; data: Project }>(`/api/projects/${id}`);
-    return response.data;
-  }
-
-  async createProject(data: { name: string; description?: string }): Promise<Project> {
-    const response = await this.request<{ success: boolean; data: Project }>('/api/projects', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-    return response.data;
-  }
-
-  async updateProject(id: number, data: { name?: string; description?: string }): Promise<Project> {
+  async createProject(data: {
+    name: string;
+    description?: string;
+  }): Promise<Project> {
     const response = await this.request<{ success: boolean; data: Project }>(
-      `/api/projects/${id}`,
+      "/api/projects",
       {
-        method: 'PUT',
+        method: "POST",
         body: JSON.stringify(data),
       },
     );
     return response.data;
   }
 
-  async deleteProject(id: number) {
+  async updateProject(
+    id: string,
+    data: { name?: string; description?: string },
+  ): Promise<Project> {
+    const response = await this.request<{ success: boolean; data: Project }>(
+      `/api/projects/${id}`,
+      {
+        method: "PUT",
+        body: JSON.stringify(data),
+      },
+    );
+    return response.data;
+  }
+
+  async deleteProject(id: string) {
     return this.request(`/api/projects/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
   // Files
   async getFiles(): Promise<ApiFile[]> {
-    return this.request<ApiFile[]>('/api/files');
+    return this.request<ApiFile[]>("/api/files");
   }
 
-  async getFile(id: number): Promise<ApiFile> {
+  async getFile(id: string): Promise<ApiFile> {
     return this.request<ApiFile>(`/api/files/${id}`);
   }
 
   async getFileStats(): Promise<FileStats> {
-    return this.request<FileStats>('/api/files/stats');
+    const response = await this.request<{ success: boolean; data: FileStats }>("/api/files/stats");
+    return response.data;
   }
 
   async uploadFile(file: File): Promise<ApiFile> {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append("file", file);
 
     const response = await fetch(`${this.baseUrl}/api/files/upload`, {
-      method: 'POST',
+      method: "POST",
       body: formData,
     });
 
@@ -124,31 +142,40 @@ export class ApiClient {
       throw error;
     }
 
-    return response.json();
+    const result = await response.json();
+    return result.success ? result.data : result;
   }
 
-  async deleteFile(id: number) {
+  async deleteFile(id: string) {
     return this.request(`/api/files/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   }
 
   // Forge/AutoCAD
   async forgeAuth(): Promise<ForgeAuthResponse> {
-    return this.request<ForgeAuthResponse>('/api/autocad/auth', { method: 'POST' });
+    return this.request<ForgeAuthResponse>("/api/autocad/auth", {
+      method: "POST",
+    });
   }
 
-  async forgeUpload(fileBuffer: ArrayBuffer, fileName: string): Promise<ForgeUploadResponse> {
+  async forgeUpload(
+    fileBuffer: ArrayBuffer,
+    fileName: string,
+  ): Promise<ForgeUploadResponse> {
     const base64 = btoa(String.fromCharCode(...new Uint8Array(fileBuffer)));
-    return this.request<ForgeUploadResponse>('/api/autocad/upload', {
-      method: 'POST',
+    return this.request<ForgeUploadResponse>("/api/autocad/upload", {
+      method: "POST",
       body: JSON.stringify({ fileBuffer: base64, fileName }),
     });
   }
 
-  async forgeTranslate(objectId: string, fileName: string): Promise<ForgeTranslationResponse> {
-    return this.request<ForgeTranslationResponse>('/api/autocad/translate', {
-      method: 'POST',
+  async forgeTranslate(
+    objectId: string,
+    fileName: string,
+  ): Promise<ForgeTranslationResponse> {
+    return this.request<ForgeTranslationResponse>("/api/autocad/translate", {
+      method: "POST",
       body: JSON.stringify({ objectId, fileName }),
     });
   }
@@ -158,7 +185,9 @@ export class ApiClient {
   }
 
   async getProperties(urn: string): Promise<ForgePropertiesResponse> {
-    return this.request<ForgePropertiesResponse>(`/api/autocad/properties/${urn}`);
+    return this.request<ForgePropertiesResponse>(
+      `/api/autocad/properties/${urn}`,
+    );
   }
 
   async getTakeoff(urn: string): Promise<ForgePropertiesResponse> {
@@ -167,7 +196,7 @@ export class ApiClient {
 
   // QuickBooks
   async getQBHealth(): Promise<QBHealthResponse> {
-    return this.request<QBHealthResponse>('/api/qb/health');
+    return this.request<QBHealthResponse>("/api/qb/health");
   }
 }
 

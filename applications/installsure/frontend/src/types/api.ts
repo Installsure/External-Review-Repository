@@ -7,21 +7,30 @@ export interface HealthResponse {
 }
 
 export interface Project {
-  id: number;
+  id: string;
   name: string;
   description: string | null;
   created_at: string;
   updated_at: string;
+  status?: string;
+  files?: Array<{
+    id: string;
+    name: string;
+    size: number;
+    type: string;
+  }>;
 }
 
 export interface ApiFile {
-  id: number;
-  filename: string;
+  id: string;
+  filename?: string;
   original_name: string;
-  file_path: string;
+  file_path?: string;
   file_size: number;
-  file_type: string;
+  file_type?: string;
+  mime_type?: string;
   created_at: string;
+  status?: string;
 }
 
 export interface FileStats {
