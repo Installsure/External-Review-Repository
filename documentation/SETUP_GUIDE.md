@@ -26,7 +26,7 @@
 
 ### **Step 1: Clone Repository**
 ```bash
-git clone <repository-url>
+git clone https://github.com/Installsure/External-Review-Repository.git
 cd External-Review-Repository
 ```
 
