@@ -1,0 +1,32 @@
+{
+  "name": "external-review-repository",
+  "private": true,
+  "workspaces": [
+    "applications/**"
+  ],
+  "scripts": {
+    "dev": "echo Use scripts/start-all.(ps1|sh)",
+    "build": "npm -w applications/installsure/frontend run build && npm -w applications/demo-dashboard/frontend run build",
+    "test": "bash ./scripts/test-all.sh || powershell -ExecutionPolicy Bypass -File ./scripts/test-all.ps1",
+    "lint": "eslint --max-warnings=0 \"applications/*/{src,tests}/**/*.{ts,tsx,js,jsx}\"",
+    "format": "prettier -w ."
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.0",
+    "eslint": "^9.9.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4",
+    "zod": "^3.23.8"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.0",
+    "@fastify/helmet": "^13.0.0",
+    "@fastify/rate-limit": "^10.0.0",
+    "bullmq": "^5.10.0",
+    "fastify": "^5.0.0",
+    "ioredis": "^5.4.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

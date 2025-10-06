@@ -1,53 +1,8 @@
-# Test All Applications Script
-# External Review Repository
-# Last Updated: 2025-09-29
+$ErrorActionPreference = "Stop"
+npm --prefix applications/installsure/backend test
+npm --prefix applications/installsure/frontend test
+npm --prefix applications/demo-dashboard/frontend test
 
-Write-Host "🧪 Running All Tests..." -ForegroundColor Blue
-Write-Host "=================================" -ForegroundColor Cyan
-
-# Check if Node.js is installed
-if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-    Write-Host "❌ Node.js is not installed. Please install Node.js v20+ first." -ForegroundColor Red
-    exit 1
-}
-
-# Check if npm is installed
-if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
-    Write-Host "❌ npm is not installed. Please install npm first." -ForegroundColor Red
-    exit 1
-}
-
-# Function to run tests for an application
-function Test-App {
-    param(
-        [string]$AppName,
-        [string]$AppPath,
-        [string]$TestType
-    )
-    
-    Write-Host "`n🔄 Testing $AppName ($TestType)..." -ForegroundColor Yellow
-    Write-Host "   Path: $AppPath" -ForegroundColor Gray
-    
-    if (-not (Test-Path $AppPath)) {
-        Write-Host "   ❌ Application path not found: $AppPath" -ForegroundColor Red
-        return $false
-    }
-    
-    try {
-        Set-Location $AppPath
-        
-        # Check if package.json exists
-        if (-not (Test-Path "package.json")) {
-            Write-Host "   ❌ package.json not found" -ForegroundColor Red
-            return $false
-        }
-        
-        # Check if test script exists
-        $packageJson = Get-Content "package.json" | ConvertFrom-Json
-        if (-not $packageJson.scripts.test) {
-            Write-Host "   ⚠️  No test script found in package.json" -ForegroundColor Yellow
-            return $false
-        }
         
         # Run tests
         Write-Host "   🏃 Running tests..." -ForegroundColor Gray

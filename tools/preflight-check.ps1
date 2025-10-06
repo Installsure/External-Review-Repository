@@ -1,53 +1,19 @@
-# Preflight Check Script
-# External Review Repository
-# Last Updated: 2025-09-29
+$ErrorActionPreference = "Stop"
 
-Write-Host "🔍 Running Preflight Check..." -ForegroundColor Blue
-Write-Host "=================================" -ForegroundColor Cyan
+$minNode = [Version]"20.0.0"
+$nodeVer = (node -v 2>$null) -replace 'v', ''
+if (-not $nodeVer) { throw "Node.js not found. Install Node >= $minNode" }
+$nodeVer = [Version]$nodeVer
 
-$allChecksPassed = $true
+if ($nodeVer -lt $minNode) { throw "Node.js $nodeVer < $minNode" }
 
-# Function to check if a command exists
-function Test-Command {
-    param([string]$Command, [string]$Description)
-    
-    Write-Host "`n🔄 Checking $Description..." -ForegroundColor Yellow
-    
-    if (Get-Command $Command -ErrorAction SilentlyContinue) {
-        $version = & $Command --version 2>&1 | Select-Object -First 1
-        Write-Host "   ✅ $Description is installed" -ForegroundColor Green
-        Write-Host "   Version: $version" -ForegroundColor Gray
-        return $true
-    } else {
-        Write-Host "   ❌ $Description is not installed" -ForegroundColor Red
-        Write-Host "   Please install $Description" -ForegroundColor Red
-        return $false
-    }
+$ports = @(3000,3001,8000)
+foreach ($p in $ports) {
+  $inUse = (Get-NetTCPConnection -State Listen -LocalPort $p -ErrorAction SilentlyContinue)
+  if ($inUse) { throw "Port $p already in use. Stop running services and retry." }
 }
+Write-Host "Preflight OK."
 
-# Function to check if a port is available
-function Test-Port {
-    param([int]$Port, [string]$Description)
-    
-    Write-Host "`n🔄 Checking port $Port ($Description)..." -ForegroundColor Yellow
-    
-    $portInUse = Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue
-    if ($portInUse) {
-        Write-Host "   ⚠️  Port $Port is already in use" -ForegroundColor Yellow
-        Write-Host "   Process: $($portInUse.OwningProcess)" -ForegroundColor Gray
-        return $false
-    } else {
-        Write-Host "   ✅ Port $Port is available" -ForegroundColor Green
-        return $true
-    }
-}
-
-# Function to check if a file exists
-function Test-File {
-    param([string]$FilePath, [string]$Description)
-    
-    Write-Host "`n🔄 Checking $Description..." -ForegroundColor Yellow
-    
     if (Test-Path $FilePath) {
         Write-Host "   ✅ $Description exists" -ForegroundColor Green
         return $true

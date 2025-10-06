@@ -1,53 +1,67 @@
-import { Queue, Worker, Job } from 'bullmq';
-import IORedis from 'ioredis';
-import { config } from './config.js';
-import { logger } from './logger.js';
+import { Queue, Worker, QueueEvents, JobsOptions } from "bullmq";
+import { getRedis } from "./redis.js";
 
-// If running in test environment, avoid connecting to Redis/BullMQ.
-// Provide no-op queues and a healthy check to make unit tests deterministic.
-const isTest = process.env.NODE_ENV === 'test' || config.NODE_ENV === 'test';
+export type UploadJob = {
+  userId: string;
+  fileId: string;
+  filename: string;
+  size: number;
+};
 
-let redis: IORedis | null = null;
-let translationQueue: Queue | null = null;
-let emailQueue: Queue | null = null;
+const DEFAULT_OPTS: JobsOptions = {
+  attempts: 5,
+  backoff: {
+    type: "exponential",
+    delay: 1000,
+  },
+  removeOnComplete: 1000,
+  removeOnFail: 1000,
+  timeout: 5 * 60_000,
+};
 
-if (!isTest) {
-  // Real Redis connection
-  redis = new IORedis(config.REDIS_URL || 'redis://localhost:6379', {
-    maxRetriesPerRequest: 3,
+async function connection() {
+  const r = await getRedis();
+  // BullMQ accepts an IORedis instance as connection
+  // @ts-expect-error acceptable per BullMQ typing
+  return r;
+}
+
+export async function makeUploadQueue() {
+  const conn = await connection();
+  const queue = new Queue<UploadJob>("upload", { connection: conn });
+
+  const events = new QueueEvents("upload", { connection: conn });
+  events.on("failed", ({ jobId, failedReason }) => {
+    console.error(`[queue:upload] job ${jobId} failed: ${failedReason}`);
   });
 
-  // Queue definitions
-  translationQueue = new Queue('translation', {
-    connection: redis,
-    defaultJobOptions: {
-      removeOnComplete: 10,
-      removeOnFail: 5,
-      attempts: 3,
-      backoff: {
-        type: 'exponential',
-        delay: 2000,
-      },
+  return {
+    queue,
+    async enqueue(job: UploadJob, opts: JobsOptions = {}) {
+      return queue.add("process-upload", job, { ...DEFAULT_OPTS, ...opts });
     },
-  });
-
-  emailQueue = new Queue('email', {
-    connection: redis,
-    defaultJobOptions: {
-      removeOnComplete: 10,
-      removeOnFail: 5,
-      attempts: 3,
-      backoff: {
-        type: 'exponential',
-        delay: 2000,
-      },
+    dispose: async () => {
+      await events.close();
+      await queue.close();
     },
-  });
-} else {
-  // Provide simple in-memory stand-ins for queues in tests to avoid side effects
-  logger.info('Running in test mode: queue connections disabled');
+  };
+}
 
-  // Minimal stubs implementing add() and close()
+export async function makeUploadWorker(handler: (job: UploadJob) => Promise<void>) {
+  const conn = await connection();
+  const worker = new Worker<UploadJob>(
+    "upload",
+    async (job) => handler(job.data),
+    { connection: conn, concurrency: 5 }
+  );
+
+  worker.on("failed", (job, err) => {
+    console.error(`[worker:upload] job ${job?.id} failed`, err);
+  });
+
+  return worker;
+}
+
   const stubQueue = (name: string) =>
     ({
       name,
