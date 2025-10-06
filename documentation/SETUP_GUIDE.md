@@ -20,6 +20,16 @@
 - **Git:** v2.47+
 - **Docker:** v20+ (optional, for containerization)
 
+### **Optional Development Tools**
+- **GitHub Copilot CLI:** AI-powered command line assistant (recommended for external reviewers)
+  ```bash
+  npm install -g @github/copilot
+  ```
+  After installation, authenticate with:
+  ```bash
+  github-copilot auth
+  ```
+
 ---
 
 ## 🔧 **INSTALLATION STEPS**
@@ -246,6 +256,18 @@ git commit -m "feat: add your feature"
 
 # Push and create PR
 git push origin feature/your-feature-name
+```
+
+### **GitHub Copilot CLI (Optional)**
+```bash
+# Get command suggestions
+github-copilot suggest "how to fix merge conflicts"
+
+# Get git command help
+github-copilot suggest "commit all changes with message"
+
+# Explain git commands
+github-copilot explain "git rebase -i HEAD~3"
 ```
 
 ---
