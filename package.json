@@ -2,7 +2,9 @@
   "name": "external-review-repository",
   "private": true,
   "workspaces": [
-    "applications/**"
+    "applications/installsure/backend",
+    "applications/installsure/frontend",
+    "applications/demo-dashboard"
   ],
   "scripts": {
     "dev": "echo Use scripts/start-all.(ps1|sh)",
