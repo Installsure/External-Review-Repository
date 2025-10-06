@@ -1,6 +1,4 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { logger } from './logger.js';
-import { config } from './config.js';
 
 class RetryableHttpClient {
   private client: AxiosInstance;
@@ -21,11 +19,9 @@ class RetryableHttpClient {
     // Request interceptor
     this.client.interceptors.request.use(
       (config) => {
-        logger.debug({ url: config.url, method: config.method }, 'HTTP request');
         return config;
       },
       (error) => {
-        logger.error({ error: error.message }, 'HTTP request error');
         return Promise.reject(error);
       },
     );
@@ -33,26 +29,9 @@ class RetryableHttpClient {
     // Response interceptor
     this.client.interceptors.response.use(
       (response) => {
-        logger.debug(
-          {
-            url: response.config.url,
-            method: response.config.method,
-            status: response.status,
-          },
-          'HTTP response',
-        );
         return response;
       },
       (error) => {
-        logger.error(
-          {
-            url: error.config?.url,
-            method: error.config?.method,
-            status: error.response?.status,
-            error: error.message,
-          },
-          'HTTP response error',
-        );
         return Promise.reject(error);
       },
     );
@@ -89,16 +68,6 @@ class RetryableHttpClient {
 
         // Calculate delay with exponential backoff
         const delay = baseDelay * Math.pow(2, attempt);
-        logger.warn(
-          {
-            attempt: attempt + 1,
-            maxRetries,
-            delay,
-            error: error.message,
-            status: error.response?.status,
-          },
-          'HTTP request failed, retrying',
-        );
 
         await this.sleep(delay);
       }
@@ -129,3 +98,5 @@ class RetryableHttpClient {
 }
 
 export const httpClient = new RetryableHttpClient();
+
+

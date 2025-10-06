@@ -1,174 +1,64 @@
-import { Queue, Worker, Job } from 'bullmq';
-import IORedis from 'ioredis';
-import { config } from './config.js';
-import { logger } from './logger.js';
+import { Queue, Worker, QueueEvents, JobsOptions } from "bullmq";
+import { getRedis } from "./redis.js";
 
-// If running in test environment, avoid connecting to Redis/BullMQ.
-// Provide no-op queues and a healthy check to make unit tests deterministic.
-const isTest = process.env.NODE_ENV === 'test' || config.NODE_ENV === 'test';
-
-let redis: IORedis | null = null;
-let translationQueue: Queue | null = null;
-let emailQueue: Queue | null = null;
-
-if (!isTest) {
-  // Real Redis connection
-  redis = new IORedis(config.REDIS_URL || 'redis://localhost:6379', {
-    maxRetriesPerRequest: 3,
-  });
-
-  // Queue definitions
-  translationQueue = new Queue('translation', {
-    connection: redis,
-    defaultJobOptions: {
-      removeOnComplete: 10,
-      removeOnFail: 5,
-      attempts: 3,
-      backoff: {
-        type: 'exponential',
-        delay: 2000,
-      },
-    },
-  });
-
-  emailQueue = new Queue('email', {
-    connection: redis,
-    defaultJobOptions: {
-      removeOnComplete: 10,
-      removeOnFail: 5,
-      attempts: 3,
-      backoff: {
-        type: 'exponential',
-        delay: 2000,
-      },
-    },
-  });
-} else {
-  // Provide simple in-memory stand-ins for queues in tests to avoid side effects
-  logger.info('Running in test mode: queue connections disabled');
-
-  // Minimal stubs implementing add() and close()
-  const stubQueue = (name: string) =>
-    ({
-      name,
-      async add(jobName: string, data: any, opts?: any) {
-        logger.debug({ jobName, data }, `Stub queue ${name} received job`);
-        return { id: `${Date.now()}` } as any;
-      },
-      async close() {
-        logger.debug(`Stub queue ${name} closed`);
-      },
-    }) as unknown as Queue;
-
-  translationQueue = stubQueue('translation');
-  emailQueue = stubQueue('email');
-}
-
-// Job types
-export interface TranslationJobData {
-  urn: string;
-  objectId: string;
-  fileName: string;
-  requestId: string;
-}
-
-export interface EmailJobData {
-  to: string;
-  subject: string;
-  template: string;
-  data: Record<string, any>;
-  requestId: string;
-}
-
-// Queue health check
-export const isQueueHealthy = async (): Promise<boolean> => {
-  if (isTest) return true;
-
-  try {
-    if (!redis) return false;
-    await redis.ping();
-    return true;
-  } catch (error) {
-    logger.error({ error: (error as Error).message }, 'Queue health check failed');
-    return false;
-  }
+export type UploadJob = {
+  userId: string;
+  fileId: string;
+  filename: string;
+  size: number;
 };
 
-// Graceful shutdown
-export const closeQueues = async (): Promise<void> => {
-  logger.info('Closing queues...');
-
-  try {
-    const ops: Promise<any>[] = [];
-    if (translationQueue && typeof (translationQueue as any).close === 'function')
-      ops.push((translationQueue as any).close());
-    if (emailQueue && typeof (emailQueue as any).close === 'function')
-      ops.push((emailQueue as any).close());
-    if (redis && typeof redis.disconnect === 'function')
-      ops.push(Promise.resolve(redis.disconnect()));
-
-    await Promise.all(ops);
-    logger.info('Queues closed');
-  } catch (error) {
-    logger.error({ error: (error as Error).message }, 'Error closing queues');
-  }
+const DEFAULT_OPTS: JobsOptions = {
+  attempts: 5,
+  backoff: {
+    type: "exponential",
+    delay: 1000,
+  },
+  removeOnComplete: 1000,
+  removeOnFail: 1000,
+  timeout: 5 * 60_000,
 };
 
-// Job processors (these would be implemented in separate worker processes in production)
-export const createTranslationWorker = () => {
-  return new Worker<TranslationJobData>(
-    'translation',
-    async (job: Job<TranslationJobData>) => {
-      const { urn, objectId, fileName, requestId } = job.data;
-      const jobLogger = logger.child({ requestId, jobId: job.id });
+async function connection() {
+  const r = await getRedis();
+  // BullMQ accepts an IORedis instance as connection
+  // @ts-expect-error acceptable per BullMQ typing
+  return r;
+}
 
-      jobLogger.info({ urn, objectId, fileName }, 'Processing translation job');
+export async function makeUploadQueue() {
+  const conn = await connection();
+  const queue = new Queue<UploadJob>("upload", { connection: conn });
 
-      try {
-        // This would contain the actual translation logic
-        // For now, we'll just simulate processing
-        await new Promise((resolve) => setTimeout(resolve, 5000));
+  const events = new QueueEvents("upload", { connection: conn });
+  events.on("failed", ({ jobId, failedReason }) => {
+    console.error(`[queue:upload] job ${jobId} failed: ${failedReason}`);
+  });
 
-        jobLogger.info({ urn }, 'Translation job completed');
-
-        return { success: true, urn };
-      } catch (error) {
-        jobLogger.error({ error: (error as Error).message }, 'Translation job failed');
-        throw error;
-      }
+  return {
+    queue,
+    async enqueue(job: UploadJob, opts: JobsOptions = {}) {
+      return queue.add("process-upload", job, { ...DEFAULT_OPTS, ...opts });
     },
-    {
-      connection: redis as any,
-      concurrency: 2,
+    dispose: async () => {
+      await events.close();
+      await queue.close();
     },
+  };
+}
+
+export async function makeUploadWorker(handler: (job: UploadJob) => Promise<void>) {
+  const conn = await connection();
+  const worker = new Worker<UploadJob>(
+    "upload",
+    async (job) => handler(job.data),
+    { connection: conn, concurrency: 5 }
   );
-};
 
-export const createEmailWorker = () => {
-  return new Worker<EmailJobData>(
-    'email',
-    async (job: Job<EmailJobData>) => {
-      const { to, subject, template, data, requestId } = job.data;
-      const jobLogger = logger.child({ requestId, jobId: job.id });
+  worker.on("failed", (job, err) => {
+    console.error(`[worker:upload] job ${job?.id} failed`, err);
+  });
 
-      jobLogger.info({ to, subject }, 'Processing email job');
+  return worker;
+}
 
-      try {
-        // This would contain the actual email sending logic
-        // For now, we'll just simulate sending
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        jobLogger.info({ to }, 'Email job completed');
-
-        return { success: true };
-      } catch (error) {
-        jobLogger.error({ error: (error as Error).message }, 'Email job failed');
-        throw error;
-      }
-    },
-    {
-      connection: redis as any,
-      concurrency: 5,
-    },
-  );
-};

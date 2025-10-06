@@ -1,52 +1,20 @@
-# Start All Applications Script
-# External Review Repository
-# Last Updated: 2025-09-29
+$ErrorActionPreference = "Stop"
+Write-Host "Starting services..."
 
-Write-Host "🚀 Starting All Applications..." -ForegroundColor Green
-Write-Host "=================================" -ForegroundColor Cyan
-
-# Check if Node.js is installed
-if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-    Write-Host "❌ Node.js is not installed. Please install Node.js v20+ first." -ForegroundColor Red
-    exit 1
+# Start Redis if docker exists
+if (Get-Command docker -ErrorAction SilentlyContinue) {
+  docker compose -f docker-compose.yml up -d redis | Out-Null
 }
 
-# Check if npm is installed
-if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
-    Write-Host "❌ npm is not installed. Please install npm first." -ForegroundColor Red
-    exit 1
-}
+# API
+Start-Process -NoNewWindow -FilePath "powershell" -ArgumentList "-NoProfile -Command npm --prefix applications/installsure/backend run dev"
 
-# Function to start an application
-function Start-App {
-    param(
-        [string]$AppName,
-        [string]$AppPath,
-        [int]$Port,
-        [string]$Description
-    )
-    
-    Write-Host "`n🔄 Starting $AppName..." -ForegroundColor Yellow
-    Write-Host "   Port: $Port" -ForegroundColor Gray
-    Write-Host "   Description: $Description" -ForegroundColor Gray
-    
-    # Check if port is already in use
-    $portInUse = Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue
-    if ($portInUse) {
-        Write-Host "   ⚠️  Port $Port is already in use. Skipping $AppName." -ForegroundColor Yellow
-        return
-    }
-    
-    # Start the application
-    try {
-        Set-Location $AppPath
-        Start-Process powershell -ArgumentList "-NoExit", "-Command", "Write-Host 'Starting $AppName on port $Port...' -ForegroundColor Green; npm run dev"
-        Write-Host "   ✅ $AppName started successfully" -ForegroundColor Green
-    }
-    catch {
-        Write-Host "   ❌ Failed to start $AppName: $($_.Exception.Message)" -ForegroundColor Red
-    }
-}
+# Frontends
+Start-Process -NoNewWindow -FilePath "powershell" -ArgumentList "-NoProfile -Command npm --prefix applications/installsure/frontend run dev"
+Start-Process -NoNewWindow -FilePath "powershell" -ArgumentList "-NoProfile -Command npm --prefix applications/demodashboard/frontend run dev"
+
+Write-Host "All services launching. See docker and npm output windows."
+
 
 # Start all applications
 Write-Host "`n📱 Starting Applications..." -ForegroundColor Cyan
