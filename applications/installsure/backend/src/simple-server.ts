@@ -224,6 +224,14 @@ app.delete('/api/projects/:id', (req, res) => {
   });
 });
 
+// File stats endpoint
+app.get('/api/files/stats', (req, res) => {
+  res.json({
+    totalFiles: 0,
+    totalSize: 0,
+  });
+});
+
 // File upload endpoint
 app.post('/api/files/upload', upload.single('file'), (req, res) => {
   if (!req.file) {
