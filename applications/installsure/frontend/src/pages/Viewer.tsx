@@ -1,8 +1,8 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { api } from '../lib/api.js';
-import { FileText, ExternalLink, AlertCircle, Loader2 } from 'lucide-react';
+import React from "react";
+import { useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "../lib/api.js";
+import { FileText, ExternalLink, AlertCircle, Loader2 } from "lucide-react";
 
 export default function Viewer() {
   const { urn } = useParams<{ urn: string }>();
@@ -12,7 +12,7 @@ export default function Viewer() {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['manifest', urn],
+    queryKey: ["manifest", urn],
     queryFn: () => api.getManifest(urn!),
     enabled: !!urn,
   });
@@ -36,7 +36,7 @@ export default function Viewer() {
           <div className="ml-3">
             <h3 className="text-sm font-medium text-red-800">Error</h3>
             <div className="mt-2 text-sm text-red-700">
-              <p>{(error as any)?.error || 'Failed to load model manifest'}</p>
+              <p>{(error as any)?.error || "Failed to load model manifest"}</p>
             </div>
           </div>
         </div>
@@ -93,14 +93,19 @@ export default function Viewer() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-sm font-medium text-gray-900 mb-2">3D Viewer Placeholder</h3>
+                <h3 className="text-sm font-medium text-gray-900 mb-2">
+                  3D Viewer Placeholder
+                </h3>
                 <p className="text-sm text-gray-500 mb-4">
                   The actual Forge Viewer would be integrated here
                 </p>
                 <div className="space-y-2">
                   <button
                     onClick={() =>
-                      window.open(`https://viewer.autodesk.com/viewer?urn=${urn}`, '_blank')
+                      window.open(
+                        `https://viewer.autodesk.com/viewer?urn=${urn}`,
+                        "_blank",
+                      )
                     }
                     className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 flex items-center space-x-2 mx-auto"
                   >
@@ -108,7 +113,8 @@ export default function Viewer() {
                     <span>Open in Forge Viewer</span>
                   </button>
                   <p className="text-xs text-gray-400">
-                    This will open the model in the official Autodesk Forge Viewer
+                    This will open the model in the official Autodesk Forge
+                    Viewer
                   </p>
                 </div>
               </div>

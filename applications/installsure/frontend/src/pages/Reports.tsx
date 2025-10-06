@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { api } from '../lib/api.js';
-import { toast } from 'react-hot-toast';
-import { FileText, Download, AlertCircle, Loader2 } from 'lucide-react';
+import React, { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { api } from "../lib/api.js";
+import { toast } from "react-hot-toast";
+import { FileText, Download, AlertCircle, Loader2 } from "lucide-react";
 
 export default function Reports() {
-  const [urn, setUrn] = useState('');
+  const [urn, setUrn] = useState("");
 
   const {
     data: takeoffData,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['takeoff', urn],
+    queryKey: ["takeoff", urn],
     queryFn: () => api.getTakeoff(urn),
     enabled: !!urn,
   });
@@ -20,7 +20,7 @@ export default function Reports() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!urn.trim()) {
-      toast.error('Please enter a URN');
+      toast.error("Please enter a URN");
       return;
     }
   };
@@ -35,11 +35,16 @@ export default function Reports() {
       </div>
 
       <div className="bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Generate Takeoff Report</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Generate Takeoff Report
+        </h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="urn" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="urn"
+              className="block text-sm font-medium text-gray-700"
+            >
               Model URN
             </label>
             <div className="mt-1 flex rounded-md shadow-sm">
@@ -57,7 +62,11 @@ export default function Reports() {
                 disabled={isLoading}
                 className="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 rounded-r-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
               >
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Generate'}
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Generate"
+                )}
               </button>
             </div>
           </div>
@@ -70,7 +79,7 @@ export default function Reports() {
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-red-800">Error</h3>
                 <div className="mt-2 text-sm text-red-700">
-                  <p>{(error as any)?.error || 'Failed to generate takeoff'}</p>
+                  <p>{(error as any)?.error || "Failed to generate takeoff"}</p>
                 </div>
               </div>
             </div>
@@ -115,9 +124,11 @@ export default function Reports() {
               <button
                 onClick={() => {
                   const dataStr = JSON.stringify(takeoffData, null, 2);
-                  const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                  const dataBlob = new Blob([dataStr], {
+                    type: "application/json",
+                  });
                   const url = URL.createObjectURL(dataBlob);
-                  const link = document.createElement('a');
+                  const link = document.createElement("a");
                   link.href = url;
                   link.download = `takeoff-${urn}-${Date.now()}.json`;
                   link.click();
@@ -143,14 +154,18 @@ export default function Reports() {
       </div>
 
       <div className="bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Report Templates</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">
+          Report Templates
+        </h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors">
             <div className="flex items-center space-x-2 mb-2">
               <FileText className="h-5 w-5 text-blue-500" />
               <h4 className="font-medium text-gray-900">Quantity Takeoff</h4>
             </div>
-            <p className="text-sm text-gray-600">Generate detailed quantity reports</p>
+            <p className="text-sm text-gray-600">
+              Generate detailed quantity reports
+            </p>
           </div>
 
           <div className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors">
@@ -158,7 +173,9 @@ export default function Reports() {
               <FileText className="h-5 w-5 text-green-500" />
               <h4 className="font-medium text-gray-900">Cost Estimation</h4>
             </div>
-            <p className="text-sm text-gray-600">Calculate project costs from quantities</p>
+            <p className="text-sm text-gray-600">
+              Calculate project costs from quantities
+            </p>
           </div>
 
           <div className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors">
@@ -166,11 +183,12 @@ export default function Reports() {
               <FileText className="h-5 w-5 text-purple-500" />
               <h4 className="font-medium text-gray-900">Progress Report</h4>
             </div>
-            <p className="text-sm text-gray-600">Track project progress and milestones</p>
+            <p className="text-sm text-gray-600">
+              Track project progress and milestones
+            </p>
           </div>
         </div>
       </div>
     </div>
   );
 }
-

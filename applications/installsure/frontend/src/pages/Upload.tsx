@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { Uploader } from '../components/Uploader.js';
-import { api } from '../lib/api.js';
-import { toast } from 'react-hot-toast';
-import { FileText, ExternalLink, AlertCircle } from 'lucide-react';
+import React, { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { Uploader } from "../components/Uploader.js";
+import { api } from "../lib/api.js";
+import { toast } from "react-hot-toast";
+import { FileText, ExternalLink, AlertCircle } from "lucide-react";
 
 export default function Upload() {
   const [uploadedFile, setUploadedFile] = useState<any>(null);
@@ -11,31 +11,41 @@ export default function Upload() {
   const [translationResult, setTranslationResult] = useState<any>(null);
 
   const { data: health } = useQuery({
-    queryKey: ['health'],
+    queryKey: ["health"],
     queryFn: api.getHealth,
   });
 
   const forgeUploadMutation = useMutation({
-    mutationFn: ({ fileBuffer, fileName }: { fileBuffer: ArrayBuffer; fileName: string }) =>
-      api.forgeUpload(fileBuffer, fileName),
+    mutationFn: ({
+      fileBuffer,
+      fileName,
+    }: {
+      fileBuffer: ArrayBuffer;
+      fileName: string;
+    }) => api.forgeUpload(fileBuffer, fileName),
     onSuccess: (result) => {
       setForgeResult(result);
-      toast.success('File uploaded to Forge successfully');
+      toast.success("File uploaded to Forge successfully");
     },
     onError: (error: any) => {
-      toast.error(error?.error || 'Forge upload failed');
+      toast.error(error?.error || "Forge upload failed");
     },
   });
 
   const forgeTranslateMutation = useMutation({
-    mutationFn: ({ objectId, fileName }: { objectId: string; fileName: string }) =>
-      api.forgeTranslate(objectId, fileName),
+    mutationFn: ({
+      objectId,
+      fileName,
+    }: {
+      objectId: string;
+      fileName: string;
+    }) => api.forgeTranslate(objectId, fileName),
     onSuccess: (result) => {
       setTranslationResult(result);
-      toast.success('Translation job started');
+      toast.success("Translation job started");
     },
     onError: (error: any) => {
-      toast.error(error?.error || 'Translation failed');
+      toast.error(error?.error || "Translation failed");
     },
   });
 
@@ -54,10 +64,10 @@ export default function Upload() {
           fileName: file.original_name,
         });
       } catch (error) {
-        toast.error('Failed to process with Forge');
+        toast.error("Failed to process with Forge");
       }
     } else {
-      toast.error('System not healthy, skipping Forge processing');
+      toast.error("System not healthy, skipping Forge processing");
     }
   };
 
@@ -67,7 +77,7 @@ export default function Upload() {
 
   const openViewer = () => {
     if (translationResult?.urn) {
-      window.open(`/viewer/${translationResult.urn}`, '_blank');
+      window.open(`/viewer/${translationResult.urn}`, "_blank");
     }
   };
 
@@ -86,9 +96,14 @@ export default function Upload() {
           <div className="flex">
             <AlertCircle className="h-5 w-5 text-yellow-400" />
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-yellow-800">System Warning</h3>
+              <h3 className="text-sm font-medium text-yellow-800">
+                System Warning
+              </h3>
               <div className="mt-2 text-sm text-yellow-700">
-                <p>System is not healthy. Forge processing may not work correctly.</p>
+                <p>
+                  System is not healthy. Forge processing may not work
+                  correctly.
+                </p>
               </div>
             </div>
           </div>
@@ -96,12 +111,17 @@ export default function Upload() {
       )}
 
       <div className="bg-white shadow rounded-lg p-6">
-        <Uploader onUploadSuccess={handleUploadSuccess} onUploadError={handleUploadError} />
+        <Uploader
+          onUploadSuccess={handleUploadSuccess}
+          onUploadError={handleUploadError}
+        />
       </div>
 
       {uploadedFile && (
         <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Upload Results</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            Upload Results
+          </h3>
 
           <div className="space-y-4">
             <div className="border rounded-lg p-4">
@@ -114,7 +134,8 @@ export default function Upload() {
                   <strong>Name:</strong> {uploadedFile.original_name}
                 </p>
                 <p>
-                  <strong>Size:</strong> {(uploadedFile.file_size / 1024 / 1024).toFixed(2)} MB
+                  <strong>Size:</strong>{" "}
+                  {(uploadedFile.file_size / 1024 / 1024).toFixed(2)} MB
                 </p>
                 <p>
                   <strong>Type:</strong> {uploadedFile.file_type}
@@ -131,7 +152,9 @@ export default function Upload() {
               <div className="border rounded-lg p-4">
                 <div className="flex items-center space-x-2">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                  <span className="text-sm text-gray-600">Uploading to Forge...</span>
+                  <span className="text-sm text-gray-600">
+                    Uploading to Forge...
+                  </span>
                 </div>
               </div>
             )}
@@ -174,7 +197,9 @@ export default function Upload() {
               <div className="border rounded-lg p-4">
                 <div className="flex items-center space-x-2">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                  <span className="text-sm text-gray-600">Starting translation job...</span>
+                  <span className="text-sm text-gray-600">
+                    Starting translation job...
+                  </span>
                 </div>
               </div>
             )}
@@ -197,7 +222,7 @@ export default function Upload() {
                   </p>
                 </div>
 
-                {translationResult.status === 'success' && (
+                {translationResult.status === "success" && (
                   <div className="mt-3">
                     <button
                       onClick={openViewer}
@@ -215,10 +240,12 @@ export default function Upload() {
               <div className="border border-red-200 rounded-lg p-4 bg-red-50">
                 <div className="flex items-center space-x-2">
                   <AlertCircle className="h-5 w-5 text-red-500" />
-                  <h4 className="font-medium text-red-900">Forge Upload Error</h4>
+                  <h4 className="font-medium text-red-900">
+                    Forge Upload Error
+                  </h4>
                 </div>
                 <p className="mt-1 text-sm text-red-700">
-                  {(forgeUploadMutation.error as any)?.error || 'Upload failed'}
+                  {(forgeUploadMutation.error as any)?.error || "Upload failed"}
                 </p>
               </div>
             )}
@@ -227,10 +254,13 @@ export default function Upload() {
               <div className="border border-red-200 rounded-lg p-4 bg-red-50">
                 <div className="flex items-center space-x-2">
                   <AlertCircle className="h-5 w-5 text-red-500" />
-                  <h4 className="font-medium text-red-900">Translation Error</h4>
+                  <h4 className="font-medium text-red-900">
+                    Translation Error
+                  </h4>
                 </div>
                 <p className="mt-1 text-sm text-red-700">
-                  {(forgeTranslateMutation.error as any)?.error || 'Translation failed'}
+                  {(forgeTranslateMutation.error as any)?.error ||
+                    "Translation failed"}
                 </p>
               </div>
             )}
@@ -240,4 +270,3 @@ export default function Upload() {
     </div>
   );
 }
-

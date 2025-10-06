@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Uploader } from '../components/Uploader';
-import { api } from '../lib/api';
+import React, { useState } from "react";
+import { Uploader } from "../components/Uploader";
+import { api } from "../lib/api";
 
 export default function Upload() {
   const [uploadedFile, setUploadedFile] = useState<any>(null);
@@ -27,7 +27,7 @@ export default function Upload() {
     try {
       // Step 1: Get Forge auth token
       const authResult = await api.forgeAuth();
-      console.log('Forge auth:', authResult);
+      console.log("Forge auth:", authResult);
 
       // Step 2: Read file and upload to Forge
       const response = await fetch(`/api/files/${file.id}`);
@@ -37,7 +37,10 @@ export default function Upload() {
       // In a real implementation, you'd read the actual file
       const mockBuffer = new ArrayBuffer(1024);
 
-      const uploadResult = await api.forgeUpload(mockBuffer, file.original_name);
+      const uploadResult = await api.forgeUpload(
+        mockBuffer,
+        file.original_name,
+      );
       setForgeResult(uploadResult);
 
       // Step 3: Start translation
@@ -47,7 +50,7 @@ export default function Upload() {
       );
       setTranslationResult(translateResult);
     } catch (err: any) {
-      setError(err.message || 'Forge processing failed');
+      setError(err.message || "Forge processing failed");
     } finally {
       setLoading(false);
     }
@@ -55,7 +58,7 @@ export default function Upload() {
 
   const openViewer = () => {
     if (translationResult?.urn) {
-      window.open(`/viewer/${translationResult.urn}`, '_blank');
+      window.open(`/viewer/${translationResult.urn}`, "_blank");
     }
   };
 
@@ -72,7 +75,11 @@ export default function Upload() {
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <svg
+                className="h-5 w-5 text-red-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
                 <path
                   fillRule="evenodd"
                   d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -91,39 +98,58 @@ export default function Upload() {
       )}
 
       <div className="bg-white shadow rounded-lg p-6">
-        <Uploader onUploadSuccess={handleUploadSuccess} onUploadError={handleUploadError} />
+        <Uploader
+          onUploadSuccess={handleUploadSuccess}
+          onUploadError={handleUploadError}
+        />
       </div>
 
       {uploadedFile && (
         <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Upload Results</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            Upload Results
+          </h3>
 
           <div className="space-y-4">
             <div className="border rounded-lg p-4">
               <h4 className="font-medium text-gray-900">File Uploaded</h4>
-              <p className="text-sm text-gray-600">Name: {uploadedFile.original_name}</p>
+              <p className="text-sm text-gray-600">
+                Name: {uploadedFile.original_name}
+              </p>
               <p className="text-sm text-gray-600">
                 Size: {(uploadedFile.file_size / 1024 / 1024).toFixed(2)} MB
               </p>
-              <p className="text-sm text-gray-600">Type: {uploadedFile.file_type}</p>
+              <p className="text-sm text-gray-600">
+                Type: {uploadedFile.file_type}
+              </p>
             </div>
 
             {forgeResult && (
               <div className="border rounded-lg p-4">
                 <h4 className="font-medium text-gray-900">Forge Upload</h4>
-                <p className="text-sm text-gray-600">Object ID: {forgeResult.objectId}</p>
-                <p className="text-sm text-gray-600">Bucket: {forgeResult.bucketKey}</p>
+                <p className="text-sm text-gray-600">
+                  Object ID: {forgeResult.objectId}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Bucket: {forgeResult.bucketKey}
+                </p>
               </div>
             )}
 
             {translationResult && (
               <div className="border rounded-lg p-4">
                 <h4 className="font-medium text-gray-900">Translation Job</h4>
-                <p className="text-sm text-gray-600">URN: {translationResult.urn}</p>
-                <p className="text-sm text-gray-600">Status: {translationResult.status}</p>
-                <p className="text-sm text-gray-600">Progress: {translationResult.progress}</p>
+                <p className="text-sm text-gray-600">
+                  URN: {translationResult.urn}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Status: {translationResult.status}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Progress: {translationResult.progress}
+                </p>
 
-                {translationResult.status === 'success' && (
+                {translationResult.status === "success" && (
                   <div className="mt-4">
                     <button
                       onClick={openViewer}
@@ -139,7 +165,9 @@ export default function Upload() {
             {loading && (
               <div className="flex items-center justify-center p-4">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <span className="ml-2 text-sm text-gray-600">Processing with Forge...</span>
+                <span className="ml-2 text-sm text-gray-600">
+                  Processing with Forge...
+                </span>
               </div>
             )}
           </div>

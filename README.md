@@ -16,16 +16,20 @@
 - Ready for external technical assessment
 
 ### **🚀 Quick Start:**
+
 ```bash
 git clone https://github.com/Installsure/External-Review-Repository.git
 cd External-Review-Repository
-.\tools\preflight-check.ps1
+# Windows
+powershell -ExecutionPolicy Bypass -File .\tools\preflight-check.ps1
+# macOS/Linux
+./tools/preflight-check.sh
 ```
 
 **Access Applications:**
-- **InstallSure**: http://localhost:3000 (Main Application)
-- **Demo Dashboard**: http://localhost:3001 (Control Panel)
-- **Backend API**: http://localhost:8000 (RESTful API)
+- **InstallSure (frontend)**: http://localhost:3000
+- **Demo Dashboard**: http://localhost:3001  
+- **Backend API (Node/TS)**: http://localhost:8000
 
 ---
 
@@ -53,19 +57,14 @@ This repository contains a complete application suite for external review and re
 - Git v2.47+
 
 ### **Installation**
+
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd External-Review-Repository
-
-# Run preflight check
-.\tools\preflight-check.ps1
-
-# Install dependencies
+# Run preflight (see above), then
 npm install
-
-# Start all applications
-.\scripts\start-all.ps1
+# Windows
+powershell -ExecutionPolicy Bypass -File .\scripts\start-all.ps1
+# macOS/Linux
+./scripts/start-all.sh
 ```
 
 ### **Access Applications**
@@ -127,13 +126,15 @@ npm run test:e2e
 
 | Application | Status | Port | Frontend | Backend | Tests | E2E |
 |-------------|--------|------|----------|---------|-------|-----|
-| **InstallSure** | ✅ Production Ready | 3000 | React + Vite | FastAPI | ✅ | ✅ |
+| **InstallSure** | ✅ Production Ready | 3000 | React + Vite | Node/TypeScript | ✅ | ✅ |
 | **Demo Dashboard** | ✅ Demo Ready | 3001 | React + Vite | - | ✅ | ✅ |
 | **FF4U** | ⚠️ Development Ready | 3002 | React + Vite | - | ⚠️ | ⚠️ |
 | **RedEye** | ⚠️ Development Ready | 3003 | React + Vite | - | ⚠️ | ⚠️ |
 | **ZeroStack** | ⚠️ Development Ready | 3004 | React + Vite | - | ⚠️ | ⚠️ |
 | **Hello** | ⚠️ Development Ready | 3005 | React + Vite | - | ⚠️ | ⚠️ |
 | **Avatar** | ⚠️ Development Ready | 3006 | React + Vite | - | ⚠️ | ⚠️ |
+
+> **Note**: Backend is implemented in TypeScript (Node). Earlier docs mentioning FastAPI were outdated and have been corrected.
 
 ---
 

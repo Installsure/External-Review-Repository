@@ -1,5 +1,5 @@
-import { QueryClient } from '@tanstack/react-query';
-import { toast } from 'react-hot-toast';
+import { QueryClient } from "@tanstack/react-query";
+import { toast } from "react-hot-toast";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,10 +20,9 @@ export const queryClient = new QueryClient({
     mutations: {
       retry: false, // Don't retry mutations by default
       onError: (error: any) => {
-        const message = error?.message || 'An unexpected error occurred';
+        const message = error?.message || "An unexpected error occurred";
         toast.error(message);
       },
     },
   },
 });
-

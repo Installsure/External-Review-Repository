@@ -1,0 +1,185 @@
+# Docker Compose for External Review Repository
+# Production Infrastructure Setup
+# Last Updated: 2025-10-06
+
+version: '3.8'
+
+services:
+  # Redis - In-memory data structure store
+  redis:
+    image: redis:7-alpine
+    container_name: redis-installsure
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - installsure_network
+    labels:
+      - "com.external-review.service=redis"
+      - "com.external-review.environment=production"
+
+  # InstallSure Backend API
+  installsure-backend:
+    build:
+      context: ./applications/installsure/backend
+      dockerfile: Dockerfile
+    container_name: installsure-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - NODE_ENV=production
+      - PORT=8000
+      - REDIS_URL=redis://redis:6379
+      - API_SECRET=${API_SECRET:-default-secret-change-in-production}
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./applications/installsure/backend/uploads:/app/uploads
+      - ./applications/installsure/backend/logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - installsure_network
+    labels:
+      - "com.external-review.service=backend"
+      - "com.external-review.environment=production"
+      - "com.external-review.critical=true"
+
+  # InstallSure Frontend (Production Build)
+  installsure-frontend:
+    build:
+      context: ./applications/installsure/frontend
+      dockerfile: Dockerfile
+      target: production
+    container_name: installsure-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - VITE_ENV=production
+    depends_on:
+      installsure-backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - installsure_network
+    labels:
+      - "com.external-review.service=frontend"
+      - "com.external-review.environment=production" 
+      - "com.external-review.critical=true"
+
+  # Demo Dashboard
+  demo-dashboard:
+    build:
+      context: ./applications/demo-dashboard
+      dockerfile: Dockerfile
+    container_name: demo-dashboard
+    restart: unless-stopped
+    ports:
+      - "3001:80"
+    environment:
+      - VITE_ENV=production
+      - VITE_INSTALLSURE_URL=http://localhost:3000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - installsure_network
+    labels:
+      - "com.external-review.service=demo"
+      - "com.external-review.environment=production"
+      - "com.external-review.critical=false"
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: installsure-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+      - ./docker/nginx/logs:/var/log/nginx
+    depends_on:
+      - installsure-frontend
+      - installsure-backend
+      - demo-dashboard
+    networks:
+      - installsure_network
+    labels:
+      - "com.external-review.service=proxy"
+      - "com.external-review.environment=production"
+    profiles:
+      - proxy
+
+  # PostgreSQL Database (Optional - for future use)
+  postgres:
+    image: postgres:15-alpine
+    container_name: installsure-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=installsure
+      - POSTGRES_USER=installsure
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-change-in-production}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U installsure"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - installsure_network
+    labels:
+      - "com.external-review.service=database"
+      - "com.external-review.environment=production"
+    profiles:
+      - database
+
+volumes:
+  redis_data:
+    driver: local
+    labels:
+      - "com.external-review.volume=redis-data"
+  
+  postgres_data:
+    driver: local
+    labels:
+      - "com.external-review.volume=postgres-data"
+
+networks:
+  installsure_network:
+    driver: bridge
+    labels:
+      - "com.external-review.network=main"
+
+# Production deployment profiles:
+# docker-compose up                           # Core services only
+# docker-compose --profile proxy up          # With Nginx proxy
+# docker-compose --profile database up       # With PostgreSQL
+# docker-compose --profile proxy --profile database up  # Full stack

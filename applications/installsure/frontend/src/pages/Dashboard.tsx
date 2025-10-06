@@ -1,7 +1,7 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { api } from '../lib/api.js';
-import { Building2, FileText, AlertCircle, TrendingUp } from 'lucide-react';
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "../lib/api.js";
+import { Building2, FileText, AlertCircle, TrendingUp } from "lucide-react";
 
 export default function Dashboard() {
   const {
@@ -9,17 +9,17 @@ export default function Dashboard() {
     isLoading: projectsLoading,
     error: projectsError,
   } = useQuery({
-    queryKey: ['projects'],
+    queryKey: ["projects"],
     queryFn: api.getProjects,
   });
 
   const { data: fileStats, isLoading: statsLoading } = useQuery({
-    queryKey: ['fileStats'],
+    queryKey: ["fileStats"],
     queryFn: api.getFileStats,
   });
 
   const { data: health, isLoading: healthLoading } = useQuery({
-    queryKey: ['health'],
+    queryKey: ["health"],
     queryFn: api.getHealth,
     refetchInterval: 30000, // Refetch every 30 seconds
   });
@@ -48,13 +48,15 @@ export default function Dashboard() {
             <h3 className="text-lg font-medium text-gray-900">System Status</h3>
             <div
               className={`flex items-center space-x-2 ${
-                health.ok ? 'text-green-600' : 'text-red-600'
+                health.ok ? "text-green-600" : "text-red-600"
               }`}
             >
               <div
-                className={`w-2 h-2 rounded-full ${health.ok ? 'bg-green-500' : 'bg-red-500'}`}
+                className={`w-2 h-2 rounded-full ${health.ok ? "bg-green-500" : "bg-red-500"}`}
               />
-              <span className="text-sm font-medium">{health.ok ? 'Healthy' : 'Unhealthy'}</span>
+              <span className="text-sm font-medium">
+                {health.ok ? "Healthy" : "Unhealthy"}
+              </span>
             </div>
           </div>
           <div className="mt-2 text-sm text-gray-500">
@@ -71,7 +73,9 @@ export default function Dashboard() {
             <div className="ml-3">
               <h3 className="text-sm font-medium text-red-800">Error</h3>
               <div className="mt-2 text-sm text-red-700">
-                <p>Failed to load dashboard data. Please try refreshing the page.</p>
+                <p>
+                  Failed to load dashboard data. Please try refreshing the page.
+                </p>
               </div>
             </div>
           </div>
@@ -88,8 +92,12 @@ export default function Dashboard() {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Projects</dt>
-                  <dd className="text-lg font-medium text-gray-900">{projects?.length || 0}</dd>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Projects
+                  </dt>
+                  <dd className="text-lg font-medium text-gray-900">
+                    {projects?.length || 0}
+                  </dd>
                 </dl>
               </div>
             </div>
@@ -104,7 +112,9 @@ export default function Dashboard() {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Files</dt>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Files
+                  </dt>
                   <dd className="text-lg font-medium text-gray-900">
                     {fileStats?.totalFiles || 0}
                   </dd>
@@ -122,11 +132,13 @@ export default function Dashboard() {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Storage Used</dt>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Storage Used
+                  </dt>
                   <dd className="text-lg font-medium text-gray-900">
                     {fileStats?.totalSize
                       ? `${(fileStats.totalSize / 1024 / 1024).toFixed(1)} MB`
-                      : '0 MB'}
+                      : "0 MB"}
                   </dd>
                 </dl>
               </div>
@@ -144,7 +156,9 @@ export default function Dashboard() {
               </div>
               <div className="ml-5 w-0 flex-1">
                 <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">Status</dt>
+                  <dt className="text-sm font-medium text-gray-500 truncate">
+                    Status
+                  </dt>
                   <dd className="text-lg font-medium text-gray-900">Active</dd>
                 </dl>
               </div>
@@ -156,15 +170,21 @@ export default function Dashboard() {
       {/* Recent Projects */}
       <div className="bg-white shadow overflow-hidden sm:rounded-md">
         <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Recent Projects</h3>
-          <p className="mt-1 max-w-2xl text-sm text-gray-500">Your latest construction projects</p>
+          <h3 className="text-lg leading-6 font-medium text-gray-900">
+            Recent Projects
+          </h3>
+          <p className="mt-1 max-w-2xl text-sm text-gray-500">
+            Your latest construction projects
+          </p>
         </div>
         <ul className="divide-y divide-gray-200">
           {projects?.length === 0 ? (
             <li className="px-4 py-5 sm:px-6">
               <div className="text-center text-gray-500">
                 <Building2 className="mx-auto h-12 w-12 text-gray-400" />
-                <p className="mt-2">No projects yet. Create your first project to get started.</p>
+                <p className="mt-2">
+                  No projects yet. Create your first project to get started.
+                </p>
               </div>
             </li>
           ) : (
@@ -172,9 +192,13 @@ export default function Dashboard() {
               <li key={project.id} className="px-4 py-5 sm:px-6">
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">{project.name}</p>
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {project.name}
+                    </p>
                     {project.description && (
-                      <p className="text-sm text-gray-500 truncate">{project.description}</p>
+                      <p className="text-sm text-gray-500 truncate">
+                        {project.description}
+                      </p>
                     )}
                   </div>
                   <div className="ml-2 flex-shrink-0 flex">
@@ -191,4 +215,3 @@ export default function Dashboard() {
     </div>
   );
 }
-

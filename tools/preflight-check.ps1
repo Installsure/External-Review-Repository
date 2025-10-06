@@ -1,52 +1,98 @@
-# Preflight Check Script
+# Preflight Check Script - Windows
 # External Review Repository
-# Last Updated: 2025-09-29
+# Last Updated: 2025-10-06
 
 Write-Host "🔍 Running Preflight Check..." -ForegroundColor Blue
 Write-Host "=================================" -ForegroundColor Cyan
 
 $allChecksPassed = $true
 
-# Function to check if a command exists
-function Test-Command {
-    param([string]$Command, [string]$Description)
+# Function to check Node.js version
+function Test-NodeVersion {
+    Write-Host "`n🔄 Checking Node.js..." -ForegroundColor Yellow
     
-    Write-Host "`n🔄 Checking $Description..." -ForegroundColor Yellow
-    
-    if (Get-Command $Command -ErrorAction SilentlyContinue) {
-        $version = & $Command --version 2>&1 | Select-Object -First 1
-        Write-Host "   ✅ $Description is installed" -ForegroundColor Green
-        Write-Host "   Version: $version" -ForegroundColor Gray
-        return $true
-    } else {
-        Write-Host "   ❌ $Description is not installed" -ForegroundColor Red
-        Write-Host "   Please install $Description" -ForegroundColor Red
+    try {
+        $nodeVersion = node -v 2>$null
+        if ($nodeVersion) {
+            $versionNum = [Version]($nodeVersion.TrimStart("v"))
+            $minVersion = [Version]"20.0.0"
+            
+            if ($versionNum -ge $minVersion) {
+                Write-Host "   ✅ Node.js $nodeVersion is installed (minimum v20.0.0)" -ForegroundColor Green
+                return $true
+            } else {
+                Write-Host "   ❌ Node.js $nodeVersion < v20.0.0 (upgrade required)" -ForegroundColor Red
+                return $false
+            }
+        }
+    } catch {
+        Write-Host "   ❌ Node.js is not installed or not in PATH" -ForegroundColor Red
+        Write-Host "   Install Node.js >= 20.0.0 from https://nodejs.org" -ForegroundColor Red
         return $false
     }
 }
 
-# Function to check if a port is available
-function Test-Port {
-    param([int]$Port, [string]$Description)
+# Function to check npm
+function Test-Npm {
+    Write-Host "`n🔄 Checking npm..." -ForegroundColor Yellow
     
-    Write-Host "`n🔄 Checking port $Port ($Description)..." -ForegroundColor Yellow
-    
-    $portInUse = Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue
-    if ($portInUse) {
-        Write-Host "   ⚠️  Port $Port is already in use" -ForegroundColor Yellow
-        Write-Host "   Process: $($portInUse.OwningProcess)" -ForegroundColor Gray
-        return $false
-    } else {
-        Write-Host "   ✅ Port $Port is available" -ForegroundColor Green
+    if (Get-Command npm -ErrorAction SilentlyContinue) {
+        $npmVersion = npm -v 2>$null
+        Write-Host "   ✅ npm $npmVersion is installed" -ForegroundColor Green
         return $true
+    } else {
+        Write-Host "   ❌ npm is not installed" -ForegroundColor Red
+        return $false
     }
 }
 
-# Function to check if a file exists
-function Test-File {
-    param([string]$FilePath, [string]$Description)
+# Function to check if ports are available
+function Test-PortAvailability {
+    Write-Host "`n🌐 Checking Port Availability..." -ForegroundColor Yellow
     
-    Write-Host "`n🔄 Checking $Description..." -ForegroundColor Yellow
+    $requiredPorts = @(3000, 3001, 8000)
+    $allPortsAvailable = $true
+    
+    foreach ($port in $requiredPorts) {
+        $portInUse = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
+        if ($portInUse) {
+            Write-Host "   ❌ Port $port is already in use" -ForegroundColor Red
+            $allPortsAvailable = $false
+        } else {
+            Write-Host "   ✅ Port $port is available" -ForegroundColor Green
+        }
+    }
+    
+    if (-not $allPortsAvailable) {
+        Write-Host "`n💡 Stop running services and retry preflight check" -ForegroundColor Yellow
+    }
+    
+    return $allPortsAvailable
+}
+
+# Run all checks
+$nodeOK = Test-NodeVersion
+$npmOK = Test-Npm  
+$portsOK = Test-PortAvailability
+
+$allChecksPassed = $nodeOK -and $npmOK -and $portsOK
+
+Write-Host "`n📊 Preflight Check Results..." -ForegroundColor Blue
+Write-Host "=================================" -ForegroundColor Cyan
+
+if ($allChecksPassed) {
+    Write-Host "✅ All preflight checks passed!" -ForegroundColor Green
+    Write-Host "🚀 Ready to start development" -ForegroundColor Green
+    Write-Host "`n💡 Next steps:" -ForegroundColor Yellow
+    Write-Host "   npm install" -ForegroundColor Gray
+    Write-Host "   .\scripts\start-all.ps1" -ForegroundColor Gray
+} else {
+    Write-Host "❌ Some preflight checks failed!" -ForegroundColor Red
+    Write-Host "💡 Fix the issues above before proceeding" -ForegroundColor Yellow
+    exit 1
+}
+
+Write-Host "`n🔍 Preflight check completed!" -ForegroundColor Blue
     
     if (Test-Path $FilePath) {
         Write-Host "   ✅ $Description exists" -ForegroundColor Green

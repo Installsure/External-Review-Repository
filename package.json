@@ -1,0 +1,102 @@
+{
+  "name": "external-review-repository",
+  "version": "1.0.0",
+  "description": "Multi-application repository for external code review and development",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "applications/installsure/frontend",
+    "applications/installsure/backend", 
+    "applications/demo-dashboard",
+    "applications/ff4u",
+    "applications/redeye",
+    "applications/zerostack",
+    "applications/hello",
+    "applications/avatar"
+  ],
+  "scripts": {
+    "preflight": "node -e \"console.log('Running cross-platform preflight...'); process.platform === 'win32' ? require('child_process').spawn('powershell', ['-File', './tools/preflight-check.ps1'], {stdio: 'inherit'}) : require('child_process').spawn('./tools/preflight-check.sh', [], {stdio: 'inherit'})\"",
+    "start": "node -e \"console.log('Starting all applications...'); process.platform === 'win32' ? require('child_process').spawn('powershell', ['-File', './scripts/start-all.ps1'], {stdio: 'inherit'}) : require('child_process').spawn('./scripts/start-all.sh', [], {stdio: 'inherit'})\"",
+    "stop": "node -e \"console.log('Stopping all applications...'); process.platform === 'win32' ? require('child_process').spawn('powershell', ['-File', './scripts/stop-all.ps1'], {stdio: 'inherit'}) : require('child_process').spawn('./scripts/stop-all.sh', [], {stdio: 'inherit'})\"",
+    "test": "node -e \"console.log('Running all tests...'); process.platform === 'win32' ? require('child_process').spawn('powershell', ['-File', './scripts/test-all.ps1'], {stdio: 'inherit'}) : require('child_process').spawn('./scripts/test-all.sh', [], {stdio: 'inherit'})\"",
+    "install:all": "npm install && npm run install:workspaces",
+    "install:workspaces": "npm install --workspaces",
+    "build:all": "npm run build --workspaces --if-present",
+    "test:all": "npm run test --workspaces --if-present",
+    "lint:all": "npm run lint --workspaces --if-present",
+    "clean": "npm run clean --workspaces --if-present && rm -rf node_modules",
+    "dev:installsure": "npm run dev --workspace=applications/installsure/frontend",
+    "dev:backend": "npm run dev --workspace=applications/installsure/backend",
+    "dev:demo": "npm run dev --workspace=applications/demo-dashboard",
+    "health": "node scripts/health-check.js",
+    "docker:redis": "docker run -d --name redis-installsure -p 6379:6379 redis:7-alpine",
+    "docker:stop": "docker stop redis-installsure",
+    "status": "node scripts/status-check.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "concurrently": "^8.0.0",
+    "cross-env": "^7.0.0",
+    "rimraf": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/user/external-review-repository.git"
+  },
+  "keywords": [
+    "external-review",
+    "multi-app",
+    "production-ready",
+    "installsure",
+    "construction-management",
+    "react",
+    "typescript",
+    "vite",
+    "express"
+  ],
+  "author": "Development Team",
+  "license": "MIT",
+  "config": {
+    "ports": {
+      "installsure-frontend": 3000,
+      "installsure-backend": 8000,
+      "demo-dashboard": 3001,
+      "ff4u": 3002,
+      "redeye": 3003,
+      "zerostack": 3004,
+      "hello": 3005,
+      "avatar": 3006,
+      "redis": 6379
+    }
+  },
+  "production": {
+    "apps": [
+      {
+        "name": "InstallSure Frontend",
+        "workspace": "applications/installsure/frontend",
+        "port": 3000,
+        "critical": true,
+        "healthCheck": "http://localhost:3000"
+      },
+      {
+        "name": "InstallSure Backend", 
+        "workspace": "applications/installsure/backend",
+        "port": 8000,
+        "critical": true,
+        "healthCheck": "http://localhost:8000/api/health"
+      },
+      {
+        "name": "Demo Dashboard",
+        "workspace": "applications/demo-dashboard", 
+        "port": 3001,
+        "critical": false,
+        "healthCheck": "http://localhost:3001"
+      }
+    ]
+  }
+}

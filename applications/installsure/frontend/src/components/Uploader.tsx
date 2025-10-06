@@ -1,30 +1,41 @@
-import React, { useState, useRef } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { api } from '../lib/api.js';
-import { toast } from 'react-hot-toast';
-import { Upload, File, AlertCircle } from 'lucide-react';
-import { flags } from '../lib/flags.js';
-import type { ApiFile } from '../types/api.js';
+import React, { useState, useRef } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { api } from "../lib/api.js";
+import { toast } from "react-hot-toast";
+import { Upload, File, AlertCircle } from "lucide-react";
+import { flags } from "../lib/flags.js";
+import type { ApiFile } from "../types/api.js";
 
 interface UploaderProps {
   onUploadSuccess: (file: ApiFile) => void;
   onUploadError?: (error: string) => void;
 }
 
-export const Uploader: React.FC<UploaderProps> = ({ onUploadSuccess, onUploadError }) => {
+export const Uploader: React.FC<UploaderProps> = ({
+  onUploadSuccess,
+  onUploadError,
+}) => {
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const allowedTypes = ['.ifc', '.dwg', '.rvt', '.step', '.obj', '.gltf', '.glb'];
+  const allowedTypes = [
+    ".ifc",
+    ".dwg",
+    ".rvt",
+    ".step",
+    ".obj",
+    ".gltf",
+    ".glb",
+  ];
 
   const uploadMutation = useMutation({
     mutationFn: api.uploadFile,
     onSuccess: (file: ApiFile) => {
-      toast.success('File uploaded successfully');
+      toast.success("File uploaded successfully");
       onUploadSuccess(file);
     },
     onError: (error: any) => {
-      const message = error?.error || 'Upload failed';
+      const message = error?.error || "Upload failed";
       toast.error(message);
       onUploadError?.(message);
     },
@@ -32,7 +43,7 @@ export const Uploader: React.FC<UploaderProps> = ({ onUploadSuccess, onUploadErr
 
   const handleFile = async (file: File) => {
     if (!allowedTypes.some((type) => file.name.toLowerCase().endsWith(type))) {
-      const message = `Invalid file type. Allowed: ${allowedTypes.join(', ')}`;
+      const message = `Invalid file type. Allowed: ${allowedTypes.join(", ")}`;
       toast.error(message);
       onUploadError?.(message);
       return;
@@ -40,7 +51,7 @@ export const Uploader: React.FC<UploaderProps> = ({ onUploadSuccess, onUploadErr
 
     if (file.size > 100 * 1024 * 1024) {
       // 100MB
-      const message = 'File too large. Maximum size is 100MB';
+      const message = "File too large. Maximum size is 100MB";
       toast.error(message);
       onUploadError?.(message);
       return;
@@ -52,9 +63,9 @@ export const Uploader: React.FC<UploaderProps> = ({ onUploadSuccess, onUploadErr
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
+    if (e.type === "dragenter" || e.type === "dragover") {
       setDragActive(true);
-    } else if (e.type === 'dragleave') {
+    } else if (e.type === "dragleave") {
       setDragActive(false);
     }
   };
@@ -84,8 +95,8 @@ export const Uploader: React.FC<UploaderProps> = ({ onUploadSuccess, onUploadErr
     <div className="w-full">
       <div
         className={`relative border-2 border-dashed rounded-lg p-6 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-          dragActive ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
-        } ${uploadMutation.isPending ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+          dragActive ? "border-blue-400 bg-blue-50" : "border-gray-300"
+        } ${uploadMutation.isPending ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
@@ -96,7 +107,7 @@ export const Uploader: React.FC<UploaderProps> = ({ onUploadSuccess, onUploadErr
           ref={fileInputRef}
           type="file"
           className="hidden"
-          accept={allowedTypes.join(',')}
+          accept={allowedTypes.join(",")}
           onChange={handleChange}
           disabled={uploadMutation.isPending}
         />
@@ -120,14 +131,14 @@ export const Uploader: React.FC<UploaderProps> = ({ onUploadSuccess, onUploadErr
               <>
                 <span className="font-medium text-blue-600 hover:text-blue-500">
                   Click to upload
-                </span>{' '}
+                </span>{" "}
                 or drag and drop
               </>
             )}
           </div>
 
           <p className="text-xs text-gray-500">
-            {allowedTypes.join(', ').toUpperCase()} files up to 100MB
+            {allowedTypes.join(", ").toUpperCase()} files up to 100MB
           </p>
         </div>
       </div>
@@ -135,13 +146,15 @@ export const Uploader: React.FC<UploaderProps> = ({ onUploadSuccess, onUploadErr
       {uploadMutation.error && (
         <div className="mt-4 flex items-center space-x-2 text-red-600 text-sm">
           <AlertCircle className="h-4 w-4" />
-          <span>{(uploadMutation.error as any)?.error || 'Upload failed'}</span>
+          <span>{(uploadMutation.error as any)?.error || "Upload failed"}</span>
         </div>
       )}
 
       {flags.debug.enabled && uploadMutation.error && (
         <details className="mt-2">
-          <summary className="text-xs text-gray-500 cursor-pointer">Debug Info</summary>
+          <summary className="text-xs text-gray-500 cursor-pointer">
+            Debug Info
+          </summary>
           <pre className="mt-1 text-xs text-gray-400 bg-gray-100 p-2 rounded overflow-auto">
             {JSON.stringify(uploadMutation.error, null, 2)}
           </pre>

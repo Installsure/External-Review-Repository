@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { api } from '../lib/api';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { api } from "../lib/api";
 
 export default function Viewer() {
   const { urn } = useParams<{ urn: string }>();
@@ -38,7 +38,11 @@ export default function Viewer() {
       <div className="bg-red-50 border border-red-200 rounded-md p-4">
         <div className="flex">
           <div className="flex-shrink-0">
-            <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <svg
+              className="h-5 w-5 text-red-400"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
               <path
                 fillRule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -91,14 +95,19 @@ export default function Viewer() {
                     d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                   />
                 </svg>
-                <h3 className="mt-2 text-sm font-medium text-gray-900">3D Viewer Placeholder</h3>
+                <h3 className="mt-2 text-sm font-medium text-gray-900">
+                  3D Viewer Placeholder
+                </h3>
                 <p className="mt-1 text-sm text-gray-500">
                   The actual Forge Viewer would be integrated here
                 </p>
                 <div className="mt-4">
                   <button
                     onClick={() =>
-                      window.open(`https://viewer.autodesk.com/viewer?urn=${urn}`, '_blank')
+                      window.open(
+                        `https://viewer.autodesk.com/viewer?urn=${urn}`,
+                        "_blank",
+                      )
                     }
                     className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
                   >
