@@ -2,8 +2,8 @@
 name: Estimator Edge Cases
 about: Tracking issue for cost estimator edge case handling and validation
 title: '[TRACKING] Estimator Edge Cases'
-labels: 'pri:high, area:estimator'
-assignees: ''
+labels: ['pri:high', 'area:estimator']
+assignees: []
 ---
 
 # Estimator Edge Cases - Tracking Issue

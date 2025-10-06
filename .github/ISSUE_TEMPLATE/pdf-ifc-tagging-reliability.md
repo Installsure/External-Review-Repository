@@ -2,8 +2,8 @@
 name: PDF/IFC Tagging Reliability Tests
 about: Tracking issue for PDF and IFC file tagging reliability test suite
 title: '[TRACKING] PDF/IFC Tagging Reliability Tests'
-labels: 'pri:high, area:viewer, area:estimator'
-assignees: ''
+labels: ['pri:high', 'area:viewer', 'area:estimator']
+assignees: []
 ---
 
 # PDF/IFC Tagging Reliability Tests - Tracking Issue

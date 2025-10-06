@@ -2,8 +2,8 @@
 name: UE5 Pipeline Preflight Checks
 about: Tracking issue for Unreal Engine 5 pipeline preflight validation checks
 title: '[TRACKING] UE5 Pipeline Preflight Checks'
-labels: 'pri:high, area:ue, area:viewer'
-assignees: ''
+labels: ['pri:high', 'area:ue', 'area:viewer']
+assignees: []
 ---
 
 # UE5 Pipeline Preflight Checks - Tracking Issue

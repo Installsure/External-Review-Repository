@@ -2,8 +2,8 @@
 name: Boot Scripts & Path Hardening
 about: Tracking issue for boot script improvements and path hardening security
 title: '[TRACKING] Boot Scripts & Path Hardening'
-labels: 'pri:high, area:viewer, area:estimator, area:ue'
-assignees: ''
+labels: ['pri:high', 'area:viewer', 'area:estimator', 'area:ue']
+assignees: []
 ---
 
 # Boot Scripts & Path Hardening - Tracking Issue
