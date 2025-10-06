@@ -58,6 +58,7 @@ npm install
 
 ## 📚 **DOCUMENTATION**
 
+- **[Quick Start Guide](documentation/QUICKSTART.md)** - Fast setup for InstallSure
 - **[Setup Guide](documentation/SETUP_GUIDE.md)** - Complete setup instructions
 - **[API Documentation](documentation/API_DOCUMENTATION.md)** - Comprehensive API reference
 - **[Troubleshooting Guide](documentation/TROUBLESHOOTING.md)** - Common issues and solutions
@@ -115,6 +116,9 @@ npm run test:e2e
 ---
 
 ## 🛠️ **SCRIPTS**
+
+### **Shell Scripts (Unix/Linux/macOS)**
+- `./scripts/setup-installsure.sh` - Quick setup script for InstallSure
 
 ### **PowerShell Scripts (Windows)**
 - `.\scripts\start-all.ps1` - Start all applications
