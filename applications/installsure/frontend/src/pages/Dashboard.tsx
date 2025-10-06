@@ -10,17 +10,17 @@ export default function Dashboard() {
     error: projectsError,
   } = useQuery({
     queryKey: ['projects'],
-    queryFn: api.getProjects,
+    queryFn: () => api.getProjects(),
   });
 
   const { data: fileStats, isLoading: statsLoading } = useQuery({
     queryKey: ['fileStats'],
-    queryFn: api.getFileStats,
+    queryFn: () => api.getFileStats(),
   });
 
   const { data: health, isLoading: healthLoading } = useQuery({
     queryKey: ['health'],
-    queryFn: api.getHealth,
+    queryFn: () => api.getHealth(),
     refetchInterval: 30000, // Refetch every 30 seconds
   });
 
