@@ -32,7 +32,7 @@ This repository contains a complete application suite for external review and re
 ### **Installation**
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/Installsure/External-Review-Repository.git
 cd External-Review-Repository
 
 # Run preflight check

@@ -232,9 +232,9 @@ Brief description of changes
 - **General Questions**: Open a GitHub issue
 
 ### **Contact Information**
-- **Repository**: [GitHub Repository URL]
-- **Issues**: [GitHub Issues](https://github.com/YOUR_USERNAME/External-Review-Repository/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/YOUR_USERNAME/External-Review-Repository/discussions)
+- **Repository**: https://github.com/Installsure/External-Review-Repository
+- **Issues**: [GitHub Issues](https://github.com/Installsure/External-Review-Repository/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/Installsure/External-Review-Repository/discussions)
 
 ---
 
