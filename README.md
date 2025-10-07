@@ -83,6 +83,7 @@ npm install
 
 - **[Setup Guide](documentation/SETUP_GUIDE.md)** - Complete setup instructions
 - **[API Documentation](documentation/API_DOCUMENTATION.md)** - Comprehensive API reference
+- **[3D BIM Estimating Test Guide](documentation/3D_BIM_ESTIMATING_TEST_GUIDE.md)** - Complete 3D BIM testing and validation guide
 - **[Troubleshooting Guide](documentation/TROUBLESHOOTING.md)** - Common issues and solutions
 - **[Contributing Guide](CONTRIBUTING.md)** - Guidelines for external reviewers
 - **[Comprehensive Review Report](documentation/COMPREHENSIVE_REVIEW_REPORT.md)** - Detailed analysis
