@@ -122,9 +122,14 @@ curl http://localhost:8000/api/health  # ✅ PASS
 1. **Dashboard** - Project overview with real-time health
 2. **Project Management** - Create, view, edit construction projects  
 3. **File Upload** - CAD file handling (DWG, RVT, IFC)
-4. **Reports** - Project reporting interface
-5. **Settings** - Application configuration
-6. **AutoCAD Integration** - Forge API endpoints ready
+4. **3D BIM Estimating** - Advanced BIM parsing and quantity takeoff engine
+5. **Reports** - Project reporting interface
+6. **Settings** - Application configuration
+7. **AutoCAD Integration** - Forge API endpoints ready
+
+### **3D BIM Estimating Engine:**
+For comprehensive testing and validation of the 3D BIM estimating capabilities, see:
+- **[3D BIM Estimating Test Guide](documentation/3D_BIM_ESTIMATING_TEST_GUIDE.md)** - Complete testing procedures and executive summary
 
 ### **Demo Dashboard:**
 - Central control panel for all applications
