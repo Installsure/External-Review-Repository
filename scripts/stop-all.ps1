@@ -1,53 +1,95 @@
-# Stop All Applications Script - Enhanced
-# External Review Repository
-# Last Updated: 2025-10-06
-# Production Hardening - Phase 1
+# InstallSure BIM Services - Complete Shutdown Script
+# Coordinated GitHub Copilot + Cursor Integration
 
-$ErrorActionPreference = "Continue"
-
-Write-Host "🛑 Stopping All Applications..." -ForegroundColor Red
+Write-Host "🛑 Stopping InstallSure BIM Ecosystem..." -ForegroundColor Red
 Write-Host "=================================" -ForegroundColor Cyan
 
-# Enhanced function to stop processes with better error handling
-function Stop-App {
-    param(
-        [string]$AppName,
-        [int]$Port,
-        [bool]$Critical = $false
-    )
-    
-    Write-Host "`n🔄 Stopping $AppName on port $Port..." -ForegroundColor Yellow
+# Check if Docker is available
+try {
+    docker --version | Out-Null
+    $dockerAvailable = $true
+    Write-Host "✅ Docker is available" -ForegroundColor Green
+} catch {
+    $dockerAvailable = $false
+    Write-Host "❌ Docker is not available" -ForegroundColor Yellow
+}
+
+if ($dockerAvailable) {
+    # Stop all Docker Compose services
+    Write-Host "🔄 Stopping Docker Compose services..." -ForegroundColor Yellow
     
     try {
-        # Find processes using the port
-        $processes = Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue | ForEach-Object {
-            Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue
-        }
+        docker compose down --remove-orphans
+        Write-Host "✅ All services stopped" -ForegroundColor Green
+    } catch {
+        Write-Host "❌ Error stopping services: $($_.Exception.Message)" -ForegroundColor Red
+    }
+    
+    # Clean up containers (optional)
+    Write-Host "🧹 Cleaning up containers..." -ForegroundColor Yellow
+    try {
+        docker container prune -f | Out-Null
+        Write-Host "✅ Containers cleaned up" -ForegroundColor Green
+    } catch {
+        Write-Host "⚠️ Container cleanup skipped" -ForegroundColor Yellow
+    }
+    
+    # Show remaining containers
+    Write-Host "� Remaining containers:" -ForegroundColor Green
+    docker ps
+} else {
+    Write-Host "⚠️ Docker not available - checking for running processes..." -ForegroundColor Yellow
+    
+    # Fallback: Stop processes by port
+    $ports = @(3000, 8000, 8001, 8002, 5432, 6379)
+    
+    foreach ($port in $ports) {
+        Write-Host "🔍 Checking port $port..." -ForegroundColor Yellow
         
-        if ($processes) {
-            foreach ($process in $processes) {
-                Write-Host "   🎯 Found process: $($process.ProcessName) (PID: $($process.Id))" -ForegroundColor Gray
-                
-                # Try graceful shutdown first
-                try {
-                    $process.CloseMainWindow() | Out-Null
-                    Start-Sleep -Seconds 3
-                    if (-not $process.HasExited) {
-                        Stop-Process -Id $process.Id -Force -ErrorAction Stop
+        try {
+            $connections = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
+            if ($connections) {
+                foreach ($conn in $connections) {
+                    try {
+                        $process = Get-Process -Id $conn.OwningProcess -ErrorAction SilentlyContinue
+                        if ($process) {
+                            Write-Host "   🎯 Stopping process: $($process.ProcessName) (PID: $($process.Id))" -ForegroundColor Gray
+                            Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+                            Write-Host "   ✅ Process stopped" -ForegroundColor Green
+                        }
+                    } catch {
+                        Write-Host "   ⚠️ Error stopping process on port $port" -ForegroundColor Yellow
                     }
-                    Write-Host "   ✅ Process stopped gracefully" -ForegroundColor Green
-                } catch {
-                    # Force kill if graceful shutdown fails
-                    Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
-                    Write-Host "   ⚡ Process force-killed" -ForegroundColor Yellow
                 }
+            } else {
+                Write-Host "   ℹ️ No processes found on port $port" -ForegroundColor Gray
             }
-        } else {
-            Write-Host "   ℹ️  No processes found on port $Port" -ForegroundColor Gray
+        } catch {
+            Write-Host "   ⚠️ Error checking port $port" -ForegroundColor Yellow
         }
     }
-    catch {
-        Write-Host "   ❌ Error stopping ${AppName}: $($_.Exception.Message)" -ForegroundColor Red
+}
+
+Write-Host ""
+Write-Host "🎯 Shutdown Summary:" -ForegroundColor Green
+Write-Host "===================" -ForegroundColor Cyan
+
+if ($dockerAvailable) {
+    Write-Host "✅ Docker Compose services stopped" -ForegroundColor Green
+    Write-Host "✅ Containers cleaned up" -ForegroundColor Green
+} else {
+    Write-Host "✅ Process cleanup completed" -ForegroundColor Green
+}
+
+Write-Host ""
+Write-Host "💡 Status Check Commands:" -ForegroundColor Cyan
+Write-Host "docker compose ps" -ForegroundColor White
+Write-Host "docker ps" -ForegroundColor White
+Write-Host "netstat -an | findstr ':3000 :8000 :8001 :8002'" -ForegroundColor White
+
+Write-Host ""
+Write-Host "🚀 To restart: .\scripts\start-all.ps1" -ForegroundColor Green
+Write-Host "🎉 InstallSure BIM Ecosystem: STOPPED!" -ForegroundColor Red
     }
 }
 

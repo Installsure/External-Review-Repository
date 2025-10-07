@@ -1,53 +1,261 @@
-# Test All Applications Script - Enhanced
-# External Review Repository
-# Last Updated: 2025-10-06
-# Production Hardening - Phase 1
+# InstallSure BIM - End-to-End Testing Script
+# Coordinated GitHub Copilot + Cursor Integration
 
-$ErrorActionPreference = "Continue"
+param(
+    [string]$TestFile = "c:\Users\lesso\Desktop\07.28.25 Whispering Pines_Building A.pdf",
+    [switch]$SkipStartup,
+    [switch]$Verbose
+)
 
-Write-Host "🧪 Running All Tests (Production Mode)..." -ForegroundColor Blue
-Write-Host "=================================" -ForegroundColor Cyan
+Write-Host "🧪 InstallSure BIM End-to-End Testing" -ForegroundColor Green
+Write-Host "====================================" -ForegroundColor Cyan
 
-# Run preflight checks first
-Write-Host "🔍 Running preflight checks..." -ForegroundColor Yellow
-try {
-    & ".\tools\preflight-check.ps1"
-    Write-Host "   ✅ Preflight checks passed" -ForegroundColor Green
-} catch {
-    Write-Host "   ❌ Preflight checks failed. Some tests may not run properly." -ForegroundColor Red
-    Write-Host "   ⚠️  Continuing with tests anyway..." -ForegroundColor Yellow
+# Check if test file exists
+if (-not (Test-Path $TestFile)) {
+    Write-Host "❌ Test file not found: $TestFile" -ForegroundColor Red
+    Write-Host "Please ensure the test file exists or specify a different file with -TestFile parameter" -ForegroundColor Yellow
+    exit 1
 }
 
-# Enhanced function to run tests with better reporting
-function Test-App {
-    param(
-        [string]$AppName,
-        [string]$AppPath,
-        [string]$TestType,
-        [bool]$Critical = $false
-    )
-    
-    Write-Host "`n🔄 Testing $AppName ($TestType)..." -ForegroundColor Yellow
-    Write-Host "   Path: $AppPath" -ForegroundColor Gray
-    
-    if (-not (Test-Path $AppPath)) {
-        Write-Host "   ❌ Application path not found: $AppPath" -ForegroundColor Red
-        if ($Critical) { 
-            Write-Host "   🚨 Critical application test failed!" -ForegroundColor Red
-            return $false
+Write-Host "📂 Test file: $TestFile" -ForegroundColor White
+
+# Start services if not skipped
+if (-not $SkipStartup) {
+    Write-Host "`n🚀 Starting services..." -ForegroundColor Yellow
+    try {
+        & ".\scripts\start-all.ps1"
+        if ($LASTEXITCODE -ne 0) {
+            throw "Failed to start services"
         }
-        return $false
+    } catch {
+        Write-Host "❌ Failed to start services: $($_.Exception.Message)" -ForegroundColor Red
+        exit 1
     }
     
-    $originalLocation = Get-Location
+    Write-Host "⏳ Waiting additional time for services to stabilize..." -ForegroundColor Yellow
+    Start-Sleep -Seconds 10
+}
+
+# Health check before testing
+Write-Host "`n🏥 Pre-test health check..." -ForegroundColor Cyan
+
+$services = @(
+    @{name="Gateway"; url="http://localhost:8000/health"},
+    @{name="BIM Service"; url="http://localhost:8002/health"},
+    @{name="Web App"; url="http://localhost:3000"}
+)
+
+$allHealthy = $true
+foreach ($service in $services) {
     try {
-        Set-Location $AppPath
+        $response = Invoke-RestMethod -Uri $service.url -TimeoutSec 10 -ErrorAction Stop
+        Write-Host "✅ $($service.name): Healthy" -ForegroundColor Green
+        if ($Verbose -and $response.status) {
+            Write-Host "   Status: $($response.status)" -ForegroundColor Gray
+        }
+    } catch {
+        Write-Host "❌ $($service.name): Health check failed" -ForegroundColor Red
+        $allHealthy = $false
+        if ($Verbose) {
+            Write-Host "   Error: $($_.Exception.Message)" -ForegroundColor Gray
+        }
+    }
+}
+
+if (-not $allHealthy) {
+    Write-Host "`n❌ Health checks failed. Cannot proceed with testing." -ForegroundColor Red
+    exit 1
+}
+
+# Test sequence
+Write-Host "`n🧪 Running End-to-End Tests..." -ForegroundColor Green
+Write-Host "==============================" -ForegroundColor Cyan
+
+$testResults = @()
+
+# Test 1: Gateway connectivity
+Write-Host "`n1️⃣ Testing Gateway connectivity..." -ForegroundColor Yellow
+try {
+    $response = Invoke-RestMethod -Uri "http://localhost:8000/health" -TimeoutSec 10
+    Write-Host "✅ Gateway is responding" -ForegroundColor Green
+    $testResults += @{Test="Gateway Connectivity"; Status="PASS"; Details=$response.status}
+} catch {
+    Write-Host "❌ Gateway connectivity test failed" -ForegroundColor Red
+    $testResults += @{Test="Gateway Connectivity"; Status="FAIL"; Details=$_.Exception.Message}
+}
+
+# Test 2: BIM Service connectivity
+Write-Host "`n2️⃣ Testing BIM Service connectivity..." -ForegroundColor Yellow
+try {
+    $response = Invoke-RestMethod -Uri "http://localhost:8002/health" -TimeoutSec 10
+    Write-Host "✅ BIM Service is responding" -ForegroundColor Green
+    $testResults += @{Test="BIM Service Connectivity"; Status="PASS"; Details=$response.status}
+} catch {
+    Write-Host "❌ BIM Service connectivity test failed" -ForegroundColor Red
+    $testResults += @{Test="BIM Service Connectivity"; Status="FAIL"; Details=$_.Exception.Message}
+}
+
+# Test 3: File upload simulation (if IFC file available)
+$icfTestFile = $null
+$commonIfcPaths = @(
+    "c:\Users\lesso\Desktop\*.ifc",
+    "c:\Users\lesso\Documents\*.ifc",
+    ".\test-files\*.ifc"
+)
+
+foreach ($path in $commonIfcPaths) {
+    $files = Get-ChildItem -Path $path -ErrorAction SilentlyContinue
+    if ($files) {
+        $icfTestFile = $files[0].FullName
+        break
+    }
+}
+
+Write-Host "`n3️⃣ Testing IFC file upload..." -ForegroundColor Yellow
+if ($icfTestFile -and (Test-Path $icfTestFile)) {
+    Write-Host "📁 Found IFC test file: $icfTestFile" -ForegroundColor White
+    try {
+        # Create multipart form data for file upload
+        $boundary = [System.Guid]::NewGuid().ToString()
+        $fileContent = [System.IO.File]::ReadAllBytes($icfTestFile)
+        $fileName = [System.IO.Path]::GetFileName($icfTestFile)
         
-        # Check if package.json exists
-        if (-not (Test-Path "package.json")) {
-            Write-Host "   ❌ package.json not found" -ForegroundColor Red
-            if ($Critical) { 
-                Set-Location $originalLocation
+        $bodyLines = @(
+            "--$boundary",
+            "Content-Disposition: form-data; name=`"file`"; filename=`"$fileName`"",
+            "Content-Type: application/octet-stream",
+            "",
+            [System.Text.Encoding]::GetEncoding("iso-8859-1").GetString($fileContent),
+            "--$boundary--"
+        )
+        
+        $body = $bodyLines -join "`r`n"
+        
+        $response = Invoke-RestMethod -Uri "http://localhost:8000/api/bim/upload" `
+            -Method POST `
+            -Body $body `
+            -ContentType "multipart/form-data; boundary=$boundary" `
+            -TimeoutSec 30
+            
+        Write-Host "✅ IFC file upload successful" -ForegroundColor Green
+        $testResults += @{Test="IFC File Upload"; Status="PASS"; Details="File processed successfully"}
+        
+        if ($Verbose -and $response.projectId) {
+            Write-Host "   Project ID: $($response.projectId)" -ForegroundColor Gray
+        }
+    } catch {
+        Write-Host "❌ IFC file upload test failed" -ForegroundColor Red
+        $testResults += @{Test="IFC File Upload"; Status="FAIL"; Details=$_.Exception.Message}
+        if ($Verbose) {
+            Write-Host "   Error details: $($_.Exception.Message)" -ForegroundColor Gray
+        }
+    }
+} else {
+    Write-Host "⚠️ No IFC test file found - skipping upload test" -ForegroundColor Yellow
+    $testResults += @{Test="IFC File Upload"; Status="SKIP"; Details="No test file available"}
+}
+
+# Test 4: BIM processing endpoint
+Write-Host "`n4️⃣ Testing BIM processing endpoints..." -ForegroundColor Yellow
+try {
+    $response = Invoke-RestMethod -Uri "http://localhost:8002/projects" -TimeoutSec 10
+    Write-Host "✅ BIM projects endpoint is responding" -ForegroundColor Green
+    $testResults += @{Test="BIM Processing Endpoints"; Status="PASS"; Details="Projects endpoint accessible"}
+} catch {
+    Write-Host "❌ BIM processing endpoint test failed" -ForegroundColor Red
+    $testResults += @{Test="BIM Processing Endpoints"; Status="FAIL"; Details=$_.Exception.Message}
+}
+
+# Test 5: Web application accessibility
+Write-Host "`n5️⃣ Testing Web application..." -ForegroundColor Yellow
+try {
+    $response = Invoke-WebRequest -Uri "http://localhost:3000" -TimeoutSec 10
+    if ($response.StatusCode -eq 200) {
+        Write-Host "✅ Web application is accessible" -ForegroundColor Green
+        $testResults += @{Test="Web Application"; Status="PASS"; Details="HTTP 200 OK"}
+    } else {
+        Write-Host "⚠️ Web application returned status: $($response.StatusCode)" -ForegroundColor Yellow
+        $testResults += @{Test="Web Application"; Status="WARN"; Details="HTTP $($response.StatusCode)"}
+    }
+} catch {
+    Write-Host "❌ Web application test failed" -ForegroundColor Red
+    $testResults += @{Test="Web Application"; Status="FAIL"; Details=$_.Exception.Message}
+}
+
+# Test Results Summary
+Write-Host "`n📊 Test Results Summary" -ForegroundColor Green
+Write-Host "======================" -ForegroundColor Cyan
+
+$passCount = ($testResults | Where-Object {$_.Status -eq "PASS"}).Count
+$failCount = ($testResults | Where-Object {$_.Status -eq "FAIL"}).Count
+$skipCount = ($testResults | Where-Object {$_.Status -eq "SKIP"}).Count
+$warnCount = ($testResults | Where-Object {$_.Status -eq "WARN"}).Count
+
+foreach ($result in $testResults) {
+    $emoji = switch ($result.Status) {
+        "PASS" { "✅" }
+        "FAIL" { "❌" }
+        "SKIP" { "⏭️" }
+        "WARN" { "⚠️" }
+    }
+    
+    $color = switch ($result.Status) {
+        "PASS" { "Green" }
+        "FAIL" { "Red" }
+        "SKIP" { "Yellow" }
+        "WARN" { "Yellow" }
+    }
+    
+    Write-Host "$emoji $($result.Test): $($result.Status)" -ForegroundColor $color
+    if ($Verbose -and $result.Details) {
+        Write-Host "   $($result.Details)" -ForegroundColor Gray
+    }
+}
+
+Write-Host "`n📈 Summary Statistics:" -ForegroundColor Cyan
+Write-Host "   ✅ Passed: $passCount" -ForegroundColor Green
+Write-Host "   ❌ Failed: $failCount" -ForegroundColor Red
+Write-Host "   ⚠️ Warnings: $warnCount" -ForegroundColor Yellow
+Write-Host "   ⏭️ Skipped: $skipCount" -ForegroundColor Yellow
+
+# Overall result
+$overallStatus = if ($failCount -eq 0 -and $passCount -gt 0) {
+    "SUCCESS"
+} elseif ($failCount -eq 0 -and $warnCount -gt 0) {
+    "SUCCESS_WITH_WARNINGS"
+} else {
+    "FAILURE"
+}
+
+Write-Host "`n🎯 Overall Test Status: $overallStatus" -ForegroundColor $(
+    switch ($overallStatus) {
+        "SUCCESS" { "Green" }
+        "SUCCESS_WITH_WARNINGS" { "Yellow" }
+        "FAILURE" { "Red" }
+    }
+)
+
+# Next steps
+Write-Host "`n📋 Next Steps:" -ForegroundColor Cyan
+if ($overallStatus -eq "SUCCESS") {
+    Write-Host "✅ System is ready for production use!" -ForegroundColor Green
+    Write-Host "🌐 Open http://localhost:3000 to use the application" -ForegroundColor White
+    Write-Host "📂 Upload IFC files and generate cost estimates" -ForegroundColor White
+} elseif ($overallStatus -eq "SUCCESS_WITH_WARNINGS") {
+    Write-Host "⚠️ System is functional but has some issues" -ForegroundColor Yellow
+    Write-Host "🌐 You can still test at http://localhost:3000" -ForegroundColor White
+    Write-Host "🔧 Check warnings and consider fixing them" -ForegroundColor White
+} else {
+    Write-Host "❌ System has critical issues that need to be resolved" -ForegroundColor Red
+    Write-Host "🔧 Review failed tests and check logs: docker compose logs" -ForegroundColor White
+    Write-Host "🛠️ Consider restarting services: .\scripts\start-all.ps1" -ForegroundColor White
+}
+
+Write-Host ""
+Write-Host "🤝 GitHub Copilot + Cursor Integration: TEST COMPLETE!" -ForegroundColor Green
+
+# Exit with appropriate code
+exit $(if ($overallStatus -eq "FAILURE") { 1 } else { 0 })
                 return $false
             }
             Set-Location $originalLocation

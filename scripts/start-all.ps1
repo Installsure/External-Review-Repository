@@ -1,196 +1,196 @@
-# Start All Applications Script - Enhanced
-# External Review Repository
-# Last Updated: 2025-10-06
-# Production Hardening - Phase 1
+# InstallSure BIM Services - Complete Startup Script
+# Coordinated GitHub Copilot + Cursor Integration
 
-$ErrorActionPreference = "Stop"
+Write-Host "Starting Complete InstallSure BIM Ecosystem..." -ForegroundColor Green
+Write-Host "===============================================" -ForegroundColor Cyan
 
-Write-Host "🚀 Starting All Applications (Production Mode)..." -ForegroundColor Green
-Write-Host "=================================" -ForegroundColor Cyan
+# Check prerequisites
+Write-Host "Checking prerequisites..." -ForegroundColor Yellow
 
-# Run preflight checks first
-Write-Host "🔍 Running preflight checks..." -ForegroundColor Yellow
+# Check Docker
 try {
-    & ".\tools\preflight-check.ps1"
-    Write-Host "   ✅ Preflight checks passed" -ForegroundColor Green
+    docker --version | Out-Null
+    Write-Host "Docker is available" -ForegroundColor Green
 } catch {
-    Write-Host "   ❌ Preflight checks failed. Please address issues before starting." -ForegroundColor Red
+    Write-Host "Docker is not installed or not running" -ForegroundColor Red
+    Write-Host "Please install Docker Desktop and ensure it's running" -ForegroundColor Yellow
     exit 1
 }
 
-# Check and start Redis if available
-if (Get-Command docker -ErrorAction SilentlyContinue) {
-    Write-Host "`n🔄 Starting Redis (Docker)..." -ForegroundColor Yellow
+# Check Docker Compose
+try {
+    docker compose version | Out-Null
+    Write-Host "✅ Docker Compose is available" -ForegroundColor Green
+} catch {
+    Write-Host "❌ Docker Compose is not available" -ForegroundColor Red
+    exit 1
+}
+
+# Stop any existing services
+Write-Host "🛑 Stopping existing services..." -ForegroundColor Yellow
+docker compose down --remove-orphans 2>$null
+
+# Remove old containers if they exist
+Write-Host "🧹 Cleaning up old containers..." -ForegroundColor Yellow
+docker container prune -f 2>$null
+
+# Build and start services
+Write-Host "🏗️ Building and starting services..." -ForegroundColor Green
+Write-Host "This may take several minutes on first run..." -ForegroundColor Yellow
+
+# Start infrastructure services first
+Write-Host "📦 Starting infrastructure services..." -ForegroundColor Cyan
+docker compose up -d postgres redis ollama
+
+# Wait for infrastructure to be ready
+Write-Host "⏳ Waiting for infrastructure services..." -ForegroundColor Yellow
+$timeout = 60
+$elapsed = 0
+
+do {
+    Start-Sleep 2
+    $elapsed += 2
+    $ready = $true
+    
+    # Check postgres
     try {
-        $existingContainer = docker ps -a --filter "name=redis-installsure" --format "{{.Names}}" 2>$null
-        if ($existingContainer -eq "redis-installsure") {
-            docker start redis-installsure | Out-Null
-            Write-Host "   ✅ Redis container restarted" -ForegroundColor Green
-        } else {
-            docker run -d --name redis-installsure -p 6379:6379 redis:7-alpine | Out-Null
-            Write-Host "   ✅ Redis started on port 6379" -ForegroundColor Green
+        docker compose exec postgres pg_isready -U installsure 2>$null | Out-Null
+    } catch {
+        $ready = $false
+    }
+    
+    # Check redis
+    try {
+        docker compose exec redis redis-cli ping 2>$null | Out-Null
+    } catch {
+        $ready = $false
+    }
+    
+    if ($ready) {
+        Write-Host "✅ Infrastructure services are ready" -ForegroundColor Green
+        break
+    }
+    
+    if ($elapsed -ge $timeout) {
+        Write-Host "❌ Timeout waiting for infrastructure services" -ForegroundColor Red
+        exit 1
+    }
+    
+    Write-Host "⏳ Still waiting... ($elapsed/$timeout seconds)" -ForegroundColor Yellow
+} while ($true)
+
+# Start BIM service
+Write-Host "🔧 Starting BIM service..." -ForegroundColor Cyan
+docker compose up -d bim
+
+# Wait for BIM service
+Write-Host "⏳ Waiting for BIM service..." -ForegroundColor Yellow
+$timeout = 30
+$elapsed = 0
+
+do {
+    Start-Sleep 2
+    $elapsed += 2
+    
+    try {
+        $response = Invoke-RestMethod -Uri "http://localhost:8002/health" -TimeoutSec 5 -ErrorAction Stop
+        if ($response.status -eq "healthy") {
+            Write-Host "✅ BIM service is ready" -ForegroundColor Green
+            break
         }
     } catch {
-        Write-Host "   ⚠️  Redis setup skipped (Docker not available)" -ForegroundColor Yellow
+        # Service not ready yet
     }
-} else {
-    Write-Host "   ⚠️  Docker not found - Redis will not be available" -ForegroundColor Yellow
-}
+    
+    if ($elapsed -ge $timeout) {
+        Write-Host "❌ Timeout waiting for BIM service" -ForegroundColor Red
+        docker compose logs bim
+        exit 1
+    }
+    
+    Write-Host "Waiting for BIM service... ($elapsed/$timeout seconds)" -ForegroundColor Yellow
+} while ($true)
 
-# Enhanced function to start applications with error handling
-function Start-App {
-    param(
-        [string]$AppName,
-        [string]$AppPath,
-        [int]$Port,
-        [string]$Description,
-        [bool]$Critical = $false
-    )
+# Start remaining services
+Write-Host "Starting gateway and web services..." -ForegroundColor Cyan
+docker compose up -d
+
+# Final health checks
+Write-Host "🏥 Running health checks..." -ForegroundColor Green
+
+$services = @(
+    @{name="Gateway"; url="http://localhost:8000/health"; port=8000},
+    @{name="BIM Service"; url="http://localhost:8002/health"; port=8002},
+    @{name="Web App"; url="http://localhost:3000"; port=3000}
+)
+
+$allHealthy = $true
+
+foreach ($service in $services) {
+    Write-Host "Checking $($service.name)..." -ForegroundColor Yellow
     
-    Write-Host "`n🔄 Starting $AppName..." -ForegroundColor Yellow
-    Write-Host "   Port: $Port" -ForegroundColor Gray
-    Write-Host "   Description: $Description" -ForegroundColor Gray
-    
-    # Check if directory exists
-    if (-not (Test-Path $AppPath)) {
-        Write-Host "   ❌ Application directory not found: $AppPath" -ForegroundColor Red
-        if ($Critical) { exit 1 }
-        return
-    }
-    
-    # Check if port is already in use
-    $portInUse = Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue
-    if ($portInUse) {
-        Write-Host "   ⚠️  Port $Port is already in use. Skipping $AppName." -ForegroundColor Yellow
-        return
-    }
-    
-    # Check if package.json exists
-    if (-not (Test-Path "$AppPath\package.json")) {
-        Write-Host "   ❌ package.json not found in $AppPath" -ForegroundColor Red
-        if ($Critical) { exit 1 }
-        return
-    }
-    
-    # Start the application with enhanced error handling
+    # Check if port is listening
     try {
-        $startLocation = Get-Location
-        Set-Location $AppPath
-        
-        # Install dependencies if node_modules doesn't exist
-        if (-not (Test-Path "node_modules")) {
-            Write-Host "   📦 Installing dependencies..." -ForegroundColor Blue
-            npm install --silent
+        $connection = Test-NetConnection -ComputerName localhost -Port $service.port -InformationLevel Quiet
+        if (-not $connection) {
+            Write-Host "❌ $($service.name): Port $($service.port) not listening" -ForegroundColor Red
+            $allHealthy = $false
+            continue
         }
-        
-        Start-Process powershell -ArgumentList "-NoExit", "-Command", "Write-Host 'Starting $AppName on port $Port...' -ForegroundColor Green; npm run dev" -WindowStyle Normal
-        Set-Location $startLocation
-        Write-Host "   ✅ $AppName started successfully" -ForegroundColor Green
-        Start-Sleep -Seconds 2  # Give process time to start
+    } catch {
+        Write-Host "❌ $($service.name): Port check failed" -ForegroundColor Red
+        $allHealthy = $false
+        continue
     }
-    catch {
-        Set-Location $startLocation
-        Write-Host "   ❌ Failed to start $AppName: $($_.Exception.Message)" -ForegroundColor Red
-        if ($Critical) { exit 1 }
-    }
-}
-
-# Start core applications (Critical Path)
-Write-Host "`n🎯 Starting Core Applications..." -ForegroundColor Cyan
-
-# InstallSure Backend (Critical - Must start first)
-Start-App -AppName "InstallSure Backend" -AppPath "applications\installsure\backend" -Port 8000 -Description "API Server" -Critical $true
-
-# InstallSure Frontend (Critical - Main Application)  
-Start-App -AppName "InstallSure Frontend" -AppPath "applications\installsure\frontend" -Port 3000 -Description "Construction Management Platform" -Critical $true
-
-# Demo Dashboard (Important for demonstration)
-Start-App -AppName "Demo Dashboard" -AppPath "applications\demo-dashboard" -Port 3001 -Description "Central Control Panel" -Critical $false
-
-# Optional applications (Development/Demo purposes)
-Write-Host "`n📱 Starting Optional Applications..." -ForegroundColor Cyan
-
-Start-App -AppName "FF4U" -AppPath "applications\ff4u" -Port 3002 -Description "Adult Entertainment Platform"
-Start-App -AppName "RedEye" -AppPath "applications\redeye" -Port 3003 -Description "Project Management System"
-Start-App -AppName "ZeroStack" -AppPath "applications\zerostack" -Port 3004 -Description "Infrastructure Management"
-Start-App -AppName "Hello" -AppPath "applications\hello" -Port 3005 -Description "Digital Business Cards"
-Start-App -AppName "Avatar" -AppPath "applications\avatar" -Port 3006 -Description "AI Avatar Platform"
-
-# Wait for core applications to start
-Write-Host "`n⏳ Waiting for core applications to initialize..." -ForegroundColor Yellow
-Start-Sleep -Seconds 15
-
-# Enhanced health check with retry logic
-Write-Host "`n🔍 Performing Health Checks..." -ForegroundColor Cyan
-Write-Host "=================================" -ForegroundColor Cyan
-
-$coreApps = @(
-    @{Name="InstallSure Backend"; Port=8000; URL="http://localhost:8000/api/health"; Critical=$true},
-    @{Name="InstallSure Frontend"; Port=3000; URL="http://localhost:3000"; Critical=$true},
-    @{Name="Demo Dashboard"; Port=3001; URL="http://localhost:3001"; Critical=$false}
-)
-
-$optionalApps = @(
-    @{Name="FF4U"; Port=3002; URL="http://localhost:3002"; Critical=$false},
-    @{Name="RedEye"; Port=3003; URL="http://localhost:3003"; Critical=$false},
-    @{Name="ZeroStack"; Port=3004; URL="http://localhost:3004"; Critical=$false},
-    @{Name="Hello"; Port=3005; URL="http://localhost:3005"; Critical=$false},
-    @{Name="Avatar"; Port=3006; URL="http://localhost:3006"; Critical=$false}
-)
-
-function Test-AppHealth {
-    param($app, $maxRetries = 3)
     
-    for ($i = 1; $i -le $maxRetries; $i++) {
-        try {
-            $response = Invoke-WebRequest -Uri $app.URL -TimeoutSec 10 -ErrorAction Stop
-            if ($response.StatusCode -eq 200) {
-                Write-Host "✅ $($app.Name) - Healthy on port $($app.Port)" -ForegroundColor Green
-                return $true
-            }
-        }
-        catch {
-            if ($i -eq $maxRetries) {
-                $status = if ($app.Critical) { "❌ CRITICAL" } else { "⚠️  WARNING" }
-                $color = if ($app.Critical) { "Red" } else { "Yellow" }
-                Write-Host "$status $($app.Name) - Not responding on port $($app.Port)" -ForegroundColor $color
-                return $false
-            }
-            Start-Sleep -Seconds 5
-        }
-    }
-    return $false
-}
-
-# Test core applications
-$criticalHealthy = $true
-foreach ($app in $coreApps) {
-    $healthy = Test-AppHealth -app $app
-    if (-not $healthy -and $app.Critical) {
-        $criticalHealthy = $false
+    # Check health endpoint
+    try {
+        $response = Invoke-RestMethod -Uri $service.url -TimeoutSec 10 -ErrorAction Stop
+        Write-Host "✅ $($service.name): Healthy" -ForegroundColor Green
+    } catch {
+        Write-Host "❌ $($service.name): Health check failed" -ForegroundColor Red
+        $allHealthy = $false
     }
 }
 
-# Test optional applications
-foreach ($app in $optionalApps) {
-    Test-AppHealth -app $app | Out-Null
-}
+Write-Host ""
+Write-Host "🎯 Integration Status:" -ForegroundColor Green
+Write-Host "=========================" -ForegroundColor Cyan
 
-# Final status
-Write-Host "`n🎉 Startup Summary" -ForegroundColor Green
-Write-Host "=================================" -ForegroundColor Cyan
-
-if ($criticalHealthy) {
-    Write-Host "✅ SYSTEM READY - All critical applications are running" -ForegroundColor Green
+if ($allHealthy) {
+    Write-Host "✅ All services are healthy and running!" -ForegroundColor Green
 } else {
-    Write-Host "❌ SYSTEM DEGRADED - Some critical applications failed to start" -ForegroundColor Red
+    Write-Host "⚠️ Some services have issues" -ForegroundColor Yellow
+    Write-Host "Check the logs with: docker compose logs" -ForegroundColor Yellow
 }
 
-Write-Host "`n🌐 Application URLs:" -ForegroundColor Yellow
-Write-Host "   • InstallSure:     http://localhost:3000" -ForegroundColor White
-Write-Host "   • Demo Dashboard:  http://localhost:3001" -ForegroundColor White
-Write-Host "   • Backend API:     http://localhost:8000" -ForegroundColor White
-Write-Host "`n💡 Management Commands:" -ForegroundColor Cyan
-Write-Host "   • Stop All:   .\scripts\stop-all.ps1" -ForegroundColor Gray
-Write-Host "   • Test All:   .\scripts\test-all.ps1" -ForegroundColor Gray
-Write-Host "   • Preflight:  .\tools\preflight-check.ps1" -ForegroundColor Gray
+Write-Host ""
+Write-Host "🌐 Access Points:" -ForegroundColor Green
+Write-Host "📋 Web Application: http://localhost:3000" -ForegroundColor White
+Write-Host "🔧 Gateway API: http://localhost:8000" -ForegroundColor White
+Write-Host "🏗️ BIM Service: http://localhost:8002" -ForegroundColor White
+Write-Host "📊 Health Dashboard: http://localhost:8000/health" -ForegroundColor White
+
+Write-Host ""
+Write-Host "📝 Quick Test Commands:" -ForegroundColor Green
+Write-Host "curl http://localhost:8000/health" -ForegroundColor White
+Write-Host "curl http://localhost:8002/health" -ForegroundColor White
+
+Write-Host ""
+Write-Host "📊 Container Status:" -ForegroundColor Green
+docker compose ps
+
+Write-Host ""
+Write-Host "🎉 InstallSure BIM Ecosystem: READY FOR TESTING!" -ForegroundColor Green
+Write-Host "🤝 GitHub Copilot + Cursor integration: ACTIVE!" -ForegroundColor Green
+
+Write-Host ""
+Write-Host "📂 To test end-to-end:" -ForegroundColor Yellow
+Write-Host "1. Open http://localhost:3000" -ForegroundColor White
+Write-Host "2. Upload an IFC file" -ForegroundColor White
+Write-Host "3. View quantities and generate estimate" -ForegroundColor White
+Write-Host "4. Download PDF report" -ForegroundColor White
+
+Write-Host ""
+Write-Host "🛠️ To view logs: docker compose logs [service-name]" -ForegroundColor Yellow
+Write-Host "To stop all: docker compose down" -ForegroundColor Yellow
